@@ -39,6 +39,8 @@ class MainController(
 
     private val clearSearchCodeCombination = KeyCodeCombination(KeyCode.ESCAPE)
 
+    private val openTabKeyCodeCompanion = KeyCodeCombination(KeyCode.ENTER)
+
     @FXML
     lateinit var menuBar: MenuBar
 
@@ -106,12 +108,21 @@ class MainController(
         listView.items = filteredList
         listView.cellFactory = Callback { PodInfoViewCell() }
         listView.setOnMouseClicked {
-            val selectedPod = listView.selectionModel.selectedItem ?: return@setOnMouseClicked
-            val newTab = tabFactoryService.createTab(selectedPod)
-            tabPane.tabs.add(newTab)
-            tabPane.selectionModel.select(newTab)
-            listView.selectionModel.clearSelection()
+            openSelectedPod()
         }
+        listView.setOnKeyPressed {
+            if (openTabKeyCodeCompanion.match(it)) {
+                openSelectedPod()
+                it.consume()
+            }
+        }
+    }
+
+    private fun openSelectedPod() {
+        val selectedPod = listView.selectionModel.selectedItem ?: return
+        val newTab = tabFactoryService.createTab(selectedPod)
+        tabPane.tabs.add(newTab)
+        tabPane.selectionModel.select(newTab)
     }
 
     private fun initMenuList() {
