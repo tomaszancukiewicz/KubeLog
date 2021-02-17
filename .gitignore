@@ -1,0 +1,13 @@
+.idea/
+.gradle/
+
+_dist/
+dist/
+build/
+target/
+tmp/
+
+.DS_Store
+*.iml
+*.log
+*.zip

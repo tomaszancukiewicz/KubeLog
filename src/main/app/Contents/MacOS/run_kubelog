@@ -1,0 +1,47 @@
+#!/bin/bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $SCRIPT_DIR
+
+echo "[$$][KubeLogScript] Started in: $SCRIPT_DIR" > logs.log
+
+function stub_logger() {
+  echo "[$$][KubeLogScript] $1" >> logs.log
+  syslog -s -k \
+    Facility com.apple.console \
+    Level Notice \
+    Sender "KubeLogScript" \
+    Message "[$$][KubeLogScript] $1"
+}
+
+stub_logger "Search for Java"
+
+JH=`/usr/libexec/java_home -X |
+  grep -A 1 "<key>JVMHomePath</key>" |
+  grep -e "<string>" | sed "s@.*<string>\(.*\)</string>.*@\1@" |
+  grep -v "jdk1." | grep jdk | head -n 1`
+JH11=/Library/Java/JavaVirtualMachines/jdk-11.0.7.jdk/Contents/Home
+if [ -d "$JH11" ]; then
+  stub_logger "Found java11: $JH11"
+  export JAVA_HOME="$JH11"
+  JAVACMD="$JAVA_HOME/bin/java"
+elif [ -d "$JH" ]; then
+  stub_logger "Found java: $JH"
+  export JAVA_HOME="$JH"
+  JAVACMD="$JAVA_HOME/bin/java"
+else
+  stub_logger "Use standard java"
+  JAVACMD=java
+fi
+
+stub_logger "Start KubeLog"
+
+"${JAVACMD}" \
+		-Xdock:icon="../Resources/AppIcon.icns" \
+		-Xdock:name="KubeLog" \
+		-jar ./KubeLog.jar >> logs.log 2>&1
+EXIT_CODE=$?
+
+stub_logger "Stop KubeLog with code: $EXIT_CODE"
+
+exit $EXIT_CODE

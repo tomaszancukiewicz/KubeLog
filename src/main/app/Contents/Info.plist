@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<plist version="1.0">
+    <dict>
+        <key>CFBundleName</key>
+            <string>KubeLog</string>
+        <key>CFBundleDisplayName</key>
+            <string>KubeLog</string>
+        <key>CFBundleIdentifier</key>
+            <string>com.payu.KubeLog</string>
+        <key>CFBundleVersion</key>
+            <string>1</string>
+        <key>CFBundleIconFile</key>
+            <string>AppIcon</string>
+        <key>CFBundleIconName</key>
+            <string>AppIcon</string>
+        <key>CFBundleExecutable</key>
+            <string>run_kubelog</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+            <string>6.0</string>
+        <key>CFBundlePackageType</key>
+            <string>BNDL</string>
+    </dict>
+</plist>

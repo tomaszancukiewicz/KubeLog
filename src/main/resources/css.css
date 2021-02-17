@@ -1,0 +1,55 @@
+.list-cell.log-entry {
+    -fx-selection-bar:derive(paleturquoise, 0%);
+}
+
+.list-cell.log-entry.searched {
+    -fx-selection-bar:derive(palegreen, -20%);
+    -fx-selection-bar-non-focused: derive(palegreen, -10%);
+
+    -fx-control-inner-background: derive(palegreen, 50%);
+}
+
+.list-cell.log-entry.searched.odd {
+    -fx-control-inner-background: derive(palegreen, 100%);
+}
+
+.list-cell.log-entry .text {
+    -fx-font-family: 'monospace';
+}
+
+.list-cell.log-entry.searched .text.marked {
+    -fx-fill: red;
+    -fx-underline: true;
+}
+/*******************************************************************************
+ *                                                                             *
+ * ScrollBar                                                                   *
+ *                                                                             *
+ ******************************************************************************/
+
+/*.scroll-bar > .thumb {*/
+/*    -fx-background-color: #7a7a7a;*/
+/*    -fx-background-radius: 0.5em; !* makes sure this remains circular *!*/
+/*}*/
+
+/*.scroll-bar:vertical {*/
+/*    -fx-pref-width: 14;*/
+/*    -fx-padding: 2;*/
+/*}*/
+
+/*.scroll-bar:horizontal {*/
+/*    -fx-pref-height: 14;*/
+/*    -fx-padding: 2;*/
+/*}*/
+
+/*.scroll-bar > .track {*/
+/*    -fx-background-color: #f0f0f1;*/
+/*    -fx-background-radius: 0.5em; !* makes sure this remains circular *!*/
+/*}*/
+
+/*.scroll-bar > .track-background {*/
+/*    -fx-background-color: #F0F0F1;*/
+/*}*/
+/*.corner {*/
+/*    -fx-background-color: #f0f0f1;*/
+/*}*/
