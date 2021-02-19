@@ -1,5 +1,6 @@
 package com.payu.kube.log.controller
 
+import com.payu.kube.log.util.ViewUtils.toggleClass
 import javafx.beans.value.ObservableValue
 import javafx.scene.control.ListCell
 import javafx.scene.text.Text
@@ -37,19 +38,19 @@ class LogEntryCell(
             maxWidth = Double.MAX_VALUE
         }
 
-        styleClass.addOnce(logEntryClass)
+        toggleClass(logEntryClass, true)
 
         val realSearchText = searchedText.value
         if (realSearchText.isNotBlank() && item != null && realSearchText in item) {
-            styleClass.addOnce(logEntrySearchedClass)
+            toggleClass(logEntrySearchedClass, true)
             textFlow.children.setAll(
                 createTextWithMarks(item, realSearchText)
             )
         } else {
-            styleClass.remove(logEntrySearchedClass)
+            toggleClass(logEntrySearchedClass, false)
 
             textFlow.children.setAll(
-                Text(item ?: "").also { it.styleClass.addOnce(textClass) }
+                Text(item ?: "").also { it.toggleClass(textClass, true) }
             )
         }
     }
@@ -80,25 +81,19 @@ class LogEntryCell(
         for ((from, to) in regions) {
             if (index < from) {
                 val subtext = item.substring(index, from)
-                list.add(Text(subtext).also { it.styleClass.addOnce(textClass) })
+                list.add(Text(subtext).also { it.toggleClass(textClass, true) })
             }
             val subtext = item.substring(from, to)
             list.add(Text(subtext).also {
-                it.styleClass.addOnce(textClass)
-                it.styleClass.addOnce(markedTextClass)
+                it.toggleClass(textClass, true)
+                it.toggleClass(markedTextClass, true)
             })
             index = to
         }
         if (index < item.length) {
             val subtext = item.substring(index)
-            list.add(Text(subtext).also { it.styleClass.addOnce(textClass) })
+            list.add(Text(subtext).also { it.toggleClass(textClass, true) })
         }
         return list
-    }
-
-    private fun <E> MutableList<E>.addOnce(element: E) {
-        if (!this.contains(element)) {
-            this.add(element)
-        }
     }
 }

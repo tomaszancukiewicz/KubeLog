@@ -1,16 +1,19 @@
 .list-cell.log-entry {
-    -fx-selection-bar:derive(paleturquoise, 0%);
+    -fx-log-entry-selected: paleturquoise;
+    -fx-log-entry-searched: palegreen;
+
+    -fx-selection-bar: -fx-log-entry-selected;
 }
 
 .list-cell.log-entry.searched {
-    -fx-selection-bar:derive(palegreen, -20%);
-    -fx-selection-bar-non-focused: derive(palegreen, -10%);
+    -fx-selection-bar:derive(-fx-log-entry-searched, -20%);
+    -fx-selection-bar-non-focused: derive(-fx-log-entry-searched, -10%);
 
-    -fx-control-inner-background: derive(palegreen, 50%);
+    -fx-control-inner-background: derive(-fx-log-entry-searched, 50%);
 }
 
 .list-cell.log-entry.searched.odd {
-    -fx-control-inner-background: derive(palegreen, 100%);
+    -fx-control-inner-background: derive(-fx-log-entry-searched, 100%);
 }
 
 .list-cell.log-entry .text {
@@ -21,35 +24,12 @@
     -fx-fill: red;
     -fx-underline: true;
 }
-/*******************************************************************************
- *                                                                             *
- * ScrollBar                                                                   *
- *                                                                             *
- ******************************************************************************/
 
-/*.scroll-bar > .thumb {*/
-/*    -fx-background-color: #7a7a7a;*/
-/*    -fx-background-radius: 0.5em; !* makes sure this remains circular *!*/
-/*}*/
+.dark.root {
+    -fx-base: #413f43;
+}
 
-/*.scroll-bar:vertical {*/
-/*    -fx-pref-width: 14;*/
-/*    -fx-padding: 2;*/
-/*}*/
-
-/*.scroll-bar:horizontal {*/
-/*    -fx-pref-height: 14;*/
-/*    -fx-padding: 2;*/
-/*}*/
-
-/*.scroll-bar > .track {*/
-/*    -fx-background-color: #f0f0f1;*/
-/*    -fx-background-radius: 0.5em; !* makes sure this remains circular *!*/
-/*}*/
-
-/*.scroll-bar > .track-background {*/
-/*    -fx-background-color: #F0F0F1;*/
-/*}*/
-/*.corner {*/
-/*    -fx-background-color: #f0f0f1;*/
-/*}*/
+.dark .list-cell.log-entry {
+    -fx-log-entry-selected: derive(paleturquoise, -50%);
+    -fx-log-entry-searched: green;
+}

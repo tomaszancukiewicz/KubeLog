@@ -9,9 +9,11 @@ import org.springframework.context.ApplicationListener
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Component
 import com.payu.kube.log.service.GlobalKeyEventHandlerService
+import com.payu.kube.log.service.IsDarkThemeService
 import com.payu.kube.log.service.namespaces.NamespaceStoreService
+import com.payu.kube.log.util.ViewUtils.toggleClass
+import javafx.beans.Observable
 import javafx.beans.binding.Bindings
-import javafx.scene.image.Image
 import javafx.stage.Stage
 
 @Component
@@ -22,8 +24,11 @@ class MainStageInitializer(
     @Value("classpath:/css.css")
     private val cssResource: Resource,
     private val globalKeyEventHandlerService: GlobalKeyEventHandlerService,
-    private val namespaceStoreService: NamespaceStoreService
+    private val namespaceStoreService: NamespaceStoreService,
+    private val isDarkThemeService: IsDarkThemeService
 ) : ApplicationListener<StageReadyEvent> {
+
+    private val darkModeClass = "dark"
 
     override fun onApplicationEvent(event: StageReadyEvent) {
         val fxmlLoader = FXMLLoader(mainFxmlResource.url)
@@ -37,8 +42,17 @@ class MainStageInitializer(
             globalKeyEventHandlerService.onKeyPressed(it)
         }
         event.stage.scene = scene
+        setStyle(parent)
         setTitle(event.stage)
         event.stage.show()
+    }
+
+    private fun setStyle(parent: Parent) {
+        val changeStyleCallback: (observable: Observable) -> Unit = { _ ->
+            parent.toggleClass(darkModeClass, isDarkThemeService.isDarkThemeProperty.value)
+        }
+        isDarkThemeService.isDarkThemeProperty.addListener(changeStyleCallback)
+        changeStyleCallback(isDarkThemeService.isDarkThemeProperty)
     }
 
     private fun setTitle(stage: Stage) {

@@ -8,4 +8,18 @@ object ViewUtils {
         managedProperty().bind(visibleProperty())
         visibleProperty().bind(observable)
     }
+
+    fun Node.toggleClass(className: String, isOn: Boolean) {
+        if (isOn) {
+            styleClass.addOnce(className)
+        } else {
+            styleClass.remove(className)
+        }
+    }
+
+    private fun <E> MutableList<E>.addOnce(element: E) {
+        if (!this.contains(element)) {
+            this.add(element)
+        }
+    }
 }

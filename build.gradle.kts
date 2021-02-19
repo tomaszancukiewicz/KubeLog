@@ -24,6 +24,7 @@ java.sourceCompatibility = JavaVersion.VERSION_11
 repositories {
     jcenter()
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -32,6 +33,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
+
+    implementation("com.github.Dansoftowner:jSystemThemeDetector:2.1")
 }
 
 tasks.withType<KotlinCompile> {
