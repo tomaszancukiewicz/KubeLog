@@ -6,6 +6,7 @@ data class PodInfo(
     val uid: String,
     val name: String,
     val appNameLabel: String,
+    val ownerReferencesName: String,
     val namespace: String,
     val containerImage: String,
     val containerName: String,
