@@ -18,7 +18,11 @@ class PodStoreService(private val podService: PodService) : PodListChangeInterfa
     private val log = logger()
 
     private final val pods: ObservableList<PodInfo> = FXCollections.observableArrayList()
-    final val podsSorted: ObservableList<PodInfo> = pods.sorted(Comparator.comparing { it.name })
+    final val podsSorted: ObservableList<PodInfo> = pods.sorted(
+        compareBy<PodInfo> { it.calculatedAppName }
+            .thenBy { it.creationTimestamp }
+            .thenBy { it.name }
+    )
     final val status: ObjectProperty<PodListState> = SimpleObjectProperty(PodListState.LoadingPods)
 
     private var podWatchers = mutableMapOf<PodInfo, MutableList<PodChangeInterface>>()
