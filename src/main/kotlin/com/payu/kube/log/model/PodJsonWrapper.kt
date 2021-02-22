@@ -15,6 +15,9 @@ data class PodJsonWrapper(val json: JsonNode) {
     val name: String
         get() = objectMetadata.path("name").asText()
 
+    val appNameLabel: String
+        get() = objectMetadata.path("labels").path("app.kubernetes.io/name").asText()
+
     val namespace: String
         get() = objectMetadata.path("namespace").asText()
 
@@ -29,6 +32,9 @@ data class PodJsonWrapper(val json: JsonNode) {
 
     val containerImage: String
         get() = podSpec.path("containers").firstOrNull()?.path("image")?.asText() ?: ""
+
+    val containerName: String
+        get() = podSpec.path("containers").firstOrNull()?.path("name")?.asText() ?: ""
 
     val nodeName: String
         get() = podSpec.path("nodeName").asText()
@@ -81,7 +87,7 @@ data class PodJsonWrapper(val json: JsonNode) {
         val creationTimestampInstant = Instant.parse(creationTimestamp)
         val deletionTimestampInstant = deletionTimestamp?.let { Instant.parse(it) }
         return PodInfo(
-            uid, name, namespace, containerImage, nodeName,
+            uid, name, appNameLabel, namespace, containerImage, containerName, nodeName,
             containerStatuses.count(),
             startedCount, readyCount, restarts,
             state, phase,

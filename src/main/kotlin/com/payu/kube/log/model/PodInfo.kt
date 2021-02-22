@@ -5,8 +5,10 @@ import java.time.Instant
 data class PodInfo(
     val uid: String,
     val name: String,
+    val appNameLabel: String,
     val namespace: String,
     val containerImage: String,
+    val containerName: String,
     val nodeName: String,
     val containerCount: Int,
     val startedCount: Int,
