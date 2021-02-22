@@ -21,6 +21,28 @@ data class PodInfo(
     val deletionTimestamp: Instant?
 ) {
 
+    val calculatedAppName: String by lazy {
+        val appNameLabelValue = appNameLabel
+            .takeIf { it.isNotBlank() }
+            ?.takeIf { name.startsWith(it) }
+        if (appNameLabelValue != null) {
+            return@lazy appNameLabelValue
+        }
+        val ownerReferenceNameValue = ownerReferencesName
+            .takeIf { it.isNotBlank() }
+            ?.takeIf { name.startsWith(it) }
+        if (ownerReferenceNameValue != null) {
+            return@lazy ownerReferenceNameValue
+        }
+        val containterNameValue = containerName
+            .takeIf { it.isNotBlank() }
+            ?.takeIf { name.startsWith(it) }
+        if (containterNameValue != null) {
+            return@lazy containterNameValue
+        }
+        return@lazy name
+    }
+
     val isReady: Boolean
         get() = readyCount == containerCount
 
