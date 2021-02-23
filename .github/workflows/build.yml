@@ -1,0 +1,13 @@
+name: Build and Sign macOS
+on: workflow_dispatch
+jobs:
+  macos:
+    runs-on: macos-11.2
+    steps:
+      - uses: actions/checkout@v2
+      - name: Import Code-Signing Certificates
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+        run: |
+          echo $MACOS_CERTIFICATE | base64 —decode > certificate.p12
