@@ -83,6 +83,11 @@ tasks.register("creatAppBundle") {
                 "-s", "Code Signing Certificate", appDir)
         }
 
+        exec {
+            workingDir(buildAppDir)
+            commandLine("xattr", "-cr", appDir)
+        }
+
         val zipDir = buildAppDir.resolve("${project.name}.zip")
         exec {
             workingDir(buildAppDir)
