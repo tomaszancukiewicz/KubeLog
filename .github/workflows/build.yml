@@ -23,7 +23,10 @@ jobs:
         with:
           tag_name: ${{ github.run_id }}
           release_name: Release ${{ github.run_id }}
-          body: New release with commit:${{ github.sha }}
+          body: |
+            New release with commit:${{ github.sha }}
+
+            Run `xattr -cr KubeLog-mac.zip` before unpacking.
           draft: false
           prerelease: false
       - name: Upload Release Asset
