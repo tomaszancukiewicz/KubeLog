@@ -34,11 +34,11 @@ data class PodInfo(
         if (ownerReferenceNameValue != null) {
             return@lazy ownerReferenceNameValue
         }
-        val containterNameValue = containerName
+        val containerNameValue = containerName
             .takeIf { it.isNotBlank() }
             ?.takeIf { name.startsWith(it) }
-        if (containterNameValue != null) {
-            return@lazy containterNameValue
+        if (containerNameValue != null) {
+            return@lazy containerNameValue
         }
         return@lazy name
     }

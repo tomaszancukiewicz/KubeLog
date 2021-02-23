@@ -45,11 +45,6 @@ class PodStoreService(private val podService: PodService) : PodListChangeInterfa
     }
 
     override fun onWholeList(map: Map<String, PodInfo>) {
-        val podsToRemoveFromWatch = podWatchers.keys.toSet().filter {
-            it.name !in map
-        }
-        podsToRemoveFromWatch.forEach { podWatchers.remove(it) }
-
         Platform.runLater {
             pods.setAll(map.values)
             map.values.forEach { pod ->
