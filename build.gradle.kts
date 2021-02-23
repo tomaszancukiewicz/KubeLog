@@ -93,5 +93,10 @@ tasks.register("creatAppBundle") {
             workingDir(buildAppDir)
             commandLine("zip", "-r", zipDir, appDir.fileName)
         }
+
+        exec {
+            workingDir(buildAppDir)
+            commandLine("xattr", "-cr", zipDir)
+        }
     }
 }
