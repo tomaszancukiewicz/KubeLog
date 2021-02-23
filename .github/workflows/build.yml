@@ -30,7 +30,7 @@ jobs:
         with:
           tag_name: ${{ github.run_id }}
           release_name: Release ${{ github.run_id }}
-          body: New release with commit:${{ GITHUB_SHA }}
+          body: New release with commit:${{ env.GITHUB_SHA }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
