@@ -28,8 +28,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.run_id }}
+          release_name: Release ${{ github.run_id }}
+          body: New release with commit:${{ GITHUB_SHA }}
           draft: false
           prerelease: false
       - name: Upload Release Asset
@@ -39,5 +40,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./build/app/KubeLog.zip
-          asset_name: KubeLog.zip
+          asset_name: KubeLog-mac.zip
           asset_content_type: application/zip
