@@ -16,6 +16,15 @@ class StylingTextService {
 
     data class StyledSegment(val styles: List<String>, var range: IntRange)
 
+    fun calcSegmentForIndex(text: String, rules: List<ColoringRule>, index: Int): String? {
+        for (rule in rules.reversed()) {
+            val fragments = rule.findFragments(text)
+            val range = fragments.firstOrNull { it.contains(index) } ?: continue
+            return text.substring(range)
+        }
+        return null
+    }
+
     fun styleText(text: String, rules: List<ColoringRule>): StyledText {
         val appliedStyles = mutableSetOf<String>()
         var segments = listOf(StyledSegment(listOf(), text.indices))

@@ -22,6 +22,7 @@ import com.payu.kube.log.service.pods.PodChangeInterface
 import com.payu.kube.log.service.pods.PodStoreService
 import com.payu.kube.log.util.DateUtils.fullFormat
 import com.payu.kube.log.util.LoggerUtils.logger
+import javafx.scene.text.Text
 import java.net.URL
 import java.util.*
 
@@ -106,20 +107,8 @@ class TabController(
             LogEntryCell(stylingTextService, wrapCheckbox.selectedProperty(), searchTextProperty)
         }
         logListView.selectionModel.selectionMode = SelectionMode.MULTIPLE
-        logListView.contextMenu = ContextMenu().apply {
-            val copyItem = MenuItem("Copy")
-            copyItem.setOnAction {
-                copySelectionToClipboard(logListView)
-            }
-            this.items.add(copyItem)
-            val clearBeforeItem = MenuItem("Clear before")
-            clearBeforeItem.setOnAction {
-                val minSelectionIndex = logListView.selectionModel.selectedIndices.minOrNull() ?: return@setOnAction
-                clearIndex += minSelectionIndex
-                logsList.remove(0, minSelectionIndex)
-            }
-            this.items.add(clearBeforeItem)
-        }
+
+        setupLogListContextMenu()
 
         autoscrollCheckbox.selectedProperty().addListener { _, _, newValue ->
             if (newValue && logsList.size > 0) {
@@ -149,6 +138,40 @@ class TabController(
         }
 
         startMonitor()
+    }
+
+    private fun setupLogListContextMenu() {
+        val contextMenu = ContextMenu()
+
+        val copyItem = MenuItem("Copy")
+        copyItem.setOnAction {
+            val value = (it.source as? MenuItem)?.userData as? String ?: return@setOnAction
+            setClipboardContent(value)
+        }
+        contextMenu.items.add(copyItem)
+
+        val copyLineItem = MenuItem("Copy line")
+        copyLineItem.setOnAction {
+            copySelectionToClipboard(logListView)
+        }
+        contextMenu.items.add(copyLineItem)
+
+        val clearBeforeItem = MenuItem("Clear before")
+        clearBeforeItem.setOnAction {
+            val minSelectionIndex = logListView.selectionModel.selectedIndices.firstOrNull() ?: return@setOnAction
+            clearIndex += minSelectionIndex
+            logsList.remove(0, minSelectionIndex)
+        }
+        contextMenu.items.add(clearBeforeItem)
+
+        logListView.contextMenu = contextMenu
+        logListView.setOnContextMenuRequested { contextMenuEvent ->
+            val line = logListView.selectionModel.selectedItems.firstOrNull() ?: return@setOnContextMenuRequested
+            val index = (contextMenuEvent.target as? Text)?.userData as? Int ?: return@setOnContextMenuRequested
+            val text = stylingTextService.calcSegmentForIndex(line, LogEntryCell.RULES, index)
+            copyItem.isVisible = text != null
+            copyItem.userData = text
+        }
     }
 
     private fun search() {
@@ -258,8 +281,12 @@ class TabController(
             clipboardString.append(item?.toString())
             clipboardString.append("\n")
         }
+        setClipboardContent(clipboardString.toString())
+    }
+
+    private fun setClipboardContent(text: String) {
         val clipboardContent = ClipboardContent()
-        clipboardContent.putString(clipboardString.toString())
+        clipboardContent.putString(text)
         Clipboard.getSystemClipboard().setContent(clipboardContent)
     }
 }

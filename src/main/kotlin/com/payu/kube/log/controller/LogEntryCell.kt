@@ -25,6 +25,7 @@ class LogEntryCell(
         private const val COLORED_YELLOW_TEXT_CLASS = "color-background-yellow"
         private const val COLORED_RED_TEXT_CLASS = "color-background-red"
         private const val COLORED_BLUE_TEXT_CLASS = "color-background-blue"
+        private const val COLORED_GRAY_TEXT_CLASS = "color-background-gray"
 
         private val HTTP_METHODS_RULE = ColoringRule.ColoringRegexRule(
             COLORED_BLUE_TEXT_CLASS,
@@ -43,12 +44,21 @@ class LogEntryCell(
             "(?:INFO|DEBUG|TRACE)".toRegex()
         )
         private val IP_RULE = ColoringRule.ColoringRegexRule(
-            COLORED_BLUE_TEXT_CLASS,
+            COLORED_GRAY_TEXT_CLASS,
             "(?:25[0-5]|2[0-4]\\d|[0-1]?\\d{1,2})(?:\\.(?:25[0-5]|2[0-4]\\d|[0-1]?\\d{1,2})){3}".toRegex()
         )
         private val QQ_ID_RULE = ColoringRule.ColoringRegexRule(
-            COLORED_BLUE_TEXT_CLASS,
+            COLORED_GRAY_TEXT_CLASS,
             "(?:QQ[0-9A-Z]{16}QQ|TT[0-9]{10}TT)".toRegex()
+        )
+
+        val RULES = listOf(
+            HTTP_METHODS_RULE,
+            ERROR_LOG_LEVEL_RULE,
+            WARN_LOG_LEVEL_RULE,
+            INFO_LOG_LEVEL_RULE,
+            IP_RULE,
+            QQ_ID_RULE
         )
     }
 
@@ -74,15 +84,8 @@ class LogEntryCell(
 
         toggleClass(LOG_ENTRY_CLASS, true)
         val styleText = stylingTextService.styleText(
-            item ?: "", listOf(
-                HTTP_METHODS_RULE,
-                ERROR_LOG_LEVEL_RULE,
-                WARN_LOG_LEVEL_RULE,
-                INFO_LOG_LEVEL_RULE,
-                IP_RULE,
-                QQ_ID_RULE,
-                ColoringRule.ColoringTextRule(MARKED_SEARCHED_TEXT_CLASS, searchedText.value)
-            )
+            item ?: "",
+            RULES + ColoringRule.ColoringTextRule(MARKED_SEARCHED_TEXT_CLASS, searchedText.value)
         )
         toggleClass(SEARCHED_LOG_ENTRY_CLASS, MARKED_SEARCHED_TEXT_CLASS in styleText.appliedStyles)
         val textNodes = createTextFlowNodes(styleText)
@@ -90,13 +93,19 @@ class LogEntryCell(
     }
 
     private fun createTextFlowNodes(styledText: StylingTextService.StyledText): List<Node> {
-        return styledText.createSegments().map { (text, styles) ->
+        val segments = styledText.createSegments()
+        val result = mutableListOf<Text>()
+        var index = 0
+        for ((text, styles) in segments) {
             val textNode = Text(text)
             textNode.toggleClass(TEXT_CLASS, true)
             for (style in styles) {
                 textNode.toggleClass(style, true)
             }
-            textNode
+            textNode.userData = index
+            result.add(textNode)
+            index += text.length
         }
+        return result
     }
 }

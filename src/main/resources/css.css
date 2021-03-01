@@ -41,6 +41,10 @@
     -fx-fill: #2979FF;
 }
 
+.list-cell.log-entry .text.color-background-gray {
+    -fx-fill: #616161;
+}
+
 .dark.root {
     -fx-base: #413f43;
 }
