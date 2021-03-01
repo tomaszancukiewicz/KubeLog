@@ -16,6 +16,7 @@ import javafx.scene.shape.Circle
 import javafx.util.Callback
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.GlobalKeyEventHandlerService
+import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.service.logs.PodLogStoreService
 import com.payu.kube.log.service.pods.PodChangeInterface
 import com.payu.kube.log.service.pods.PodStoreService
@@ -29,7 +30,8 @@ class TabController(
     private var monitoredPod: PodInfo,
     private val podStoreService: PodStoreService,
     private val podLogStoreService: PodLogStoreService,
-    private val globalKeyEventHandlerService: GlobalKeyEventHandlerService
+    private val globalKeyEventHandlerService: GlobalKeyEventHandlerService,
+    private val stylingTextService: StylingTextService
 ) : Initializable, EventHandler<KeyEvent>, PodChangeInterface {
     private val log = logger()
     private val closeTabKeyCodeCompanion = KeyCodeCombination(KeyCode.W, KeyCodeCombination.SHORTCUT_DOWN)
@@ -100,7 +102,9 @@ class TabController(
         clearButton.setOnAction { clear() }
 
         logListView.items = logsList
-        logListView.cellFactory = Callback { LogEntryCell(wrapCheckbox.selectedProperty(), searchTextProperty) }
+        logListView.cellFactory = Callback {
+            LogEntryCell(stylingTextService, wrapCheckbox.selectedProperty(), searchTextProperty)
+        }
         logListView.selectionModel.selectionMode = SelectionMode.MULTIPLE
         logListView.contextMenu = ContextMenu().apply {
             val copyItem = MenuItem("Copy")

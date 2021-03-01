@@ -1,21 +1,56 @@
 package com.payu.kube.log.controller
 
+import com.payu.kube.log.service.coloring.ColoringRule
+import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.util.ViewUtils.toggleClass
 import javafx.beans.value.ObservableValue
+import javafx.scene.Node
 import javafx.scene.control.ListCell
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
 
 
 class LogEntryCell(
-    private var isWrappingProperty: ObservableValue<Boolean>,
-    private var searchedText: ObservableValue<String>
+    private val stylingTextService: StylingTextService,
+    private val isWrappingProperty: ObservableValue<Boolean>,
+    private val searchedText: ObservableValue<String>
 ) : ListCell<String?>() {
 
-    private val logEntryClass = "log-entry"
-    private val logEntrySearchedClass = "searched"
-    private val textClass = "text"
-    private val markedTextClass = "marked"
+    companion object {
+        private const val LOG_ENTRY_CLASS = "log-entry"
+        private const val SEARCHED_LOG_ENTRY_CLASS = "searched"
+        private const val TEXT_CLASS = "text"
+        private const val MARKED_SEARCHED_TEXT_CLASS = "marked"
+        private const val COLORED_GREEN_TEXT_CLASS = "color-background-green"
+        private const val COLORED_YELLOW_TEXT_CLASS = "color-background-yellow"
+        private const val COLORED_RED_TEXT_CLASS = "color-background-red"
+        private const val COLORED_BLUE_TEXT_CLASS = "color-background-blue"
+
+        private val HTTP_METHODS_RULE = ColoringRule.ColoringRegexRule(
+            COLORED_BLUE_TEXT_CLASS,
+            "(?:GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH)".toRegex()
+        )
+        private val ERROR_LOG_LEVEL_RULE = ColoringRule.ColoringRegexRule(
+            COLORED_RED_TEXT_CLASS,
+            "(?:FATAL|ERROR)".toRegex()
+        )
+        private val WARN_LOG_LEVEL_RULE = ColoringRule.ColoringRegexRule(
+            COLORED_YELLOW_TEXT_CLASS,
+            "(?:WARN)".toRegex()
+        )
+        private val INFO_LOG_LEVEL_RULE = ColoringRule.ColoringRegexRule(
+            COLORED_GREEN_TEXT_CLASS,
+            "(?:INFO|DEBUG|TRACE)".toRegex()
+        )
+        private val IP_RULE = ColoringRule.ColoringRegexRule(
+            COLORED_BLUE_TEXT_CLASS,
+            "(?:25[0-5]|2[0-4]\\d|[0-1]?\\d{1,2})(?:\\.(?:25[0-5]|2[0-4]\\d|[0-1]?\\d{1,2})){3}".toRegex()
+        )
+        private val QQ_ID_RULE = ColoringRule.ColoringRegexRule(
+            COLORED_BLUE_TEXT_CLASS,
+            "(?:QQ[0-9A-Z]{16}QQ|TT[0-9]{10}TT)".toRegex()
+        )
+    }
 
     private val textFlow = TextFlow()
 
@@ -26,74 +61,42 @@ class LogEntryCell(
             graphic = textFlow
         }
 
+        minWidth = 0.0
         if (isWrappingProperty.value) {
-            minWidth = 0.0
             maxWidthProperty().bind(listView.widthProperty().subtract(20))
             prefWidthProperty().bind(listView.widthProperty().subtract(20))
         } else {
-            minWidth = 0.0
             maxWidthProperty().unbind()
             prefWidthProperty().unbind()
             prefWidth = USE_COMPUTED_SIZE
             maxWidth = Double.MAX_VALUE
         }
 
-        toggleClass(logEntryClass, true)
-
-        val realSearchText = searchedText.value
-        if (realSearchText.isNotBlank() && item != null && realSearchText in item) {
-            toggleClass(logEntrySearchedClass, true)
-            textFlow.children.setAll(
-                createTextWithMarks(item, realSearchText)
+        toggleClass(LOG_ENTRY_CLASS, true)
+        val styleText = stylingTextService.styleText(
+            item ?: "", listOf(
+                HTTP_METHODS_RULE,
+                ERROR_LOG_LEVEL_RULE,
+                WARN_LOG_LEVEL_RULE,
+                INFO_LOG_LEVEL_RULE,
+                IP_RULE,
+                QQ_ID_RULE,
+                ColoringRule.ColoringTextRule(MARKED_SEARCHED_TEXT_CLASS, searchedText.value)
             )
-        } else {
-            toggleClass(logEntrySearchedClass, false)
-
-            textFlow.children.setAll(
-                Text(item ?: "").also { it.toggleClass(textClass, true) }
-            )
-        }
+        )
+        toggleClass(SEARCHED_LOG_ENTRY_CLASS, MARKED_SEARCHED_TEXT_CLASS in styleText.appliedStyles)
+        val textNodes = createTextFlowNodes(styleText)
+        textFlow.children.setAll(textNodes)
     }
 
-    private fun createTextWithMarks(item: String, searchedText: String): List<Text> {
-        val allIndexes = findAllIndexes(item, searchedText)
-        val regions = allIndexes.map { it to it + searchedText.length}
-        return createTextWithMarks(item, regions)
-    }
-
-    private fun findAllIndexes(textString: String, word: String): List<Int> {
-        val indexes = mutableListOf<Int>()
-        var wordLength = 0
-        var index = 0
-        while (index != -1) {
-            index = textString.indexOf(word, index + wordLength)
-            if (index != -1) {
-                indexes.add(index)
+    private fun createTextFlowNodes(styledText: StylingTextService.StyledText): List<Node> {
+        return styledText.createSegments().map { (text, styles) ->
+            val textNode = Text(text)
+            textNode.toggleClass(TEXT_CLASS, true)
+            for (style in styles) {
+                textNode.toggleClass(style, true)
             }
-            wordLength = word.length
+            textNode
         }
-        return indexes
-    }
-
-    private fun createTextWithMarks(item: String, regions: List<Pair<Int, Int>>): List<Text> {
-        val list = mutableListOf<Text>()
-        var index = 0
-        for ((from, to) in regions) {
-            if (index < from) {
-                val subtext = item.substring(index, from)
-                list.add(Text(subtext).also { it.toggleClass(textClass, true) })
-            }
-            val subtext = item.substring(from, to)
-            list.add(Text(subtext).also {
-                it.toggleClass(textClass, true)
-                it.toggleClass(markedTextClass, true)
-            })
-            index = to
-        }
-        if (index < item.length) {
-            val subtext = item.substring(index)
-            list.add(Text(subtext).also { it.toggleClass(textClass, true) })
-        }
-        return list
     }
 }

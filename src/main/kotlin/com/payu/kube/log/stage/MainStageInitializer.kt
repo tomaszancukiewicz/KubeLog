@@ -28,7 +28,9 @@ class MainStageInitializer(
     private val isDarkThemeService: IsDarkThemeService
 ) : ApplicationListener<StageReadyEvent> {
 
-    private val darkModeClass = "dark"
+    companion object {
+        private const val DARK_MODE_CLASS = "dark"
+    }
 
     override fun onApplicationEvent(event: StageReadyEvent) {
         val fxmlLoader = FXMLLoader(mainFxmlResource.url)
@@ -49,7 +51,7 @@ class MainStageInitializer(
 
     private fun setStyle(parent: Parent) {
         val changeStyleCallback: (observable: Observable) -> Unit = { _ ->
-            parent.toggleClass(darkModeClass, isDarkThemeService.isDarkThemeProperty.value)
+            parent.toggleClass(DARK_MODE_CLASS, isDarkThemeService.isDarkThemeProperty.value)
         }
         isDarkThemeService.isDarkThemeProperty.addListener(changeStyleCallback)
         changeStyleCallback(isDarkThemeService.isDarkThemeProperty)

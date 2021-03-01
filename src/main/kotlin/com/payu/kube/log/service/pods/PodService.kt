@@ -13,7 +13,9 @@ import kotlin.concurrent.thread
 
 @Service
 class PodService {
-    val POD_WATCHING_TERMINATION_SEQUENCE = "\n}\n"
+    companion object {
+        private const val POD_WATCHING_TERMINATION_SEQUENCE = "\n}\n"
+    }
 
     private val log = logger()
     private var listener: PodListChangeInterface? = null

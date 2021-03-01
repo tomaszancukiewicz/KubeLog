@@ -25,6 +25,22 @@
     -fx-underline: true;
 }
 
+.list-cell.log-entry .text.color-background-green {
+    -fx-fill: #2E7D32;
+}
+
+.list-cell.log-entry .text.color-background-yellow {
+    -fx-fill: #F57F17;
+}
+
+.list-cell.log-entry .text.color-background-red {
+    -fx-fill: #B71C1C;
+}
+
+.list-cell.log-entry .text.color-background-blue {
+    -fx-fill: #2979FF;
+}
+
 .dark.root {
     -fx-base: #413f43;
 }
