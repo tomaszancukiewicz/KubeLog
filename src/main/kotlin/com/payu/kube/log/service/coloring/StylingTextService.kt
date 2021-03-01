@@ -32,7 +32,7 @@ class StylingTextService {
             val fragments = rule.findFragments(text)
             if (fragments.isNotEmpty()) {
                 segments = merge(segments, rule.coloringClass, fragments)
-                appliedStyles.add(rule.coloringClass)
+                appliedStyles.addAll(rule.coloringClass)
             }
         }
         val calcSegments = mergeSimilarSegments(segments)
@@ -51,7 +51,7 @@ class StylingTextService {
         }
     }
 
-    private fun merge(styledSegments: List<StyledSegment>, style: String, fragments: List<IntRange>): List<StyledSegment> {
+    private fun merge(styledSegments: List<StyledSegment>, styles: List<String>, fragments: List<IntRange>):List<StyledSegment> {
         var iS = 0
         var iF = 0
         var index = 0
@@ -65,10 +65,12 @@ class StylingTextService {
                 StyledSegment(styledSegmentRange.styles, IntRange(index, end))
             } else {
                 val end = min(fragmentRange.last, styledSegmentRange.range.last)
-                val styles = styledSegmentRange.styles.toMutableList()
-                styles.remove(style)
-                styles.add(style)
-                StyledSegment(styles, IntRange(index, end))
+                val appliedStyles = styledSegmentRange.styles.toMutableList()
+                styles.forEach { style ->
+                    appliedStyles.remove(style)
+                    appliedStyles.add(style)
+                }
+                StyledSegment(appliedStyles, IntRange(index, end))
             }
 
             results.add(newStyledSegment)

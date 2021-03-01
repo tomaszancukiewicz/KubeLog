@@ -1,9 +1,9 @@
 package com.payu.kube.log.service.coloring
 
-abstract class ColoringRule(val coloringClass: String) {
+abstract class ColoringRule(val coloringClass: List<String>) {
     abstract fun findFragments(text: String): List<IntRange>
 
-    class ColoringTextRule(coloringClass: String, private val searchedText: String) : ColoringRule(coloringClass) {
+    class ColoringTextRule(coloringClass: List<String>, private val searchedText: String) : ColoringRule(coloringClass) {
         override fun findFragments(text: String): List<IntRange> {
             return findAllIndexes(text, searchedText)
                 .map { IntRange(it, it + searchedText.length - 1) }
@@ -27,16 +27,30 @@ abstract class ColoringRule(val coloringClass: String) {
         }
     }
 
-    class ColoringRegexRule(coloringClass: String, private val regex: Regex) : ColoringRule(coloringClass) {
+    class ColoringRegexRule(
+        coloringClass: List<String>, private val regex: Regex, private val chooseGroup: Int? = null
+    ) : ColoringRule
+        (coloringClass) {
         override fun findFragments(text: String): List<IntRange> {
             return regex.findAll(text)
                 .map { matchResult ->
-                    matchResult
-                        .takeIf { it.groups.size > 1 }
-                        ?.groups
-                        ?.get(1)?.range
-                        ?: matchResult.range
+                    if (chooseGroup != null) {
+                        return@map matchResult.groups
+                            .takeIf { chooseGroup < it.size }
+                            ?.get(chooseGroup)
+                            ?.range
+                    }
+                    var matchGroup: MatchGroup? = null
+                    for (i in 1 until matchResult.groups.size) {
+                        val group = matchResult.groups[1]
+                        if (group != null) {
+                            matchGroup = group
+                            break
+                        }
+                    }
+                    matchGroup?.range ?: matchResult.range
                 }
+                .filterNotNull()
                 .toList()
         }
     }

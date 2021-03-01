@@ -28,28 +28,43 @@ class LogEntryCell(
         private const val COLORED_GRAY_TEXT_CLASS = "color-background-gray"
 
         private val HTTP_METHODS_RULE = ColoringRule.ColoringRegexRule(
-            COLORED_BLUE_TEXT_CLASS,
-            "(?:GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH)".toRegex()
+            listOf(COLORED_BLUE_TEXT_CLASS, "http-method"),
+            "GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH".toRegex()
         )
         private val ERROR_LOG_LEVEL_RULE = ColoringRule.ColoringRegexRule(
-            COLORED_RED_TEXT_CLASS,
-            "(?:FATAL|ERROR)".toRegex()
+            listOf(COLORED_RED_TEXT_CLASS, "log-level"),
+            "^.*?(?:(FATAL|ERROR)|WARN|INFO|DEBUG|TRACE)".toRegex(),
+            chooseGroup = 1
         )
         private val WARN_LOG_LEVEL_RULE = ColoringRule.ColoringRegexRule(
-            COLORED_YELLOW_TEXT_CLASS,
-            "(?:WARN)".toRegex()
+            listOf(COLORED_YELLOW_TEXT_CLASS, "log-level"),
+            "^.*?(?:FATAL|ERROR|(WARN)|INFO|DEBUG|TRACE)".toRegex(),
+            chooseGroup = 1
         )
         private val INFO_LOG_LEVEL_RULE = ColoringRule.ColoringRegexRule(
-            COLORED_GREEN_TEXT_CLASS,
-            "(?:INFO|DEBUG|TRACE)".toRegex()
+            listOf(COLORED_GREEN_TEXT_CLASS, "log-level"),
+            "^.*?(?:FATAL|ERROR|WARN|(INFO|DEBUG|TRACE))".toRegex(),
+            chooseGroup = 1
+        )
+        private val EXTRACT_VALUES_FROM_BRACKETS_RULE = ColoringRule.ColoringRegexRule(
+            listOf(COLORED_GRAY_TEXT_CLASS, "brackets"),
+            "\\[([^\\[\\]]+)\\]|\\(([^()]+)\\)|<([^<>]+)>".toRegex()
+        )
+        private val EXTRACT_VALUES_RULE = ColoringRule.ColoringRegexRule(
+            listOf(COLORED_GRAY_TEXT_CLASS, "value"),
+            "[,\\s(\\[{][\\w]+=([\\w+:./?#@-]+)[,\\s)\\]}]".toRegex()
         )
         private val IP_RULE = ColoringRule.ColoringRegexRule(
-            COLORED_GRAY_TEXT_CLASS,
+            listOf(COLORED_GRAY_TEXT_CLASS, "ip"),
             "(?:25[0-5]|2[0-4]\\d|[0-1]?\\d{1,2})(?:\\.(?:25[0-5]|2[0-4]\\d|[0-1]?\\d{1,2})){3}".toRegex()
         )
+        private val EMAIL_RULE = ColoringRule.ColoringRegexRule(
+            listOf(COLORED_GRAY_TEXT_CLASS, "email"),
+            "(?:[\\w]+(?:[.+-][\\w]+)*)@(?:(?:[\\w-]+\\.)*\\w[\\w-]{0,66})\\.(?:[a-z]{2,6}(?:\\.[a-z]{2})?)".toRegex()
+        )
         private val QQ_ID_RULE = ColoringRule.ColoringRegexRule(
-            COLORED_GRAY_TEXT_CLASS,
-            "(?:QQ[0-9A-Z]{16}QQ|TT[0-9]{10}TT)".toRegex()
+            listOf(COLORED_GRAY_TEXT_CLASS, "qq-id"),
+            "QQ[0-9A-Z]{16}QQ|TT[0-9]{10}TT".toRegex()
         )
 
         val RULES = listOf(
@@ -57,7 +72,10 @@ class LogEntryCell(
             ERROR_LOG_LEVEL_RULE,
             WARN_LOG_LEVEL_RULE,
             INFO_LOG_LEVEL_RULE,
+            EXTRACT_VALUES_FROM_BRACKETS_RULE,
+            EXTRACT_VALUES_RULE,
             IP_RULE,
+            EMAIL_RULE,
             QQ_ID_RULE
         )
     }
@@ -85,7 +103,7 @@ class LogEntryCell(
         toggleClass(LOG_ENTRY_CLASS, true)
         val styleText = stylingTextService.styleText(
             item ?: "",
-            RULES + ColoringRule.ColoringTextRule(MARKED_SEARCHED_TEXT_CLASS, searchedText.value)
+            RULES + ColoringRule.ColoringTextRule(listOf(MARKED_SEARCHED_TEXT_CLASS), searchedText.value)
         )
         toggleClass(SEARCHED_LOG_ENTRY_CLASS, MARKED_SEARCHED_TEXT_CLASS in styleText.appliedStyles)
         val textNodes = createTextFlowNodes(styleText)
