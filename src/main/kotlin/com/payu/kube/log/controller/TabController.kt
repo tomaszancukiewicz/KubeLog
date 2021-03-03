@@ -22,6 +22,7 @@ import com.payu.kube.log.service.pods.PodChangeInterface
 import com.payu.kube.log.service.pods.PodStoreService
 import com.payu.kube.log.util.DateUtils.fullFormat
 import com.payu.kube.log.util.LoggerUtils.logger
+import com.payu.kube.log.view.CustomListViewSkin
 import javafx.scene.text.Text
 import java.net.URL
 import java.util.*
@@ -88,6 +89,7 @@ class TabController(
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         log.info("initialize - ${monitoredPod.name}")
+        logListView.skin = CustomListViewSkin(logListView)
         searchBox.managedProperty().bind(searchBox.visibleProperty())
         searchBox.isVisible = false
         searchTextProperty = Bindings.`when`(searchBox.visibleProperty())
@@ -180,16 +182,14 @@ class TabController(
         val text = searchTextProperty.get()
 
         if (text.isNotBlank()) {
-            var index = logsList.indexOfLast {
+            val index = logsList.indexOfLast {
                 text in it
             }
             if (index >= 0) {
-                index -= 2
-                if (index < 0) {
-                    index = 0
-                }
                 autoscrollCheckbox.isSelected = false
-                logListView.scrollTo(index)
+                (logListView.skin as? CustomListViewSkin<*>)
+                    ?.getCustomFlow()
+                    ?.forceScrollTo(index)
             }
         }
     }

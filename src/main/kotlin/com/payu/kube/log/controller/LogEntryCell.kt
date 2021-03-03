@@ -5,7 +5,9 @@ import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.util.ViewUtils.toggleClass
 import javafx.beans.value.ObservableValue
 import javafx.scene.Node
+import javafx.scene.control.ContentDisplay
 import javafx.scene.control.ListCell
+import javafx.scene.layout.Region
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
 
@@ -82,32 +84,34 @@ class LogEntryCell(
 
     private val textFlow = TextFlow()
 
+    init {
+        contentDisplay = ContentDisplay.GRAPHIC_ONLY
+        text = null
+    }
+
     override fun updateItem(item: String?, empty: Boolean) {
         super.updateItem(item, empty)
-        text = null
-        if (graphic == null) {
-            graphic = textFlow
+        if (empty || item == null) {
+            graphic = null
+            return
         }
 
-        minWidth = 0.0
         if (isWrappingProperty.value) {
-            maxWidthProperty().bind(listView.widthProperty().subtract(20))
-            prefWidthProperty().bind(listView.widthProperty().subtract(20))
+            textFlow.prefWidth = Region.USE_PREF_SIZE
         } else {
-            maxWidthProperty().unbind()
-            prefWidthProperty().unbind()
-            prefWidth = USE_COMPUTED_SIZE
-            maxWidth = Double.MAX_VALUE
+            textFlow.prefWidth = Region.USE_COMPUTED_SIZE
         }
 
         toggleClass(LOG_ENTRY_CLASS, true)
         val styleText = stylingTextService.styleText(
-            item ?: "",
+            item,
             RULES + ColoringRule.ColoringTextRule(listOf(MARKED_SEARCHED_TEXT_CLASS), searchedText.value)
         )
         toggleClass(SEARCHED_LOG_ENTRY_CLASS, MARKED_SEARCHED_TEXT_CLASS in styleText.appliedStyles)
         val textNodes = createTextFlowNodes(styleText)
         textFlow.children.setAll(textNodes)
+
+        graphic = textFlow
     }
 
     private fun createTextFlowNodes(styledText: StylingTextService.StyledText): List<Node> {
