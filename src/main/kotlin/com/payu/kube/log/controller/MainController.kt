@@ -109,6 +109,7 @@ class MainController(
         listView.cellFactory = Callback { PodInfoViewCell() }
         listView.setOnMouseClicked {
             openSelectedPod()
+            listView.selectionModel.clearSelection()
         }
         listView.setOnKeyPressed {
             if (openTabKeyCodeCompanion.match(it)) {
