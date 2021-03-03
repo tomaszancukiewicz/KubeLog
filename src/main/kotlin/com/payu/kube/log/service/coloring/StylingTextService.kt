@@ -1,5 +1,6 @@
 package com.payu.kube.log.service.coloring
 
+import com.payu.kube.log.service.coloring.rules.ColoringRule
 import org.springframework.stereotype.Service
 import kotlin.math.min
 

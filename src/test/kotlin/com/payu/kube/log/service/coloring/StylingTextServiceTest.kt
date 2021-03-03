@@ -1,5 +1,8 @@
 package com.payu.kube.log.service.coloring
 
+import com.payu.kube.log.service.coloring.rules.ColoringRegexRule
+import com.payu.kube.log.service.coloring.rules.ColoringRule
+import com.payu.kube.log.service.coloring.rules.ColoringTextRule
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -30,8 +33,8 @@ internal class StylingTextServiceTest {
                 Arguments.of(
                     "log line",
                     listOf(
-                        ColoringRule.ColoringRegexRule(P_CLASS, "([0-9]+)".toRegex()),
-                        ColoringRule.ColoringTextRule(S_CLASS, "")
+                        ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
+                        ColoringTextRule(listOf(S_CLASS), "")
                     ),
                     listOf("log line" to listOf<String>())
                 ),
@@ -39,16 +42,16 @@ internal class StylingTextServiceTest {
                 Arguments.of(
                     "log line",
                     listOf(
-                        ColoringRule.ColoringRegexRule(P_CLASS, "([0-9]+)".toRegex()),
-                        ColoringRule.ColoringTextRule(S_CLASS, "xd")
+                        ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
+                        ColoringTextRule(listOf(S_CLASS), "xd")
                     ),
                     listOf("log line" to listOf<String>())
                 ),
                 Arguments.of(
                     "abbccbbcc",
                     listOf(
-                        ColoringRule.ColoringRegexRule(P_CLASS, "([0-9]+)".toRegex()),
-                        ColoringRule.ColoringTextRule(S_CLASS, "bb")
+                        ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
+                        ColoringTextRule(listOf(S_CLASS), "bb")
                     ),
                     listOf(
                         "a" to listOf(),
@@ -61,8 +64,8 @@ internal class StylingTextServiceTest {
                 Arguments.of(
                     "abbccbbcc",
                     listOf(
-                        ColoringRule.ColoringRegexRule(P_CLASS, "([0-9]+)".toRegex()),
-                        ColoringRule.ColoringTextRule(S_CLASS, "b")
+                        ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
+                        ColoringTextRule(listOf(S_CLASS), "b")
                     ),
                     listOf(
                         "a" to listOf(),
@@ -75,8 +78,8 @@ internal class StylingTextServiceTest {
                 Arguments.of(
                     "  123 123  ",
                     listOf(
-                        ColoringRule.ColoringRegexRule(P_CLASS, "([0-9]+)".toRegex()),
-                        ColoringRule.ColoringTextRule(S_CLASS, "")
+                        ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
+                        ColoringTextRule(listOf(S_CLASS), "")
                     ),
                     listOf(
                         "  " to listOf(),
@@ -89,8 +92,8 @@ internal class StylingTextServiceTest {
                 Arguments.of(
                     "  123 123  ",
                     listOf(
-                        ColoringRule.ColoringRegexRule(P_CLASS, "([0-9]+)".toRegex()),
-                        ColoringRule.ColoringTextRule(S_CLASS, "2")
+                        ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
+                        ColoringTextRule(listOf(S_CLASS), "2")
                     ),
                     listOf(
                         "  " to listOf(),
@@ -107,8 +110,8 @@ internal class StylingTextServiceTest {
                 Arguments.of(
                     "  123  123  ",
                     listOf(
-                        ColoringRule.ColoringRegexRule(P_CLASS, "([0-9]+)".toRegex()),
-                        ColoringRule.ColoringTextRule(S_CLASS, " 123 ")
+                        ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
+                        ColoringTextRule(listOf(S_CLASS), " 123 ")
                     ),
                     listOf(
                         " " to listOf(),
@@ -123,7 +126,7 @@ internal class StylingTextServiceTest {
                 Arguments.of(
                     "10.77.213.151-- - - [28/Feb/2021:16:07:02 +0100] \"GET /index.html HTTP/1.1\" 200 77 \"-\" [repT=261]",
                     listOf(
-                        ColoringRule.ColoringTextRule(S_CLASS, "10.77")
+                        ColoringTextRule(listOf(S_CLASS), "10.77")
                     ),
                     listOf(
                         "10.77" to listOf(S_CLASS),

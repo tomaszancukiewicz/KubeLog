@@ -20,11 +20,6 @@
     -fx-font-family: 'monospace';
 }
 
-.list-cell.log-entry.searched .text.marked {
-    -fx-fill: red;
-    -fx-underline: true;
-}
-
 .list-cell.log-entry .text.color-background-green {
     -fx-fill: #2E7D32;
 }
@@ -41,8 +36,25 @@
     -fx-fill: #2979FF;
 }
 
+.list-cell.log-entry .text.color-background-purple {
+    -fx-fill: #6200EA;
+}
+
 .list-cell.log-entry .text.color-background-gray {
     -fx-fill: #616161;
+}
+
+.list-cell.log-entry .text.brackets.ip.color-background-blue {
+    -fx-fill: #6200EA;
+}
+
+.list-cell.log-entry .text.brackets.ip.color-background-purple {
+    -fx-fill: #2979FF;
+}
+
+.list-cell.log-entry.searched .text.marked {
+    -fx-fill: red;
+    -fx-underline: true;
 }
 
 .dark.root {
