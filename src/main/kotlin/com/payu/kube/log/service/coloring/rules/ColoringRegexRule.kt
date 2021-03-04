@@ -13,7 +13,7 @@ open class ColoringRegexRule(
     protected open fun extractRange(matchResult: MatchResult): IntRange? {
         var matchGroup: MatchGroup? = null
         for (i in 1 until matchResult.groups.size) {
-            val group = matchResult.groups[1]
+            val group = matchResult.groups[i]
             if (group != null) {
                 matchGroup = group
                 break
