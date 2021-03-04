@@ -42,6 +42,13 @@
                 <TextField fx:id="searchTextField" promptText="Search in logs" HBox.hgrow="ALWAYS" />
             </HBox>
             <ListView fx:id="logListView" VBox.vgrow="ALWAYS" />
+            <HBox fx:id="appPodBox" alignment="CENTER_LEFT" spacing="10">
+                <Label fx:id="appPodLabel" minWidth="-Infinity"/>
+                <Button fx:id="openNewestAppPodButton" mnemonicParsing="false" text="Open" />
+                <VBox.margin>
+                    <Insets bottom="5" left="5" right="5" top="5" />
+                </VBox.margin>
+            </HBox>
         </VBox>
     </Tab>
 <!--</TabPane>-->

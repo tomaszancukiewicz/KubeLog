@@ -121,7 +121,11 @@ class MainController(
 
     private fun openSelectedPod() {
         val selectedPod = listView.selectionModel.selectedItem ?: return
-        val newTab = tabFactoryService.createTab(selectedPod)
+        openPod(selectedPod)
+    }
+
+    fun openPod(selectedPod: PodInfo) {
+        val newTab = tabFactoryService.createTab(selectedPod, this)
         tabPane.tabs.add(newTab)
         tabPane.selectionModel.select(newTab)
     }

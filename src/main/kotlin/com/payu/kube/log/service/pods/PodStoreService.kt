@@ -26,6 +26,7 @@ class PodStoreService(private val podService: PodService) : PodListChangeInterfa
     final val status: ObjectProperty<PodListState> = SimpleObjectProperty(PodListState.LoadingPods)
 
     private var podWatchers = mutableMapOf<PodInfo, MutableList<PodChangeInterface>>()
+    private var newAppContainerWatchers = mutableMapOf<String, MutableList<PodWithAppInterface>>()
 
     @PostConstruct
     fun init() {
@@ -50,6 +51,12 @@ class PodStoreService(private val podService: PodService) : PodListChangeInterfa
             map.values.forEach { pod ->
                 notifyPodChange(pod)
             }
+            map.values
+                .groupBy { it.calculatedAppName }
+                .forEach { (appName, pods) ->
+                    val newestPod = pods.maxByOrNull { it.creationTimestamp } ?: return@forEach
+                    notifyAppChange(appName, newestPod)
+                }
         }
     }
 
@@ -63,12 +70,26 @@ class PodStoreService(private val podService: PodService) : PodListChangeInterfa
                 pods.add(pod)
             }
             notifyPodChange(pod)
+            val newestPod = getNewestPodForApp(pod.calculatedAppName) ?: return@runLater
+            notifyAppChange(pod.calculatedAppName, newestPod)
         }
+    }
+
+    fun getNewestPodForApp(appName: String): PodInfo? {
+        return pods
+            .filter { it.calculatedAppName == appName }
+            .maxByOrNull { it.creationTimestamp }
     }
 
     private fun notifyPodChange(pod: PodInfo) {
         podWatchers[pod]?.toList()?.forEach {
             it.onPodChange(pod)
+        }
+    }
+
+    private fun notifyAppChange(appName: String, newPod: PodInfo) {
+        newAppContainerWatchers[appName]?.toList()?.forEach {
+            it.onNewPodWithApp(newPod)
         }
     }
 
@@ -88,6 +109,22 @@ class PodStoreService(private val podService: PodService) : PodListChangeInterfa
 
     fun stopWatchPod(pod: PodInfo, watcher: PodChangeInterface) {
         podWatchers.compute(pod) { _, list ->
+            val nList = list ?: mutableListOf()
+            nList.remove(watcher)
+            nList.takeIf { it.isNotEmpty() }
+        }
+    }
+
+    fun startWatchApp(appName: String, watcher: PodWithAppInterface) {
+        newAppContainerWatchers.compute(appName) { _, list ->
+            val nList = list ?: mutableListOf()
+            nList.add(watcher)
+            nList
+        }
+    }
+
+    fun stopWatchApp(appName: String, watcher: PodWithAppInterface) {
+        newAppContainerWatchers.compute(appName) { _, list ->
             val nList = list ?: mutableListOf()
             nList.remove(watcher)
             nList.takeIf { it.isNotEmpty() }

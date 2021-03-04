@@ -1,5 +1,6 @@
 package com.payu.kube.log.service.tab
 
+import com.payu.kube.log.controller.MainController
 import javafx.fxml.FXMLLoader
 import javafx.scene.control.Tab
 import org.springframework.beans.factory.annotation.Value
@@ -22,10 +23,11 @@ class TabFactoryService(
     private val stylingTextService: StylingTextService
 ) {
 
-    fun createTab(pod: PodInfo): Tab {
+    fun createTab(pod: PodInfo, mainController: MainController): Tab {
         val fxmlLoader = FXMLLoader(chartResource.url)
         fxmlLoader.setController(TabController(
-            pod, podStoreService, podLogStoreService, globalKeyEventHandlerService, stylingTextService
+            pod, podStoreService, podLogStoreService, globalKeyEventHandlerService, stylingTextService,
+            mainController
         ))
         return fxmlLoader.load()
     }

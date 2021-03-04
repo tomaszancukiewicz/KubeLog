@@ -20,21 +20,27 @@ import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.service.logs.PodLogStoreService
 import com.payu.kube.log.service.pods.PodChangeInterface
 import com.payu.kube.log.service.pods.PodStoreService
+import com.payu.kube.log.service.pods.PodWithAppInterface
+import com.payu.kube.log.util.BindingsUtils.mapToBoolean
+import com.payu.kube.log.util.BindingsUtils.mapToString
 import com.payu.kube.log.util.DateUtils.fullFormat
 import com.payu.kube.log.util.LoggerUtils.logger
+import com.payu.kube.log.util.ViewUtils.bindManagedAndVisibility
 import com.payu.kube.log.view.CustomListViewSkin
+import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.text.Text
 import java.net.URL
 import java.util.*
 
 
 class TabController(
-    private var monitoredPod: PodInfo,
+    monitoredPod: PodInfo,
     private val podStoreService: PodStoreService,
     private val podLogStoreService: PodLogStoreService,
     private val globalKeyEventHandlerService: GlobalKeyEventHandlerService,
-    private val stylingTextService: StylingTextService
-) : Initializable, EventHandler<KeyEvent>, PodChangeInterface {
+    private val stylingTextService: StylingTextService,
+    private val mainController: MainController
+) : Initializable, EventHandler<KeyEvent>, PodChangeInterface, PodWithAppInterface {
     private val log = logger()
     private val closeTabKeyCodeCompanion = KeyCodeCombination(KeyCode.W, KeyCodeCombination.SHORTCUT_DOWN)
     private val copyKeyCodeCompanion = KeyCodeCombination(KeyCode.C, KeyCodeCombination.SHORTCUT_DOWN)
@@ -79,8 +85,20 @@ class TabController(
     @FXML
     lateinit var logListView: ListView<String>
 
+    @FXML
+    lateinit var appPodBox: HBox
+
+    @FXML
+    lateinit var appPodLabel: Label
+
+    @FXML
+    lateinit var openNewestAppPodButton: Button
+
     lateinit var searchTextProperty: StringBinding
-    private var logsList = FXCollections.observableArrayList<String>()
+
+    private val monitoredPodProperty = SimpleObjectProperty(monitoredPod)
+    private val newestAppPodProperty = SimpleObjectProperty<PodInfo?>(null)
+    private val logsList = FXCollections.observableArrayList<String>()
     private var clearIndex = 0
 
     private val listChangeListener = ListChangeListener<String> {
@@ -88,13 +106,8 @@ class TabController(
     }
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
-        log.info("initialize - ${monitoredPod.name}")
-        logListView.skin = CustomListViewSkin(logListView)
-        searchBox.managedProperty().bind(searchBox.visibleProperty())
-        searchBox.isVisible = false
-        searchTextProperty = Bindings.`when`(searchBox.visibleProperty())
-            .then(searchTextField.textProperty())
-            .otherwise("")
+        log.info("initialize - ${monitoredPodProperty.value.name}")
+        setupSearch()
 
         tab.setOnClosed {
             globalKeyEventHandlerService.unregisterKeyPressEventHandler(this)
@@ -104,13 +117,7 @@ class TabController(
 
         clearButton.setOnAction { clear() }
 
-        logListView.items = logsList
-        logListView.cellFactory = Callback {
-            LogEntryCell(stylingTextService, wrapCheckbox.selectedProperty(), searchTextProperty)
-        }
-        logListView.selectionModel.selectionMode = SelectionMode.MULTIPLE
-
-        setupLogListContextMenu()
+        setupLogList()
 
         autoscrollCheckbox.selectedProperty().addListener { _, _, newValue ->
             if (newValue && logsList.size > 0) {
@@ -124,11 +131,20 @@ class TabController(
                 logListView.scrollTo(logsList.lastIndex)
             }
         }
+        setupMonitoredPod()
+        setupNewestAppPod()
+        startMonitor()
+    }
 
+    private fun setupSearch() {
+        searchBox.managedProperty().bind(searchBox.visibleProperty())
+        searchBox.isVisible = false
+        searchTextProperty = Bindings.`when`(searchBox.visibleProperty())
+            .then(searchTextField.textProperty())
+            .otherwise("")
         searchTextProperty.addListener { _ ->
             search()
         }
-
         searchTextField.setOnKeyPressed {
             if (clearSearchCodeCombination.match(it)) {
                 searchTextField.text = ""
@@ -138,8 +154,16 @@ class TabController(
                 it.consume()
             }
         }
+    }
 
-        startMonitor()
+    private fun setupLogList() {
+        logListView.skin = CustomListViewSkin(logListView)
+        logListView.items = logsList
+        logListView.cellFactory = Callback {
+            LogEntryCell(stylingTextService, wrapCheckbox.selectedProperty(), searchTextProperty)
+        }
+        logListView.selectionModel.selectionMode = SelectionMode.MULTIPLE
+        setupLogListContextMenu()
     }
 
     private fun setupLogListContextMenu() {
@@ -176,21 +200,35 @@ class TabController(
         }
     }
 
-    private fun search() {
-        logListView.refresh()
+    private fun setupMonitoredPod() {
+        tab.textProperty().bind(monitoredPodProperty.mapToString { it.name })
+        statusIndicatorCircle.fillProperty().bind(
+            Bindings.`when`(monitoredPodProperty.mapToBoolean { it.isReady })
+                .then(Color.valueOf("#2bc140"))
+                .otherwise(Color.valueOf("#f55e56"))
+        )
+        namespaceLabel.textProperty()
+            .bind(monitoredPodProperty.mapToString { "${it.namespace} - ${it.containerImage}" })
+        statusLabel.textProperty()
+            .bind(monitoredPodProperty.mapToString { "${it.state.long()} " +
+                    "${it.readyCount}/${it.startedCount}/${it.containerCount} " +
+                    "R:${it.restarts}" })
+        timestampLabel.textProperty()
+            .bind(monitoredPodProperty.mapToString { pod ->
+                pod.deletionTimestamp
+                    ?.let { "C:${pod.creationTimestamp.fullFormat()}\nD:${it.fullFormat()}"}
+                    ?: "C:${pod.creationTimestamp.fullFormat()}"
+            })
+    }
 
-        val text = searchTextProperty.get()
-
-        if (text.isNotBlank()) {
-            val index = logsList.indexOfLast {
-                text in it
-            }
-            if (index >= 0) {
-                autoscrollCheckbox.isSelected = false
-                (logListView.skin as? CustomListViewSkin<*>)
-                    ?.getCustomFlow()
-                    ?.forceScrollTo(index)
-            }
+    private fun setupNewestAppPod() {
+        appPodBox.bindManagedAndVisibility(newestAppPodProperty.isNotNull)
+        appPodLabel.textProperty().bind(newestAppPodProperty.mapToString {
+            "There is newer pod(${it?.name}) with this app(${it?.calculatedAppName})"
+        })
+        openNewestAppPodButton.setOnAction {
+            val newestPod = newestAppPodProperty.value ?: return@setOnAction
+            mainController.openPod(newestPod)
         }
     }
 
@@ -231,11 +269,15 @@ class TabController(
     }
 
     private fun startMonitor() {
-        this.onPodChange(monitoredPod)
+        newestAppPodProperty.set(
+            podStoreService.getNewestPodForApp(monitoredPodProperty.value.calculatedAppName)
+                ?.takeIf { it != monitoredPodProperty.value }
+        )
         clearIndex = 0
-        podStoreService.startWatchPod(monitoredPod, this)
-        podLogStoreService.startLogging(monitoredPod)
-        val logsList = podLogStoreService.podLogs[monitoredPod]
+        podStoreService.startWatchPod(monitoredPodProperty.value, this)
+        podStoreService.startWatchApp(monitoredPodProperty.value.calculatedAppName, this)
+        podLogStoreService.startLogging(monitoredPodProperty.value)
+        val logsList = podLogStoreService.podLogs[monitoredPodProperty.value]
         updateList(logsList)
         logsList?.addListener(listChangeListener)
     }
@@ -250,16 +292,29 @@ class TabController(
     }
 
     override fun onPodChange(pod: PodInfo) {
-        monitoredPod = pod
-        tab.text = monitoredPod.name
-        statusIndicatorCircle.fill = if (pod.isReady) Color.valueOf("#2bc140") else Color.valueOf("#f55e56")
-        namespaceLabel.text = "${pod.namespace} - ${pod.containerImage}"
-        statusLabel.text = "${pod.state.long()} " +
-                "${pod.readyCount}/${pod.startedCount}/${pod.containerCount} " +
-                "R:${pod.restarts}"
-        timestampLabel.text = pod.deletionTimestamp
-            ?.let { "C:${pod.creationTimestamp.fullFormat()}\nD:${it.fullFormat()}"}
-            ?: "C:${pod.creationTimestamp.fullFormat()}"
+        monitoredPodProperty.set(pod)
+    }
+
+    override fun onNewPodWithApp(pod: PodInfo) {
+        newestAppPodProperty.set(pod.takeIf { pod != monitoredPodProperty.value })
+    }
+
+    private fun search() {
+        logListView.refresh()
+
+        val text = searchTextProperty.get()
+
+        if (text.isNotBlank()) {
+            val index = logsList.indexOfLast {
+                text in it
+            }
+            if (index >= 0) {
+                autoscrollCheckbox.isSelected = false
+                (logListView.skin as? CustomListViewSkin<*>)
+                    ?.getCustomFlow()
+                    ?.forceScrollTo(index)
+            }
+        }
     }
 
     private fun clear() {
@@ -268,9 +323,10 @@ class TabController(
     }
 
     private fun stopMonitor() {
-        podStoreService.stopWatchPod(monitoredPod, this)
-        podLogStoreService.podLogs[monitoredPod]?.removeListener(listChangeListener)
-        podLogStoreService.stopLogging(monitoredPod)
+        podStoreService.stopWatchPod(monitoredPodProperty.value, this)
+        podStoreService.stopWatchApp(monitoredPodProperty.value.calculatedAppName, this)
+        podLogStoreService.podLogs[monitoredPodProperty.value]?.removeListener(listChangeListener)
+        podLogStoreService.stopLogging(monitoredPodProperty.value)
         logsList.clear()
     }
 
