@@ -12,8 +12,14 @@ class CustomListViewSkin<T>(control: ListView<T>) : ListViewSkin<T>(control) {
         return CustomVirtualFlow()
     }
 
-    fun getCustomFlow(): CustomVirtualFlow<T> {
+    private fun getCustomFlow(): CustomVirtualFlow<T> {
         return virtualFlow as CustomVirtualFlow<T>
+    }
+
+    fun forceScrollTo(index: Int) {
+        if (index in 0 until itemCount) {
+            getCustomFlow().forceScrollTo(index)
+        }
     }
 
     class CustomVirtualFlow<T> : VirtualFlow<ListCell<T>>() {

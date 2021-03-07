@@ -17,14 +17,14 @@
                             <Font size="12.0" />
                         </font>
                     </Label>
-                    <Label fx:id="statusLabel" text="status" minWidth="-Infinity" >
+                    <Label fx:id="statusLabel" minWidth="-Infinity" text="status">
                         <font>
                             <Font size="11.0" />
                         </font>
                     </Label>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="timestampLabel" text="creationTimestamp" HBox.hgrow="NEVER"  minWidth="-Infinity" >
+                <Label fx:id="timestampLabel" minWidth="-Infinity" text="creationTimestamp" HBox.hgrow="NEVER">
                     <font>
                         <Font size="11.0" />
                     </font>
@@ -38,12 +38,13 @@
                     <Insets bottom="5" left="5" right="5" top="5" />
                 </VBox.margin>
             </HBox>
-            <HBox fx:id="searchBox" alignment="CENTER_LEFT" spacing="10">
+            <HBox fx:id="searchBox" alignment="CENTER_LEFT">
                 <TextField fx:id="searchTextField" promptText="Search in logs" HBox.hgrow="ALWAYS" />
+                <ChoiceBox fx:id="searchTypeChoiceBox" />
             </HBox>
             <ListView fx:id="logListView" VBox.vgrow="ALWAYS" />
             <HBox fx:id="appPodBox" alignment="CENTER_LEFT" spacing="10">
-                <Label fx:id="appPodLabel" minWidth="-Infinity"/>
+                <Label fx:id="appPodLabel" minWidth="-Infinity" />
                 <Button fx:id="openNewestAppPodButton" mnemonicParsing="false" text="Open" />
                 <VBox.margin>
                     <Insets bottom="5" left="5" right="5" top="5" />

@@ -17,7 +17,7 @@ import javafx.scene.text.TextFlow
 class LogEntryCell(
     private val stylingTextService: StylingTextService,
     private val isWrappingProperty: ObservableValue<Boolean>,
-    private val searchedText: ObservableValue<String>
+    private val markedText: ObservableValue<String>
 ) : ListCell<String?>() {
 
     companion object {
@@ -131,6 +131,9 @@ class LogEntryCell(
 
     override fun updateItem(item: String?, empty: Boolean) {
         super.updateItem(item, empty)
+        toggleClass(LOG_ENTRY_CLASS, true)
+        toggleClass(SEARCHED_LOG_ENTRY_CLASS, false)
+
         if (empty || item == null) {
             graphic = null
             return
@@ -142,10 +145,9 @@ class LogEntryCell(
             textFlow.prefWidth = Region.USE_COMPUTED_SIZE
         }
 
-        toggleClass(LOG_ENTRY_CLASS, true)
         val styleText = stylingTextService.styleText(
             item,
-            RULES + ColoringTextRule(listOf(MARKED_SEARCHED_TEXT_CLASS), searchedText.value)
+            RULES + ColoringTextRule(listOf(MARKED_SEARCHED_TEXT_CLASS), markedText.value)
         )
         toggleClass(SEARCHED_LOG_ENTRY_CLASS, MARKED_SEARCHED_TEXT_CLASS in styleText.appliedStyles)
         val textNodes = createTextFlowNodes(styleText)

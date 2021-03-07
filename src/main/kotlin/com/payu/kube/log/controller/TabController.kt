@@ -27,10 +27,12 @@ import com.payu.kube.log.util.DateUtils.fullFormat
 import com.payu.kube.log.util.LoggerUtils.logger
 import com.payu.kube.log.util.ViewUtils.bindManagedAndVisibility
 import com.payu.kube.log.view.CustomListViewSkin
+import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.text.Text
 import java.net.URL
 import java.util.*
+import java.util.function.Predicate
 
 
 class TabController(
@@ -51,6 +53,12 @@ class TabController(
 
     private val executeSearchKeyCodeCompanion = KeyCodeCombination(KeyCode.ENTER)
     private val clearSearchCodeCombination = KeyCodeCombination(KeyCode.ESCAPE)
+
+    object SearchTypes {
+        const val MARK = "Mark"
+        const val FILTER = "Show only matching"
+        const val NOT_FILTER = "Show only not matching"
+    }
 
     @FXML
     lateinit var tab: Tab
@@ -83,6 +91,9 @@ class TabController(
     lateinit var searchTextField: TextField
 
     @FXML
+    lateinit var searchTypeChoiceBox: ChoiceBox<String>
+
+    @FXML
     lateinit var logListView: ListView<String>
 
     @FXML
@@ -95,10 +106,12 @@ class TabController(
     lateinit var openNewestAppPodButton: Button
 
     lateinit var searchTextProperty: StringBinding
+    lateinit var markedTextProperty: StringBinding
 
     private val monitoredPodProperty = SimpleObjectProperty(monitoredPod)
     private val newestAppPodProperty = SimpleObjectProperty<PodInfo?>(null)
     private val logsList = FXCollections.observableArrayList<String>()
+    private val filteredLogsList = logsList.filtered { true }
     private var clearIndex = 0
 
     private val listChangeListener = ListChangeListener<String> {
@@ -107,30 +120,29 @@ class TabController(
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         log.info("initialize - ${monitoredPodProperty.value.name}")
-        setupSearch()
-
         tab.setOnClosed {
             globalKeyEventHandlerService.unregisterKeyPressEventHandler(this)
             stopMonitor()
         }
         globalKeyEventHandlerService.registerKeyPressEventHandler(this)
 
-        clearButton.setOnAction { clear() }
-
-        setupLogList()
-
         autoscrollCheckbox.selectedProperty().addListener { _, _, newValue ->
-            if (newValue && logsList.size > 0) {
-                logListView.scrollTo(logsList.lastIndex)
+            if (newValue && filteredLogsList.size > 0) {
+                logListView.scrollTo(filteredLogsList.lastIndex)
             }
         }
 
         wrapCheckbox.selectedProperty().addListener { _, _, _ ->
             logListView.refresh()
-            if (autoscrollCheckbox.isSelected && logsList.size > 0) {
-                logListView.scrollTo(logsList.lastIndex)
+            if (autoscrollCheckbox.isSelected && filteredLogsList.size > 0) {
+                logListView.scrollTo(filteredLogsList.lastIndex)
             }
         }
+
+        clearButton.setOnAction { clear() }
+
+        setupSearch()
+        setupLogList()
         setupMonitoredPod()
         setupNewestAppPod()
         startMonitor()
@@ -142,7 +154,29 @@ class TabController(
         searchTextProperty = Bindings.`when`(searchBox.visibleProperty())
             .then(searchTextField.textProperty())
             .otherwise("")
+        markedTextProperty = Bindings.`when`(searchTypeChoiceBox.selectionModel.selectedItemProperty()
+            .isEqualTo(SearchTypes.MARK))
+            .then(searchTextProperty)
+            .otherwise("")
+        filteredLogsList.predicateProperty().bind(
+            Bindings.createObjectBinding({
+                val searchedText = searchTextProperty.value
+                val searchType = searchTypeChoiceBox.selectionModel.selectedItemProperty().value
+                if (searchedText.isNotEmpty()) {
+                    if (searchType == SearchTypes.FILTER) {
+                        return@createObjectBinding Predicate { searchedText in it }
+                    } else if (searchType == SearchTypes.NOT_FILTER) {
+                        return@createObjectBinding Predicate { searchedText !in it }
+                    }
+                }
+                return@createObjectBinding Predicate { true }
+            }, searchTextProperty, searchTypeChoiceBox.selectionModel.selectedItemProperty())
+        )
+
         searchTextProperty.addListener { _ ->
+            search()
+        }
+        searchTypeChoiceBox.selectionModel.selectedItemProperty().addListener { _ ->
             search()
         }
         searchTextField.setOnKeyPressed {
@@ -154,13 +188,15 @@ class TabController(
                 it.consume()
             }
         }
+        searchTypeChoiceBox.items.addAll(SearchTypes.MARK, SearchTypes.FILTER, SearchTypes.NOT_FILTER)
+        searchTypeChoiceBox.value = searchTypeChoiceBox.items.firstOrNull()
     }
 
     private fun setupLogList() {
         logListView.skin = CustomListViewSkin(logListView)
-        logListView.items = logsList
+        logListView.items = filteredLogsList
         logListView.cellFactory = Callback {
-            LogEntryCell(stylingTextService, wrapCheckbox.selectedProperty(), searchTextProperty)
+            LogEntryCell(stylingTextService, wrapCheckbox.selectedProperty(), markedTextProperty)
         }
         logListView.selectionModel.selectionMode = SelectionMode.MULTIPLE
         setupLogListContextMenu()
@@ -185,8 +221,9 @@ class TabController(
         val clearBeforeItem = MenuItem("Clear before")
         clearBeforeItem.setOnAction {
             val minSelectionIndex = logListView.selectionModel.selectedIndices.firstOrNull() ?: return@setOnAction
-            clearIndex += minSelectionIndex
-            logsList.remove(0, minSelectionIndex)
+            val indexOfOriginalList = filteredLogsList.getSourceIndex(minSelectionIndex)
+            clearIndex += indexOfOriginalList
+            logsList.remove(0, indexOfOriginalList)
         }
         contextMenu.items.add(clearBeforeItem)
 
@@ -277,17 +314,17 @@ class TabController(
         podStoreService.startWatchPod(monitoredPodProperty.value, this)
         podStoreService.startWatchApp(monitoredPodProperty.value.calculatedAppName, this)
         podLogStoreService.startLogging(monitoredPodProperty.value)
-        val logsList = podLogStoreService.podLogs[monitoredPodProperty.value]
-        updateList(logsList)
-        logsList?.addListener(listChangeListener)
+        val logsListToListen = podLogStoreService.podLogs[monitoredPodProperty.value]
+        updateList(logsListToListen)
+        logsListToListen?.addListener(listChangeListener)
     }
 
     private fun updateList(list: List<String>?) {
         val listToShow = (list ?: listOf()).drop(clearIndex)
         val newElements = listToShow.drop(logsList.size)
         logsList.addAll(newElements)
-        if (autoscrollCheckbox.isSelected && logsList.size > 0) {
-            logListView.scrollTo(logsList.lastIndex)
+        if (autoscrollCheckbox.isSelected && filteredLogsList.size > 0) {
+            logListView.scrollTo(filteredLogsList.lastIndex)
         }
     }
 
@@ -301,18 +338,25 @@ class TabController(
 
     private fun search() {
         logListView.refresh()
-
-        val text = searchTextProperty.get()
-
-        if (text.isNotBlank()) {
-            val index = logsList.indexOfLast {
-                text in it
-            }
-            if (index >= 0) {
-                autoscrollCheckbox.isSelected = false
-                (logListView.skin as? CustomListViewSkin<*>)
-                    ?.getCustomFlow()
-                    ?.forceScrollTo(index)
+        Platform.runLater {
+            val text = searchTextProperty.get()
+            if (text.isNotEmpty()) {
+                val indexToScroll =
+                    when (searchTypeChoiceBox.selectionModel.selectedItem) {
+                        SearchTypes.MARK -> {
+                            filteredLogsList.indexOfLast { text in it }
+                                .takeIf { it >= 0 }
+                                ?.let {
+                                    autoscrollCheckbox.isSelected = false
+                                    it
+                                }
+                        }
+                        else -> {
+                            autoscrollCheckbox.isSelected = true
+                            filteredLogsList.lastIndex
+                        }
+                    } ?: return@runLater
+                (logListView.skin as? CustomListViewSkin<*>)?.forceScrollTo(indexToScroll)
             }
         }
     }
@@ -327,7 +371,6 @@ class TabController(
         podStoreService.stopWatchApp(monitoredPodProperty.value.calculatedAppName, this)
         podLogStoreService.podLogs[monitoredPodProperty.value]?.removeListener(listChangeListener)
         podLogStoreService.stopLogging(monitoredPodProperty.value)
-        logsList.clear()
     }
 
     private fun copySelectionToClipboard(listView: ListView<*>) {
