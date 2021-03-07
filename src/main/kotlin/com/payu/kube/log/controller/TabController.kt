@@ -22,6 +22,7 @@ import com.payu.kube.log.service.pods.PodChangeInterface
 import com.payu.kube.log.service.pods.PodStoreService
 import com.payu.kube.log.service.pods.PodWithAppInterface
 import com.payu.kube.log.util.BindingsUtils.mapToBoolean
+import com.payu.kube.log.util.BindingsUtils.mapToObject
 import com.payu.kube.log.util.BindingsUtils.mapToString
 import com.payu.kube.log.util.DateUtils.fullFormat
 import com.payu.kube.log.util.LoggerUtils.logger
@@ -43,22 +44,17 @@ class TabController(
     private val stylingTextService: StylingTextService,
     private val mainController: MainController
 ) : Initializable, EventHandler<KeyEvent>, PodChangeInterface, PodWithAppInterface {
-    private val log = logger()
-    private val closeTabKeyCodeCompanion = KeyCodeCombination(KeyCode.W, KeyCodeCombination.SHORTCUT_DOWN)
-    private val copyKeyCodeCompanion = KeyCodeCombination(KeyCode.C, KeyCodeCombination.SHORTCUT_DOWN)
-    private val findCompanion = KeyCodeCombination(KeyCode.F, KeyCodeCombination.SHORTCUT_DOWN)
-    private val clearKeyCodeCompanion = KeyCodeCombination(KeyCode.C)
-    private val wrapKeyCodeCompanion = KeyCodeCombination(KeyCode.W)
-    private val autoscrollKeyCodeCompanion = KeyCodeCombination(KeyCode.A)
 
-    private val executeSearchKeyCodeCompanion = KeyCodeCombination(KeyCode.ENTER)
-    private val clearSearchCodeCombination = KeyCodeCombination(KeyCode.ESCAPE)
-
-    object SearchTypes {
-        const val MARK = "Mark"
-        const val FILTER = "Show only matching"
-        const val NOT_FILTER = "Show only not matching"
+    companion object {
+        private val CLOSE_TAB_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.W, KeyCodeCombination.SHORTCUT_DOWN)
+        private val COPY_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.C, KeyCodeCombination.SHORTCUT_DOWN)
+        private val FIND_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.F, KeyCodeCombination.SHORTCUT_DOWN)
+        private val CLEAR_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.C)
+        private val WRAP_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.W)
+        private val AUTOSCROLL_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.A)
     }
+
+    private val log = logger()
 
     @FXML
     lateinit var tab: Tab
@@ -85,13 +81,7 @@ class TabController(
     lateinit var clearButton: Button
 
     @FXML
-    lateinit var searchBox: HBox
-
-    @FXML
-    lateinit var searchTextField: TextField
-
-    @FXML
-    lateinit var searchTypeChoiceBox: ChoiceBox<String>
+    lateinit var searchBox: SearchBoxView
 
     @FXML
     lateinit var logListView: ListView<String>
@@ -105,7 +95,6 @@ class TabController(
     @FXML
     lateinit var openNewestAppPodButton: Button
 
-    lateinit var searchTextProperty: StringBinding
     lateinit var markedTextProperty: StringBinding
 
     private val monitoredPodProperty = SimpleObjectProperty(monitoredPod)
@@ -149,47 +138,29 @@ class TabController(
     }
 
     private fun setupSearch() {
-        searchBox.managedProperty().bind(searchBox.visibleProperty())
         searchBox.isVisible = false
-        searchTextProperty = Bindings.`when`(searchBox.visibleProperty())
-            .then(searchTextField.textProperty())
-            .otherwise("")
-        markedTextProperty = Bindings.`when`(searchTypeChoiceBox.selectionModel.selectedItemProperty()
-            .isEqualTo(SearchTypes.MARK))
-            .then(searchTextProperty)
-            .otherwise("")
+
+        markedTextProperty = searchBox.searchProperty.mapToString {
+            if (it.type == SearchBoxView.SearchTypes.MARK)
+                it.text
+            else
+                ""
+        }
+
         filteredLogsList.predicateProperty().bind(
-            Bindings.createObjectBinding({
-                val searchedText = searchTextProperty.value
-                val searchType = searchTypeChoiceBox.selectionModel.selectedItemProperty().value
-                if (searchedText.isNotEmpty()) {
-                    if (searchType == SearchTypes.FILTER) {
-                        return@createObjectBinding Predicate { searchedText in it }
-                    } else if (searchType == SearchTypes.NOT_FILTER) {
-                        return@createObjectBinding Predicate { searchedText !in it }
+            searchBox.searchProperty.mapToObject { search ->
+                if (search.text.isNotEmpty()) {
+                    if (search.type == SearchBoxView.SearchTypes.FILTER) {
+                        return@mapToObject Predicate { search.text in it }
+                    } else if (search.type == SearchBoxView.SearchTypes.NOT_FILTER) {
+                        return@mapToObject Predicate { search.text !in it }
                     }
                 }
-                return@createObjectBinding Predicate { true }
-            }, searchTextProperty, searchTypeChoiceBox.selectionModel.selectedItemProperty())
+                return@mapToObject Predicate { true }
+            }
         )
 
-        searchTextProperty.addListener { _ ->
-            search()
-        }
-        searchTypeChoiceBox.selectionModel.selectedItemProperty().addListener { _ ->
-            search()
-        }
-        searchTextField.setOnKeyPressed {
-            if (clearSearchCodeCombination.match(it)) {
-                searchTextField.text = ""
-                it.consume()
-            } else if (executeSearchKeyCodeCompanion.match(it)) {
-                search()
-                it.consume()
-            }
-        }
-        searchTypeChoiceBox.items.addAll(SearchTypes.MARK, SearchTypes.FILTER, SearchTypes.NOT_FILTER)
-        searchTypeChoiceBox.value = searchTypeChoiceBox.items.firstOrNull()
+        searchBox.searchAction = this::search
     }
 
     private fun setupLogList() {
@@ -274,32 +245,30 @@ class TabController(
             return
         }
         when {
-            closeTabKeyCodeCompanion.match(event) -> {
+            CLOSE_TAB_KEY_CODE_COMBINATION.match(event) -> {
                 tab.onClosed?.handle(Event(Tab.CLOSED_EVENT))
                 tab.tabPane.tabs.remove(tab)
                 event.consume()
             }
-            copyKeyCodeCompanion.match(event) -> {
+            COPY_KEY_CODE_COMBINATION.match(event) -> {
                 copySelectionToClipboard(logListView)
                 event.consume()
             }
-            clearKeyCodeCompanion.match(event) -> {
+            CLEAR_KEY_CODE_COMBINATION.match(event) -> {
                 clear()
                 event.consume()
             }
-            wrapKeyCodeCompanion.match(event) -> {
+            WRAP_KEY_CODE_COMBINATION.match(event) -> {
                 wrapCheckbox.isSelected = !wrapCheckbox.isSelected
                 event.consume()
             }
-            autoscrollKeyCodeCompanion.match(event) -> {
+            AUTOSCROLL_KEY_CODE_COMBINATION.match(event) -> {
                 autoscrollCheckbox.isSelected = !autoscrollCheckbox.isSelected
                 event.consume()
             }
-            findCompanion.match(event) -> {
+            FIND_KEY_CODE_COMBINATION.match(event) -> {
                 searchBox.isVisible = !searchBox.isVisible
-                if (searchBox.isVisible) {
-                    searchTextField.requestFocus()
-                }
+                searchBox.requestFocusSearchField()
                 event.consume()
             }
         }
@@ -336,15 +305,14 @@ class TabController(
         newestAppPodProperty.set(pod.takeIf { pod != monitoredPodProperty.value })
     }
 
-    private fun search() {
+    private fun search(search: SearchBoxView.Search) {
         logListView.refresh()
         Platform.runLater {
-            val text = searchTextProperty.get()
-            if (text.isNotEmpty()) {
+            if (search.text.isNotEmpty()) {
                 val indexToScroll =
-                    when (searchTypeChoiceBox.selectionModel.selectedItem) {
-                        SearchTypes.MARK -> {
-                            filteredLogsList.indexOfLast { text in it }
+                    when (search.type) {
+                        SearchBoxView.SearchTypes.MARK -> {
+                            filteredLogsList.indexOfLast { search.text in it }
                                 .takeIf { it >= 0 }
                                 ?.let {
                                     autoscrollCheckbox.isSelected = false
