@@ -17,16 +17,14 @@ class SearchBoxView : HBox() {
         private val CLEAR_SEARCH_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.ESCAPE)
     }
 
-    data class Search(val text: String, val type: String)
+    data class Search(val text: String, val type: SearchType)
 
-    object SearchTypes {
-        const val MARK = "Mark"
-        const val FILTER = "Show only matching"
-        const val NOT_FILTER = "Show only not matching"
+    enum class SearchType {
+        MARK, FILTER, NOT_FILTER
     }
 
     private val searchTextField: TextField
-    private val searchTypeChoiceBox: ChoiceBox<String>
+    private val searchTypeChoiceBox: ChoiceBox<SearchType>
 
     private val searchTextProperty: StringBinding
     val searchProperty: ObjectBinding<Search>
@@ -40,11 +38,11 @@ class SearchBoxView : HBox() {
         searchTextField.promptText = "Search in logs"
         setHgrow(searchTextField, Priority.ALWAYS)
 
-        searchTypeChoiceBox = ChoiceBox<String>()
+        searchTypeChoiceBox = ChoiceBox<SearchType>()
         searchTypeChoiceBox.items.addAll(
-            SearchTypes.MARK,
-            SearchTypes.FILTER,
-            SearchTypes.NOT_FILTER
+            SearchType.MARK,
+            SearchType.FILTER,
+            SearchType.NOT_FILTER
         )
         searchTypeChoiceBox.value = searchTypeChoiceBox.items.firstOrNull()
 

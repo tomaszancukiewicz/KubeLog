@@ -141,7 +141,7 @@ class TabController(
         searchBox.isVisible = false
 
         markedTextProperty = searchBox.searchProperty.mapToString {
-            if (it.type == SearchBoxView.SearchTypes.MARK)
+            if (it.type == SearchBoxView.SearchType.MARK)
                 it.text
             else
                 ""
@@ -150,9 +150,9 @@ class TabController(
         filteredLogsList.predicateProperty().bind(
             searchBox.searchProperty.mapToObject { search ->
                 if (search.text.isNotEmpty()) {
-                    if (search.type == SearchBoxView.SearchTypes.FILTER) {
+                    if (search.type == SearchBoxView.SearchType.FILTER) {
                         return@mapToObject Predicate { search.text in it }
-                    } else if (search.type == SearchBoxView.SearchTypes.NOT_FILTER) {
+                    } else if (search.type == SearchBoxView.SearchType.NOT_FILTER) {
                         return@mapToObject Predicate { search.text !in it }
                     }
                 }
@@ -311,7 +311,7 @@ class TabController(
             if (search.text.isNotEmpty()) {
                 val indexToScroll =
                     when (search.type) {
-                        SearchBoxView.SearchTypes.MARK -> {
+                        SearchBoxView.SearchType.MARK -> {
                             filteredLogsList.indexOfLast { search.text in it }
                                 .takeIf { it >= 0 }
                                 ?.let {
