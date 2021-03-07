@@ -50,12 +50,6 @@ class SearchBoxView : HBox() {
             .then(searchTextField.textProperty())
             .otherwise("")
 
-        searchTextProperty.addListener { _ ->
-            search()
-        }
-        searchTypeChoiceBox.selectionModel.selectedItemProperty().addListener { _ ->
-            search()
-        }
         searchTextField.setOnKeyPressed {
             if (CLEAR_SEARCH_KEY_CODE_COMBINATION.match(it)) {
                 searchTextField.text = ""
@@ -71,6 +65,10 @@ class SearchBoxView : HBox() {
             val searchType = searchTypeChoiceBox.selectionModel.selectedItemProperty().value
             Search(searchedText, searchType)
         }, searchTextProperty, searchTypeChoiceBox.selectionModel.selectedItemProperty())
+
+        searchProperty.addListener { _ ->
+            search()
+        }
 
         children.addAll(searchTextField, searchTypeChoiceBox)
     }

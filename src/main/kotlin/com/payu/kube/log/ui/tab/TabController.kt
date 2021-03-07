@@ -308,6 +308,7 @@ class TabController(
     private fun search(search: SearchBoxView.Search) {
         logListView.refresh()
         Platform.runLater {
+            Thread.sleep(50)
             if (search.text.isNotEmpty()) {
                 val indexToScroll =
                     when (search.type) {
@@ -324,7 +325,9 @@ class TabController(
                             filteredLogsList.lastIndex
                         }
                     } ?: return@runLater
-                (logListView.skin as? CustomListViewSkin<*>)?.forceScrollTo(indexToScroll)
+                Platform.runLater {
+                    (logListView.skin as? CustomListViewSkin<*>)?.forceScrollTo(indexToScroll)
+                }
             }
         }
     }
