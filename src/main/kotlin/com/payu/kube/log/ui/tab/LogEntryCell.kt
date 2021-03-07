@@ -1,4 +1,4 @@
-package com.payu.kube.log.controller
+package com.payu.kube.log.ui.tab
 
 import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.service.coloring.rules.ColoringRegexRule

@@ -7,7 +7,7 @@
 <?import javafx.scene.text.*?>
 
 <!--<TabPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">-->
-<?import com.payu.kube.log.controller.SearchBoxView?>
+<?import com.payu.kube.log.ui.tab.SearchBoxView?>
 <Tab fx:id="tab" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
         <VBox>
             <HBox alignment="CENTER_LEFT" spacing="10">

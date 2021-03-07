@@ -1,4 +1,4 @@
-package com.payu.kube.log.controller
+package com.payu.kube.log.ui.tab
 
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ObjectBinding

@@ -1,4 +1,4 @@
-package com.payu.kube.log.controller
+package com.payu.kube.log.ui
 
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
