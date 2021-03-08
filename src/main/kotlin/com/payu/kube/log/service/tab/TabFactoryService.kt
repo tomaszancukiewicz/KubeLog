@@ -10,7 +10,6 @@ import com.payu.kube.log.ui.tab.TabController
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.GlobalKeyEventHandlerService
 import com.payu.kube.log.service.coloring.StylingTextService
-import com.payu.kube.log.service.logs.PodLogStoreService
 import com.payu.kube.log.service.pods.PodStoreService
 
 @Service
@@ -18,7 +17,6 @@ class TabFactoryService(
     @Value("classpath:/fxmls/tab.fxml")
     private val chartResource: Resource,
     private val podStoreService: PodStoreService,
-    private val podLogStoreService: PodLogStoreService,
     private val globalKeyEventHandlerService: GlobalKeyEventHandlerService,
     private val stylingTextService: StylingTextService
 ) {
@@ -27,9 +25,9 @@ class TabFactoryService(
         val fxmlLoader = FXMLLoader(chartResource.url)
         fxmlLoader.setController(
             TabController(
-            pod, podStoreService, podLogStoreService, globalKeyEventHandlerService, stylingTextService,
-            mainController
-        )
+                pod, podStoreService, globalKeyEventHandlerService, stylingTextService,
+                mainController
+            )
         )
         return fxmlLoader.load()
     }

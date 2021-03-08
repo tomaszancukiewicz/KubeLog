@@ -7,16 +7,6 @@ import kotlin.math.min
 @Service
 class StylingTextService {
 
-    data class StyledText(val text: String, val styledStyledSegments: List<StyledSegment>, val appliedStyles: Set<String>) {
-        fun createSegments(): List<Pair<String, List<String>>> {
-            return styledStyledSegments.map {
-                text.substring(it.range) to it.styles
-            }
-        }
-    }
-
-    data class StyledSegment(val styles: List<String>, var range: IntRange)
-
     fun calcSegmentForIndex(text: String, rules: List<ColoringRule>, index: Int): String? {
         for (rule in rules.reversed()) {
             val fragments = rule.findFragments(text)
@@ -27,17 +17,21 @@ class StylingTextService {
     }
 
     fun styleText(text: String, rules: List<ColoringRule>): StyledText {
-        val appliedStyles = mutableSetOf<String>()
-        var segments = listOf(StyledSegment(listOf(), text.indices))
+        return styleText(StyledText(text), rules)
+    }
+
+    fun styleText(styledText: StyledText, rules: List<ColoringRule>): StyledText {
+        val appliedStyles = styledText.appliedStyles.toMutableSet()
+        var segments = styledText.styledStyledSegments
         for (rule in rules) {
-            val fragments = rule.findFragments(text)
+            val fragments = rule.findFragments(styledText.text)
             if (fragments.isNotEmpty()) {
                 segments = merge(segments, rule.coloringClass, fragments)
                 appliedStyles.addAll(rule.coloringClass)
             }
         }
         val calcSegments = mergeSimilarSegments(segments)
-        return StyledText(text, calcSegments, appliedStyles)
+        return StyledText(styledText.text, calcSegments, appliedStyles)
     }
 
     private fun mergeSimilarSegments(segments: List<StyledSegment>): List<StyledSegment> {
@@ -52,7 +46,9 @@ class StylingTextService {
         }
     }
 
-    private fun merge(styledSegments: List<StyledSegment>, styles: List<String>, fragments: List<IntRange>):List<StyledSegment> {
+    private fun merge(
+        styledSegments: List<StyledSegment>, styles: List<String>, fragments: List<IntRange>
+    ): List<StyledSegment> {
         var iS = 0
         var iF = 0
         var index = 0

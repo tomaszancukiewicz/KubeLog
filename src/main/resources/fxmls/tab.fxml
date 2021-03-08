@@ -6,8 +6,10 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<!--<TabPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">-->
 <?import com.payu.kube.log.ui.tab.SearchBoxView?>
+<?import com.payu.kube.log.ui.tab.LogListView?>
+
+<!--<TabPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">-->
 <Tab fx:id="tab" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
         <VBox>
             <HBox alignment="CENTER_LEFT" spacing="10">
@@ -40,7 +42,7 @@
                 </VBox.margin>
             </HBox>
             <SearchBoxView fx:id="searchBox" />
-            <ListView fx:id="logListView" VBox.vgrow="ALWAYS" />
+            <LogListView fx:id="logListView" VBox.vgrow="ALWAYS" />
             <HBox fx:id="appPodBox" alignment="CENTER_LEFT" spacing="10">
                 <Label fx:id="appPodLabel" minWidth="-Infinity" />
                 <Button fx:id="openNewestAppPodButton" mnemonicParsing="false" text="Open" />

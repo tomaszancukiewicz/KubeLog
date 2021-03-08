@@ -9,10 +9,12 @@ import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.support.GenericApplicationContext
+import org.springframework.scheduling.annotation.EnableScheduling
 import java.util.function.Supplier
 import javafx.application.Application as FXApplication
 
 @SpringBootApplication
+@EnableScheduling
 class Application : FXApplication() {
     lateinit var applicationContext: ConfigurableApplicationContext
 

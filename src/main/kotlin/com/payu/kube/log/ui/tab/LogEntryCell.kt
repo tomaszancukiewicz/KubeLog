@@ -1,11 +1,12 @@
 package com.payu.kube.log.ui.tab
 
+import com.payu.kube.log.service.coloring.StyledText
 import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.service.coloring.rules.ColoringRegexRule
 import com.payu.kube.log.service.coloring.rules.ColoringTextRule
 import com.payu.kube.log.util.RegexUtils.getOrNull
 import com.payu.kube.log.util.ViewUtils.toggleClass
-import javafx.beans.value.ObservableValue
+import javafx.beans.property.SimpleStringProperty
 import javafx.scene.Node
 import javafx.scene.control.ContentDisplay
 import javafx.scene.control.ListCell
@@ -14,11 +15,7 @@ import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
 
 
-class LogEntryCell(
-    private val stylingTextService: StylingTextService,
-    private val isWrappingProperty: ObservableValue<Boolean>,
-    private val markedText: ObservableValue<String>
-) : ListCell<String?>() {
+class LogEntryCell(private val stylingTextService: StylingTextService) : ListCell<StyledText?>() {
 
     companion object {
         private const val LOG_ENTRY_CLASS = "log-entry"
@@ -122,24 +119,25 @@ class LogEntryCell(
         )
     }
 
+    val markedTextProperty = SimpleStringProperty("")
+
     private val textFlow = TextFlow()
 
     init {
         contentDisplay = ContentDisplay.GRAPHIC_ONLY
         text = null
+        toggleClass(LOG_ENTRY_CLASS, true)
     }
 
-    override fun updateItem(item: String?, empty: Boolean) {
+    override fun updateItem(item: StyledText?, empty: Boolean) {
         super.updateItem(item, empty)
-        toggleClass(LOG_ENTRY_CLASS, true)
-        toggleClass(SEARCHED_LOG_ENTRY_CLASS, false)
-
         if (empty || item == null) {
+            toggleClass(SEARCHED_LOG_ENTRY_CLASS, false)
             graphic = null
             return
         }
 
-        if (isWrappingProperty.value) {
+        if (isWrapText) {
             textFlow.prefWidth = Region.USE_PREF_SIZE
         } else {
             textFlow.prefWidth = Region.USE_COMPUTED_SIZE
@@ -147,7 +145,7 @@ class LogEntryCell(
 
         val styleText = stylingTextService.styleText(
             item,
-            RULES + ColoringTextRule(listOf(MARKED_SEARCHED_TEXT_CLASS), markedText.value)
+            listOf(ColoringTextRule(listOf(MARKED_SEARCHED_TEXT_CLASS), markedTextProperty.value))
         )
         toggleClass(SEARCHED_LOG_ENTRY_CLASS, MARKED_SEARCHED_TEXT_CLASS in styleText.appliedStyles)
         val textNodes = createTextFlowNodes(styleText)
@@ -156,7 +154,7 @@ class LogEntryCell(
         graphic = textFlow
     }
 
-    private fun createTextFlowNodes(styledText: StylingTextService.StyledText): List<Node> {
+    private fun createTextFlowNodes(styledText: StyledText): List<Node> {
         val segments = styledText.createSegments()
         val result = mutableListOf<Text>()
         var index = 0

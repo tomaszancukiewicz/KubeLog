@@ -42,9 +42,12 @@ class CustomListViewSkin<T>(control: ListView<T>) : ListViewSkin<T>(control) {
         }
 
         private fun shouldTryScrollOneMoreTime(index: Int): Boolean {
-            if (index !in 0 until cellCount)
+            val range = 0 until cellCount
+            if (range.isEmpty()) {
                 return false
-            return runCatching { getVisibleCell(index) == null }
+            }
+            val matchedIndex = index.coerceIn(range)
+            return runCatching { getVisibleCell(matchedIndex) == null }
                 .getOrNull() ?: false
         }
     }
