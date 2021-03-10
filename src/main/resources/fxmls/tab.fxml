@@ -7,7 +7,7 @@
 <?import javafx.scene.text.*?>
 
 <?import com.payu.kube.log.ui.tab.SearchBoxView?>
-<?import com.payu.kube.log.ui.tab.LogListView?>
+<?import com.payu.kube.log.ui.tab.list.LogListView?>
 <?import com.payu.kube.log.ui.tab.NewAppPodView?>
 
 <!--<TabPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">-->

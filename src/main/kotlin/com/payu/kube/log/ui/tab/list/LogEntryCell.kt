@@ -1,4 +1,4 @@
-package com.payu.kube.log.ui.tab
+package com.payu.kube.log.ui.tab.list
 
 import com.payu.kube.log.service.coloring.StyledText
 import com.payu.kube.log.service.coloring.StylingTextService

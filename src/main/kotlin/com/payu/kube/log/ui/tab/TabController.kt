@@ -17,6 +17,8 @@ import com.payu.kube.log.service.pods.PodChangeInterface
 import com.payu.kube.log.service.pods.PodStoreService
 import com.payu.kube.log.service.pods.PodWithAppInterface
 import com.payu.kube.log.ui.MainController
+import com.payu.kube.log.ui.tab.list.LogEntryCell
+import com.payu.kube.log.ui.tab.list.LogListView
 import com.payu.kube.log.util.BindingsUtils.mapToBoolean
 import com.payu.kube.log.util.BindingsUtils.mapToObject
 import com.payu.kube.log.util.BindingsUtils.mapToString

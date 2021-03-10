@@ -1,4 +1,4 @@
-package com.payu.kube.log.ui.tab
+package com.payu.kube.log.ui.tab.list
 
 import javafx.application.Platform
 import javafx.scene.control.ListCell
