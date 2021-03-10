@@ -8,30 +8,33 @@
 
 <?import com.payu.kube.log.ui.tab.SearchBoxView?>
 <?import com.payu.kube.log.ui.tab.LogListView?>
+<?import com.payu.kube.log.ui.tab.NewAppPodView?>
 
 <!--<TabPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">-->
 <Tab fx:id="tab" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml">
         <VBox>
             <HBox alignment="CENTER_LEFT" spacing="10">
-                <Circle fx:id="statusIndicatorCircle" radius="5" />
-                <VBox>
-                    <Label fx:id="namespaceLabel" text="namespace" wrapText="true">
-                        <font>
-                            <Font size="12.0" />
-                        </font>
-                    </Label>
-                    <Label fx:id="statusLabel" minWidth="-Infinity" text="status">
+                <HBox alignment="CENTER_LEFT" spacing="10" HBox.hgrow="ALWAYS">
+                    <Circle fx:id="statusIndicatorCircle" radius="5" />
+                    <VBox>
+                        <Label fx:id="namespaceLabel" text="namespace" wrapText="true">
+                            <font>
+                                <Font size="12.0" />
+                            </font>
+                        </Label>
+                        <Label fx:id="statusLabel" minWidth="-Infinity" text="status">
+                            <font>
+                                <Font size="11.0" />
+                            </font>
+                        </Label>
+                    </VBox>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="timestampLabel" minWidth="-Infinity" text="creationTimestamp" HBox.hgrow="NEVER">
                         <font>
                             <Font size="11.0" />
                         </font>
                     </Label>
-                </VBox>
-                <Region HBox.hgrow="ALWAYS" />
-                <Label fx:id="timestampLabel" minWidth="-Infinity" text="creationTimestamp" HBox.hgrow="NEVER">
-                    <font>
-                        <Font size="11.0" />
-                    </font>
-                </Label>
+                </HBox>
                 <HBox alignment="CENTER_RIGHT" spacing="10" minWidth="-Infinity" >
                     <CheckBox fx:id="autoscrollCheckbox" selected="true" text="Autoscroll" />
                     <CheckBox fx:id="wrapCheckbox" selected="true" text="Wrap" />
@@ -43,13 +46,11 @@
             </HBox>
             <SearchBoxView fx:id="searchBox" />
             <LogListView fx:id="logListView" VBox.vgrow="ALWAYS" />
-            <HBox fx:id="appPodBox" alignment="CENTER_LEFT" spacing="10">
-                <Label fx:id="appPodLabel" minWidth="-Infinity" />
-                <Button fx:id="openNewestAppPodButton" mnemonicParsing="false" text="Open" />
+            <NewAppPodView fx:id="newAppPodView">
                 <VBox.margin>
                     <Insets bottom="5" left="5" right="5" top="5" />
                 </VBox.margin>
-            </HBox>
+            </NewAppPodView>
         </VBox>
     </Tab>
 <!--</TabPane>-->

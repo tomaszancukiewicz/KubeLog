@@ -7,7 +7,6 @@ import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.*
 import javafx.scene.input.*
-import javafx.scene.layout.HBox
 import javafx.scene.paint.Color
 import javafx.scene.shape.Circle
 import com.payu.kube.log.model.PodInfo
@@ -24,7 +23,6 @@ import com.payu.kube.log.util.BindingsUtils.mapToString
 import com.payu.kube.log.util.ClipboardUtils
 import com.payu.kube.log.util.DateUtils.fullFormat
 import com.payu.kube.log.util.LoggerUtils.logger
-import com.payu.kube.log.util.ViewUtils.bindManagedAndVisibility
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import java.net.URL
@@ -83,13 +81,7 @@ class TabController(
     lateinit var logListView: LogListView
 
     @FXML
-    lateinit var appPodBox: HBox
-
-    @FXML
-    lateinit var appPodLabel: Label
-
-    @FXML
-    lateinit var openNewestAppPodButton: Button
+    lateinit var newAppPodView: NewAppPodView
 
     private var timer: Timer? = null
     private var podLogsWatcher: PodLogsWatcher? = null
@@ -175,13 +167,9 @@ class TabController(
     }
 
     private fun setupNewestAppPod() {
-        appPodBox.bindManagedAndVisibility(newestAppPodProperty.isNotNull)
-        appPodLabel.textProperty().bind(newestAppPodProperty.mapToString {
-            "There is newer pod(${it?.name}) with this app(${it?.calculatedAppName})"
-        })
-        openNewestAppPodButton.setOnAction {
-            val newestPod = newestAppPodProperty.value ?: return@setOnAction
-            mainController.openPod(newestPod)
+        newAppPodView.newestAppPodProperty.bind(newestAppPodProperty)
+        newAppPodView.openPodAction = {
+            mainController.openPod(it)
         }
     }
 
