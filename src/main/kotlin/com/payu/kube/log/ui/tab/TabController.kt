@@ -191,7 +191,8 @@ class TabController(
         podLogsWatcher = PodLogsWatcher(monitoredPod)
         podLogsWatcher?.start()
         timer = fixedRateTimer(daemon = true, period = 300) {
-            val newLines = podLogsWatcher?.getNewLogs() ?: return@fixedRateTimer
+            val newLines = podLogsWatcher?.getNewLogs()
+                ?.takeIf { it.isNotEmpty() } ?: return@fixedRateTimer
             updateList(newLines)
         }
     }
