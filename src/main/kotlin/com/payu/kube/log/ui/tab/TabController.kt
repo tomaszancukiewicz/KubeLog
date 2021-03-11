@@ -1,14 +1,11 @@
 package com.payu.kube.log.ui.tab
 
-import javafx.beans.binding.Bindings
 import javafx.event.Event
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
 import javafx.scene.control.*
 import javafx.scene.input.*
-import javafx.scene.paint.Color
-import javafx.scene.shape.Circle
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.GlobalKeyEventHandlerService
 import com.payu.kube.log.service.coloring.StylingTextService
@@ -19,11 +16,9 @@ import com.payu.kube.log.service.pods.PodWithAppInterface
 import com.payu.kube.log.ui.MainController
 import com.payu.kube.log.ui.tab.list.LogEntryCell
 import com.payu.kube.log.ui.tab.list.LogListView
-import com.payu.kube.log.util.BindingsUtils.mapToBoolean
 import com.payu.kube.log.util.BindingsUtils.mapToObject
 import com.payu.kube.log.util.BindingsUtils.mapToString
 import com.payu.kube.log.util.ClipboardUtils
-import com.payu.kube.log.util.DateUtils.fullFormat
 import com.payu.kube.log.util.LoggerUtils.logger
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
@@ -56,16 +51,7 @@ class TabController(
     lateinit var tab: Tab
 
     @FXML
-    lateinit var namespaceLabel: Label
-
-    @FXML
-    lateinit var statusLabel: Label
-
-    @FXML
-    lateinit var timestampLabel: Label
-
-    @FXML
-    lateinit var statusIndicatorCircle: Circle
+    lateinit var podInfoView: PodInfoView
 
     @FXML
     lateinit var autoscrollCheckbox: CheckBox
@@ -149,23 +135,7 @@ class TabController(
 
     private fun setupMonitoredPod() {
         tab.textProperty().bind(monitoredPodProperty.mapToString { it.name })
-        statusIndicatorCircle.fillProperty().bind(
-            Bindings.`when`(monitoredPodProperty.mapToBoolean { it.isReady })
-                .then(Color.valueOf("#2bc140"))
-                .otherwise(Color.valueOf("#f55e56"))
-        )
-        namespaceLabel.textProperty()
-            .bind(monitoredPodProperty.mapToString { "${it.namespace} - ${it.containerImage}" })
-        statusLabel.textProperty()
-            .bind(monitoredPodProperty.mapToString { "${it.state.long()} " +
-                    "${it.readyCount}/${it.startedCount}/${it.containerCount} " +
-                    "R:${it.restarts}" })
-        timestampLabel.textProperty()
-            .bind(monitoredPodProperty.mapToString { pod ->
-                pod.deletionTimestamp
-                    ?.let { "C:${pod.creationTimestamp.fullFormat()}\nD:${it.fullFormat()}"}
-                    ?: "C:${pod.creationTimestamp.fullFormat()}"
-            })
+        podInfoView.podProperty.bind(monitoredPodProperty)
     }
 
     private fun setupNewestAppPod() {
