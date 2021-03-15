@@ -1,15 +1,15 @@
 package com.payu.kube.log.util
 
-import javafx.scene.control.ListView
+import com.payu.kube.log.ui.tab.list.LogListView
 import javafx.scene.input.Clipboard
 import javafx.scene.input.ClipboardContent
 
 object ClipboardUtils {
-    fun copySelectionToClipboard(listView: ListView<*>) {
+    fun copySelectionToClipboard(listView: LogListView) {
         val clipboardString = StringBuilder()
         val selectedItems = listView.selectionModel.selectedItems ?: listOf()
         for (item in selectedItems) {
-            clipboardString.append(item?.toString())
+            clipboardString.append(item?.text)
             clipboardString.append("\n")
         }
         setClipboardContent(clipboardString.toString())
