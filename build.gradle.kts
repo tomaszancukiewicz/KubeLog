@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
+    id("antlr")
     kotlin("jvm") version "1.4.21"
     kotlin("kapt") version "1.4.21"
     kotlin("plugin.allopen") version "1.4.21"
@@ -34,9 +35,15 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-web")
 
+    antlr("org.antlr:antlr4:4.9.2")
+
     implementation("com.github.Dansoftowner:jSystemThemeDetector:2.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+tasks.generateGrammarSource {
+    arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
 tasks.withType<Test> {
@@ -44,6 +51,7 @@ tasks.withType<Test> {
 }
 
 tasks.withType<KotlinCompile> {
+    dependsOn(tasks.generateGrammarSource)
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = "11"

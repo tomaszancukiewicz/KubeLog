@@ -13,10 +13,10 @@ import com.payu.kube.log.service.logs.PodLogsWatcher
 import com.payu.kube.log.service.pods.PodChangeInterface
 import com.payu.kube.log.service.pods.PodStoreService
 import com.payu.kube.log.service.pods.PodWithAppInterface
+import com.payu.kube.log.service.search.SearchQueryCompilerService
 import com.payu.kube.log.ui.MainController
 import com.payu.kube.log.ui.tab.list.LogEntryCell
 import com.payu.kube.log.ui.tab.list.LogListView
-import com.payu.kube.log.util.BindingsUtils.mapToObject
 import com.payu.kube.log.util.BindingsUtils.mapToString
 import com.payu.kube.log.util.ClipboardUtils
 import com.payu.kube.log.util.LoggerUtils.logger
@@ -24,7 +24,6 @@ import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import java.net.URL
 import java.util.*
-import java.util.function.Predicate
 import kotlin.concurrent.fixedRateTimer
 
 
@@ -33,7 +32,8 @@ class TabController(
     private val podStoreService: PodStoreService,
     private val globalKeyEventHandlerService: GlobalKeyEventHandlerService,
     private val stylingTextService: StylingTextService,
-    private val mainController: MainController
+    private val mainController: MainController,
+    private val searchQueryCompilerService: SearchQueryCompilerService
 ) : Initializable, EventHandler<KeyEvent>, PodChangeInterface, PodWithAppInterface {
 
     companion object {
@@ -110,27 +110,13 @@ class TabController(
     private fun setupSearch() {
         searchBox.isVisible = false
         searchBox.searchAction = this::search
+        searchBox.queryFactory = searchQueryCompilerService::compile
     }
 
     private fun setupLogList() {
         logListView.stylingTextService = stylingTextService
         logListView.wrapTextProperty.bind(wrapCheckbox.selectedProperty())
-        logListView.predicateProperty.bind(searchBox.searchProperty.mapToObject { search ->
-            if (search.text.isNotEmpty()) {
-                if (search.type == SearchBoxView.SearchType.FILTER) {
-                    return@mapToObject Predicate { search.text in it.text }
-                } else if (search.type == SearchBoxView.SearchType.NOT_FILTER) {
-                    return@mapToObject Predicate { search.text !in it.text }
-                }
-            }
-            return@mapToObject Predicate { true }
-        })
-        logListView.markedTextProperty.bind(searchBox.searchProperty.mapToString {
-            if (it.type == SearchBoxView.SearchType.MARK)
-                it.text
-            else
-                ""
-        })
+        logListView.searchProperty.bind(searchBox.searchProperty)
     }
 
     private fun setupMonitoredPod() {
@@ -218,28 +204,27 @@ class TabController(
         newestAppPodProperty.set(pod.takeIf { pod != monitoredPodProperty.value })
     }
 
-    private fun search(search: SearchBoxView.Search) {
+    private fun search(search: SearchBoxView.Search?) {
         logListView.refresh()
+        search ?: return
         Platform.runLater {
             Thread.sleep(50)
-            if (search.text.isNotEmpty()) {
-                val indexToScroll =
-                    when (search.type) {
-                        SearchBoxView.SearchType.MARK -> {
-                            logListView.indexOfLast { search.text in it.text }
-                                ?.let {
-                                    autoscrollCheckbox.isSelected = false
-                                    it
-                                }
-                        }
-                        else -> {
-                            autoscrollCheckbox.isSelected = true
-                            logListView.indexOfLast()
-                        }
-                    } ?: return@runLater
-                Platform.runLater {
-                    logListView.scrollUntilVisible(indexToScroll)
-                }
+            val indexToScroll =
+                when (search.type) {
+                    SearchBoxView.SearchType.MARK -> {
+                        logListView.indexOfLast { search.query.check(it.text) }
+                            ?.let {
+                                autoscrollCheckbox.isSelected = false
+                                it
+                            }
+                    }
+                    else -> {
+                        autoscrollCheckbox.isSelected = true
+                        logListView.indexOfLast()
+                    }
+                } ?: return@runLater
+            Platform.runLater {
+                logListView.scrollUntilVisible(indexToScroll)
             }
         }
     }

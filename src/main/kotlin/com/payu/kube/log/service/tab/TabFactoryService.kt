@@ -11,6 +11,7 @@ import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.GlobalKeyEventHandlerService
 import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.service.pods.PodStoreService
+import com.payu.kube.log.service.search.SearchQueryCompilerService
 
 @Service
 class TabFactoryService(
@@ -18,7 +19,8 @@ class TabFactoryService(
     private val chartResource: Resource,
     private val podStoreService: PodStoreService,
     private val globalKeyEventHandlerService: GlobalKeyEventHandlerService,
-    private val stylingTextService: StylingTextService
+    private val stylingTextService: StylingTextService,
+    private val searchQueryCompilerService: SearchQueryCompilerService
 ) {
 
     fun createTab(pod: PodInfo, mainController: MainController): Tab {
@@ -26,7 +28,7 @@ class TabFactoryService(
         fxmlLoader.setController(
             TabController(
                 pod, podStoreService, globalKeyEventHandlerService, stylingTextService,
-                mainController
+                mainController, searchQueryCompilerService
             )
         )
         return fxmlLoader.load()

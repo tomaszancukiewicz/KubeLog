@@ -1,8 +1,9 @@
 package com.payu.kube.log.ui.tab
 
+import com.payu.kube.log.service.search.query.Query
+import com.payu.kube.log.service.search.query.TextQuery
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ObjectBinding
-import javafx.beans.binding.StringBinding
 import javafx.scene.control.ChoiceBox
 import javafx.scene.control.TextField
 import javafx.scene.input.KeyCode
@@ -17,19 +18,19 @@ class SearchBoxView : HBox() {
         private val CLEAR_SEARCH_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.ESCAPE)
     }
 
-    data class Search(val text: String, val type: SearchType)
+    data class Search(val query: Query, val type: SearchType)
 
     enum class SearchType {
-        MARK, FILTER, NOT_FILTER
+        MARK, FILTER
     }
 
     private val searchTextField: TextField
     private val searchTypeChoiceBox: ChoiceBox<SearchType>
 
-    private val searchTextProperty: StringBinding
-    val searchProperty: ObjectBinding<Search>
+    val searchProperty: ObjectBinding<Search?>
 
-    var searchAction: ((Search) -> Unit)? = null
+    var queryFactory: ((String) -> Query) = { TextQuery(it) }
+    var searchAction: ((Search?) -> Unit)? = null
 
     init {
         managedProperty().bind(visibleProperty())
@@ -41,14 +42,9 @@ class SearchBoxView : HBox() {
         searchTypeChoiceBox = ChoiceBox<SearchType>()
         searchTypeChoiceBox.items.addAll(
             SearchType.MARK,
-            SearchType.FILTER,
-            SearchType.NOT_FILTER
+            SearchType.FILTER
         )
         searchTypeChoiceBox.value = searchTypeChoiceBox.items.firstOrNull()
-
-        searchTextProperty = Bindings.`when`(visibleProperty())
-            .then(searchTextField.textProperty())
-            .otherwise("")
 
         searchTextField.setOnKeyPressed {
             if (CLEAR_SEARCH_KEY_CODE_COMBINATION.match(it)) {
@@ -61,10 +57,15 @@ class SearchBoxView : HBox() {
         }
 
         searchProperty = Bindings.createObjectBinding({
-            val searchedText = searchTextProperty.value
             val searchType = searchTypeChoiceBox.selectionModel.selectedItemProperty().value
-            Search(searchedText, searchType)
-        }, searchTextProperty, searchTypeChoiceBox.selectionModel.selectedItemProperty())
+            searchTextField.textProperty().value
+                .takeIf { it.isNotEmpty() && visibleProperty().value }
+                ?.let { Search(queryFactory(it), searchType)}
+        },
+            searchTextField.textProperty(),
+            visibleProperty(),
+            searchTypeChoiceBox.selectionModel.selectedItemProperty()
+        )
 
         searchProperty.addListener { _ ->
             search()

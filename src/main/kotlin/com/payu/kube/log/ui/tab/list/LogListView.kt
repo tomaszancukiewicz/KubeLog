@@ -2,10 +2,13 @@ package com.payu.kube.log.ui.tab.list
 
 import com.payu.kube.log.service.coloring.StyledText
 import com.payu.kube.log.service.coloring.StylingTextService
+import com.payu.kube.log.ui.tab.SearchBoxView
+import com.payu.kube.log.util.BindingsUtils.mapToBoolean
+import com.payu.kube.log.util.BindingsUtils.mapToObject
 import com.payu.kube.log.util.ClipboardUtils
-import javafx.beans.property.ObjectProperty
+import javafx.beans.binding.ObjectBinding
 import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.ListView
@@ -18,23 +21,33 @@ import java.util.function.Predicate
 class LogListView: ListView<StyledText>() {
 
     val wrapTextProperty = SimpleBooleanProperty(true)
-    val markedTextProperty = SimpleStringProperty("")
+    val searchProperty = SimpleObjectProperty<SearchBoxView.Search?>(null)
+
+    private val markedTextProperty= searchProperty.mapToObject { it?.query }
+    private val markLineProperty = searchProperty.mapToBoolean { it?.type == SearchBoxView.SearchType.MARK }
+    private val predicateProperty: ObjectBinding<Predicate<in StyledText>> = searchProperty.mapToObject { search ->
+        if (search?.type == SearchBoxView.SearchType.FILTER) {
+            return@mapToObject Predicate { search.query.check(it.text) }
+        }
+        return@mapToObject Predicate { true }
+    }
 
     private val logsList = FXCollections.observableArrayList<StyledText>()
     private val filteredLogsList = logsList.filtered { true }
 
     var stylingTextService: StylingTextService? = null
 
-    val predicateProperty: ObjectProperty<Predicate<in StyledText>>
-        get() = filteredLogsList.predicateProperty()
-
     init {
         skin = CustomListViewSkin(this)
         selectionModel.selectionMode = SelectionMode.MULTIPLE
+
+        filteredLogsList.predicateProperty().bind(predicateProperty)
+
         cellFactory = Callback {
             val cell = LogEntryCell(stylingTextService!!)
             cell.wrapTextProperty().bind(wrapTextProperty)
-            cell.markedTextProperty.bind(markedTextProperty)
+            cell.markQueryProperty.bind(markedTextProperty)
+            cell.canColorLineProperty.bind(markLineProperty)
             cell
         }
 

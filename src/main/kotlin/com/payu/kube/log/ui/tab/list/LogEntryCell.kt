@@ -3,10 +3,12 @@ package com.payu.kube.log.ui.tab.list
 import com.payu.kube.log.service.coloring.StyledText
 import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.service.coloring.rules.ColoringRegexRule
-import com.payu.kube.log.service.coloring.rules.ColoringTextRule
+import com.payu.kube.log.service.coloring.rules.ColoringQueryRule
+import com.payu.kube.log.service.search.query.Query
 import com.payu.kube.log.util.RegexUtils.getOrNull
 import com.payu.kube.log.util.ViewUtils.toggleClass
-import javafx.beans.property.SimpleStringProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.Node
 import javafx.scene.control.ContentDisplay
 import javafx.scene.control.ListCell
@@ -119,7 +121,8 @@ class LogEntryCell(private val stylingTextService: StylingTextService) : ListCel
         )
     }
 
-    val markedTextProperty = SimpleStringProperty("")
+    val markQueryProperty = SimpleObjectProperty<Query?>(null)
+    val canColorLineProperty = SimpleBooleanProperty(false)
 
     private val textFlow = TextFlow()
 
@@ -143,11 +146,14 @@ class LogEntryCell(private val stylingTextService: StylingTextService) : ListCel
             textFlow.prefWidth = Region.USE_COMPUTED_SIZE
         }
 
-        val styleText = stylingTextService.styleText(
-            item,
-            listOf(ColoringTextRule(listOf(MARKED_SEARCHED_TEXT_CLASS), markedTextProperty.value))
-        )
-        toggleClass(SEARCHED_LOG_ENTRY_CLASS, MARKED_SEARCHED_TEXT_CLASS in styleText.appliedStyles)
+        val markLine = canColorLineProperty.value && (markQueryProperty.value?.check(item.text) ?: false)
+        val styleText = markQueryProperty.value?.let {
+            stylingTextService.styleText(
+                item,
+                listOf(ColoringQueryRule(listOf(MARKED_SEARCHED_TEXT_CLASS), it))
+            )
+        } ?: item
+        toggleClass(SEARCHED_LOG_ENTRY_CLASS,  markLine)
         val textNodes = createTextFlowNodes(styleText)
         textFlow.children.setAll(textNodes)
 

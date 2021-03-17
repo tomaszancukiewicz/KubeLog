@@ -52,7 +52,7 @@
     -fx-fill: #2979FF;
 }
 
-.list-cell.log-entry.searched .text.marked {
+.list-cell.log-entry .text.marked {
     -fx-fill: red;
     -fx-underline: true;
 }

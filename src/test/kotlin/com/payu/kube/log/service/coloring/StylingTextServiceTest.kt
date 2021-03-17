@@ -2,7 +2,8 @@ package com.payu.kube.log.service.coloring
 
 import com.payu.kube.log.service.coloring.rules.ColoringRegexRule
 import com.payu.kube.log.service.coloring.rules.ColoringRule
-import com.payu.kube.log.service.coloring.rules.ColoringTextRule
+import com.payu.kube.log.service.coloring.rules.ColoringQueryRule
+import com.payu.kube.log.service.search.query.TextQuery
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -34,7 +35,7 @@ internal class StylingTextServiceTest {
                     "log line",
                     listOf(
                         ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
-                        ColoringTextRule(listOf(S_CLASS), "")
+                        ColoringQueryRule(listOf(S_CLASS), TextQuery(""))
                     ),
                     listOf("log line" to listOf<String>())
                 ),
@@ -43,7 +44,7 @@ internal class StylingTextServiceTest {
                     "log line",
                     listOf(
                         ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
-                        ColoringTextRule(listOf(S_CLASS), "xd")
+                        ColoringQueryRule(listOf(S_CLASS), TextQuery("xd"))
                     ),
                     listOf("log line" to listOf<String>())
                 ),
@@ -51,7 +52,7 @@ internal class StylingTextServiceTest {
                     "abbccbbcc",
                     listOf(
                         ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
-                        ColoringTextRule(listOf(S_CLASS), "bb")
+                        ColoringQueryRule(listOf(S_CLASS), TextQuery("bb"))
                     ),
                     listOf(
                         "a" to listOf(),
@@ -65,7 +66,7 @@ internal class StylingTextServiceTest {
                     "abbccbbcc",
                     listOf(
                         ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
-                        ColoringTextRule(listOf(S_CLASS), "b")
+                        ColoringQueryRule(listOf(S_CLASS), TextQuery("b"))
                     ),
                     listOf(
                         "a" to listOf(),
@@ -79,7 +80,7 @@ internal class StylingTextServiceTest {
                     "  123 123  ",
                     listOf(
                         ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
-                        ColoringTextRule(listOf(S_CLASS), "")
+                        ColoringQueryRule(listOf(S_CLASS), TextQuery(""))
                     ),
                     listOf(
                         "  " to listOf(),
@@ -93,7 +94,7 @@ internal class StylingTextServiceTest {
                     "  123 123  ",
                     listOf(
                         ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
-                        ColoringTextRule(listOf(S_CLASS), "2")
+                        ColoringQueryRule(listOf(S_CLASS), TextQuery("2"))
                     ),
                     listOf(
                         "  " to listOf(),
@@ -111,7 +112,7 @@ internal class StylingTextServiceTest {
                     "  123  123  ",
                     listOf(
                         ColoringRegexRule(listOf(P_CLASS), "([0-9]+)".toRegex()),
-                        ColoringTextRule(listOf(S_CLASS), " 123 ")
+                        ColoringQueryRule(listOf(S_CLASS), TextQuery(" 123 "))
                     ),
                     listOf(
                         " " to listOf(),
@@ -126,7 +127,7 @@ internal class StylingTextServiceTest {
                 Arguments.of(
                     "10.77.213.151-- - - [28/Feb/2021:16:07:02 +0100] \"GET /index.html HTTP/1.1\" 200 77 \"-\" [repT=261]",
                     listOf(
-                        ColoringTextRule(listOf(S_CLASS), "10.77")
+                        ColoringQueryRule(listOf(S_CLASS), TextQuery("10.77"))
                     ),
                     listOf(
                         "10.77" to listOf(S_CLASS),
