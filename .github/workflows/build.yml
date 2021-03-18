@@ -1,11 +1,9 @@
 name: Build and release
-on:
-  push:
-    tags:
-      - v*
+on: push
 jobs:
   macos:
     runs-on: macos-latest
+    if: "startsWith(github.event.head_commit.message, 'Release: ')"
     steps:
       - uses: actions/checkout@v2
       - name: Setup Java JDK 11
@@ -20,14 +18,20 @@ jobs:
           p12-password: ${{ secrets.MACOS_CERTIFICATE_PWD }}
       - name: Create app bundle with Gradle
         run: ./gradlew creatAppBundle
+      - name: Get app version
+        id: app_version
+        run: echo "::set-output name=APP_VERSION::$(./gradlew version --no-daemon --console=plain -q)"
+      - name: Get short SHA
+        id: short_sha
+        run: echo "::set-output name=SHA8::$(echo ${GITHUB_SHA} | cut -c1-7)"
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: v${{ steps.app_version.outputs.APP_VERSION }}-${{ steps.short_sha.outputs.SHA8 }}
+          release_name: Release v${{ steps.app_version.outputs.APP_VERSION }}-${{ steps.short_sha.outputs.SHA8 }}
           body: |
             Run `xattr -cr KubeLog-mac.zip` before unpacking.
           draft: false
