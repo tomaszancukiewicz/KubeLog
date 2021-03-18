@@ -1,8 +1,20 @@
 package com.payu.kube.log.service.search.query
 
-open class TextQuery(val searchedText: String) : Query() {
+class TextQuery(val searchedText: String) : Query() {
     override fun toString(): String {
-        return "TextQuery($searchedText)"
+        return "TextQuery($searchedText, errors=$errors)"
+    }
+
+    override fun hashCode(): Int {
+        return 31 * super.hashCode() + searchedText.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (!super.equals(other))
+            return false
+        if (other !is TextQuery)
+            return false
+        return searchedText == other.searchedText
     }
 
     override fun check(text: String): Boolean {

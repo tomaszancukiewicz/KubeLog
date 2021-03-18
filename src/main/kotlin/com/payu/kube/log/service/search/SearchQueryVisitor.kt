@@ -7,21 +7,21 @@ import com.payu.kube.log.service.search.query.*
 class SearchQueryVisitor: SearchQueryBaseVisitor<Query?>() {
 
     override fun visitFullQuery(ctx: SearchQueryParser.FullQueryContext?): Query? {
-        return visit(ctx?.query())
+        return ctx?.query()?.let { visit(it) }
     }
 
     override fun visitSquareBracket(ctx: SearchQueryParser.SquareBracketContext?): Query? {
-        return visit(ctx?.query())
+        return ctx?.query()?.let { visit(it) }
     }
 
     override fun visitCurlyBracket(ctx: SearchQueryParser.CurlyBracketContext?): Query? {
-        return visit(ctx?.query())
+        return ctx?.query()?.let { visit(it) }
     }
 
     override fun visitBinaryOperation(ctx: SearchQueryParser.BinaryOperationContext?): Query? {
-        val r1 = visit(ctx?.query(0)) ?: return null
-        val r2 = visit(ctx?.query(1)) ?: return null
-        return when(ctx?.BinaryOperator()?.text) {
+        val r1 = ctx?.query(0)?.let { visit(it) } ?: return null
+        val r2 = ctx.query(1)?.let { visit(it) } ?: return null
+        return when(ctx.BinaryOperator()?.text) {
             "AND" -> AndQuery(r1, r2)
             "OR" -> OrQuery(r1, r2)
             else -> null
@@ -30,7 +30,7 @@ class SearchQueryVisitor: SearchQueryBaseVisitor<Query?>() {
 
     override fun visitUnaryOperation(ctx: SearchQueryParser.UnaryOperationContext?): Query? {
         ctx?.NOT() ?: return null
-        return visit(ctx.query())?.let { NotQuery(it) }
+        return ctx.query()?.let { visit(it) }?.let { NotQuery(it) }
     }
 
     override fun visitString(ctx: SearchQueryParser.StringContext?): Query? {
