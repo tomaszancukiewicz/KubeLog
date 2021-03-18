@@ -18,7 +18,7 @@ javafx {
 }
 
 group = "com.payu.kube.log"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 java.sourceCompatibility = JavaVersion.VERSION_11
 
@@ -56,6 +56,10 @@ tasks.withType<KotlinCompile> {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = "11"
     }
+}
+
+tasks.register("version") {
+    println(version)
 }
 
 tasks.register("creatAppBundle") {
