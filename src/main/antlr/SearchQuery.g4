@@ -10,6 +10,7 @@ query
    | LC query RC                        # curlyBracket
    | LS query RS                        # squareBracket
    | FunctionName LC query RC           # function
+   | RegexLiteral                       # regex
    | StringLiteral                      # string
    ;
 
@@ -29,6 +30,10 @@ RS : ']' ;
 
 FunctionName
     : [a-z] [a-zA-Z0-9]*
+    ;
+
+RegexLiteral
+    : 'r' StringLiteral
     ;
 
 StringLiteral

@@ -42,4 +42,10 @@ class SearchQueryVisitor: SearchQueryBaseVisitor<Query?>() {
         val text = ctx?.StringLiteral()?.text ?: return null
         return TextQuery(text.substring(1, text.lastIndex))
     }
+
+    override fun visitRegex(ctx: SearchQueryParser.RegexContext?): Query? {
+        val text = ctx?.RegexLiteral()?.text ?: return null
+        val regex = runCatching { text.substring(2, text.lastIndex).toRegex() }.getOrNull() ?: return null
+        return RegexQuery(regex)
+    }
 }
