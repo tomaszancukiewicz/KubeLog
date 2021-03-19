@@ -42,6 +42,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
+springBoot {
+    buildInfo()
+}
+
 tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor", "-long-messages")
 }

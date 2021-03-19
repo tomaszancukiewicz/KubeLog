@@ -9,18 +9,21 @@ import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.support.GenericApplicationContext
+import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
 import java.util.function.Supplier
 import javafx.application.Application as FXApplication
 
 @SpringBootApplication
 @EnableScheduling
+@EnableAsync
 class Application : FXApplication() {
     lateinit var applicationContext: ConfigurableApplicationContext
 
     override fun init() {
         super.init()
         applicationContext = SpringApplicationBuilder(Application::class.java)
+            .headless(false)
             .initializers(object : ApplicationContextInitializer<GenericApplicationContext> {
                 override fun initialize(applicationContext: GenericApplicationContext) {
                     applicationContext.registerBean(FXApplication::class.java, Supplier { this@Application })

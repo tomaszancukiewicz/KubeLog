@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 import com.payu.kube.log.service.GlobalKeyEventHandlerService
 import com.payu.kube.log.service.IsDarkThemeService
 import com.payu.kube.log.service.namespaces.NamespaceStoreService
+import com.payu.kube.log.service.version.UpdaterService
 import com.payu.kube.log.util.ViewUtils.toggleClass
 import javafx.beans.Observable
 import javafx.beans.binding.Bindings
@@ -25,7 +26,8 @@ class MainStageInitializer(
     private val cssResource: Resource,
     private val globalKeyEventHandlerService: GlobalKeyEventHandlerService,
     private val namespaceStoreService: NamespaceStoreService,
-    private val isDarkThemeService: IsDarkThemeService
+    private val isDarkThemeService: IsDarkThemeService,
+    private val updaterService: UpdaterService
 ) : ApplicationListener<StageReadyEvent> {
 
     companion object {
@@ -33,6 +35,11 @@ class MainStageInitializer(
     }
 
     override fun onApplicationEvent(event: StageReadyEvent) {
+        setupWindow(event.stage)
+        updaterService.checkVersion()
+    }
+
+    private fun setupWindow(stage: Stage) {
         val fxmlLoader = FXMLLoader(mainFxmlResource.url)
         fxmlLoader.setControllerFactory {
             applicationContext.getBean(it)
@@ -43,10 +50,10 @@ class MainStageInitializer(
         scene.setOnKeyPressed {
             globalKeyEventHandlerService.onKeyPressed(it)
         }
-        event.stage.scene = scene
+        stage.scene = scene
         setStyle(parent)
-        setTitle(event.stage)
-        event.stage.show()
+        setTitle(stage)
+        stage.show()
     }
 
     private fun setStyle(parent: Parent) {
