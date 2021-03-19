@@ -9,6 +9,7 @@ query
    | NOT query                          # unaryOperation
    | LC query RC                        # curlyBracket
    | LS query RS                        # squareBracket
+   | FunctionName LC query RC           # function
    | StringLiteral                      # string
    ;
 
@@ -27,7 +28,7 @@ LS : '[' ;
 RS : ']' ;
 
 FunctionName
-    : [a-zA-Z0-9]+
+    : [a-z] [a-zA-Z0-9]*
     ;
 
 StringLiteral
