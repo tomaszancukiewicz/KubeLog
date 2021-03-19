@@ -2,22 +2,22 @@ package com.payu.kube.log.ui.tab
 
 import com.payu.kube.log.service.search.query.Query
 import com.payu.kube.log.service.search.query.TextQuery
+import com.payu.kube.log.util.BindingsUtils.mapToBoolean
 import com.payu.kube.log.util.BindingsUtils.mapToString
-import com.payu.kube.log.util.ViewUtils.bindManagedAndVisibility
 import javafx.beans.binding.Bindings
 import javafx.beans.binding.ObjectBinding
-import javafx.geometry.Insets
 import javafx.scene.control.ChoiceBox
-import javafx.scene.control.Label
 import javafx.scene.control.TextField
+import javafx.scene.control.Tooltip
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyCodeCombination
 import javafx.scene.layout.HBox
 import javafx.scene.layout.Priority
-import javafx.scene.layout.VBox
 import javafx.scene.paint.Color
+import javafx.scene.shape.Rectangle
+import javafx.util.Duration
 
-class SearchBoxView : VBox() {
+class SearchBoxView : HBox() {
 
     companion object {
         private val EXECUTE_SEARCH_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.ENTER)
@@ -32,7 +32,8 @@ class SearchBoxView : VBox() {
 
     private val searchTextField: TextField
     private val searchTypeChoiceBox: ChoiceBox<SearchType>
-    private val errorLabel: Label
+    private val modeCircle: Rectangle
+    private val errorTooltip: Tooltip
 
     val searchProperty: ObjectBinding<Search?>
 
@@ -44,7 +45,7 @@ class SearchBoxView : VBox() {
 
         searchTextField = TextField()
         searchTextField.promptText = "Search in logs e.g. \"Hello\" OR \"world\""
-        HBox.setHgrow(searchTextField, Priority.ALWAYS)
+        setHgrow(searchTextField, Priority.ALWAYS)
 
         searchTypeChoiceBox = ChoiceBox<SearchType>()
         searchTypeChoiceBox.items.addAll(
@@ -63,9 +64,6 @@ class SearchBoxView : VBox() {
             }
         }
 
-        val hBox = HBox()
-        hBox.children.addAll(searchTextField, searchTypeChoiceBox)
-
         searchProperty = Bindings.createObjectBinding({
             val searchType = searchTypeChoiceBox.selectionModel.selectedItemProperty().value
             searchTextField.textProperty().value
@@ -81,19 +79,28 @@ class SearchBoxView : VBox() {
             search()
         }
 
-        errorLabel = Label()
-        errorLabel.padding = Insets(5.0)
-        errorLabel.textFill = Color.RED
-        errorLabel.isWrapText = true
-        errorLabel.textProperty().bind(searchProperty.mapToString { search ->
+        modeCircle = Rectangle()
+        modeCircle.heightProperty().bind(searchTextField.heightProperty())
+        modeCircle.widthProperty().bind(modeCircle.heightProperty().divide(2))
+        modeCircle.fillProperty().bind(
+            Bindings.`when`(searchProperty.mapToBoolean { it?.query?.errors?.isEmpty() ?: false })
+                .then(Color.valueOf("#2979FF"))
+                .otherwise(Color.valueOf("#2bc140"))
+        )
+
+        errorTooltip = Tooltip()
+        errorTooltip.textProperty().bind(searchProperty.mapToString { search ->
             search?.query
                 ?.errors
                 ?.takeIf { it.isNotEmpty() }
-                ?.joinToString("\n", "Errors in query found. It will be interpreted literally.\n") ?: ""
+                ?.joinToString("\n", "Literal mode.\nNot interpreted because of errors:\n") {
+                    " - $it"
+                } ?: "Interpreted mode"
         })
-        errorLabel.bindManagedAndVisibility(errorLabel.textProperty().isNotEmpty)
+        errorTooltip.showDelay = Duration.ZERO
+        Tooltip.install(modeCircle, errorTooltip)
 
-        children.addAll(hBox, errorLabel)
+        children.addAll(searchTextField, modeCircle, searchTypeChoiceBox)
     }
 
     private fun search() {
