@@ -39,13 +39,25 @@ class SearchQueryVisitor: SearchQueryBaseVisitor<Query?>() {
     }
 
     override fun visitString(ctx: SearchQueryParser.StringContext?): Query? {
-        val text = ctx?.StringLiteral()?.text ?: return null
-        return TextQuery(text.substring(1, text.lastIndex))
+        val node = ctx?.StringLiteral()?.text ?: return null
+        val text = node.substring(1, node.lastIndex).let {
+            if (node[0] == '\"')
+                it.replace("\\\"", "\"")
+            else
+                it.replace("\\'", "'")
+        }
+        return TextQuery(text)
     }
 
     override fun visitRegex(ctx: SearchQueryParser.RegexContext?): Query? {
-        val text = ctx?.RegexLiteral()?.text ?: return null
-        val regex = runCatching { text.substring(2, text.lastIndex).toRegex() }.getOrNull() ?: return null
+        val node = ctx?.RegexLiteral()?.text ?: return null
+        val text = node.substring(2, node.lastIndex).let {
+            if (node[1] == '\"')
+                it.replace("\\\"", "\"")
+            else
+                it.replace("\\'", "'")
+        }
+        val regex = runCatching { text.toRegex() }.getOrNull() ?: return null
         return RegexQuery(regex)
     }
 }
