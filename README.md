@@ -16,9 +16,13 @@ Search
 matches all lines, that: 
 - have any digit 
 - after applying upperCase to log line, 
-  it has to have `Hello` or `"Worlds"` word
-```
-1 hello 
-"World" 2
-"HELLO" "WORLD" 3
-```
+  it has to have `Hello` or `"World"` word
+  
+| Log line           | Is matched? |
+| -----------------  | ----------- |
+| 1 hello            | yes         |
+| hello              | no          |
+| "World" 2          | yes         |
+| World 2            | no          |
+| 123 alfa           | no          |
+| "HELLO" "WORLD" 3  | yes         |
