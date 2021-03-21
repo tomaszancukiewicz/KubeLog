@@ -75,7 +75,7 @@ class SearchBoxView : HBox() {
             searchTypeChoiceBox.selectionModel.selectedItemProperty()
         )
 
-        searchProperty.addListener { _ ->
+        searchProperty.addListener { _, _, _ ->
             search()
         }
 

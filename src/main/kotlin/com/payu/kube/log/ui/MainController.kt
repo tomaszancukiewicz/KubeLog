@@ -18,10 +18,10 @@ import com.payu.kube.log.util.BindingsUtils.mapToObject
 import com.payu.kube.log.util.BindingsUtils.mapToString
 import com.payu.kube.log.util.LoggerUtils.logger
 import com.payu.kube.log.util.ViewUtils.bindManagedAndVisibility
-import javafx.beans.InvalidationListener
 import javafx.beans.binding.BooleanBinding
 import javafx.beans.binding.StringBinding
 import javafx.beans.value.ObservableObjectValue
+import javafx.collections.ListChangeListener
 import javafx.scene.Parent
 import java.net.URL
 import java.util.*
@@ -131,10 +131,10 @@ class MainController(
     }
 
     private fun initMenuList() {
-        namespaceStoreService.allNamespacesSorted.addListener(InvalidationListener {
+        namespaceStoreService.allNamespacesSorted.addListener(ListChangeListener {
             buildMenu(namespaceStoreService.allNamespacesSorted, namespaceStoreService.currentNamespace.get())
         })
-        namespaceStoreService.currentNamespace.addListener { _ ->
+        namespaceStoreService.currentNamespace.addListener { _, _, _ ->
             val currentNamespace = namespaceStoreService.currentNamespace.get()
             buildMenu(namespaceStoreService.allNamespacesSorted, currentNamespace)
             podService.startMonitorNamespace(currentNamespace)
@@ -145,7 +145,7 @@ class MainController(
             podService.startMonitorNamespace(it)
         }
 
-        toggleGroup.selectedToggleProperty().addListener { _ ->
+        toggleGroup.selectedToggleProperty().addListener { _, _, _ ->
             val data = toggleGroup.selectedToggle?.userData as? String ?: return@addListener
             log.info("select new namespace: $data")
             namespaceStoreService.currentNamespace.set(data)
