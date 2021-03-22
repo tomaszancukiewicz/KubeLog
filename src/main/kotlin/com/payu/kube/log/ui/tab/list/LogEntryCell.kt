@@ -5,19 +5,21 @@ import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.service.coloring.rules.ColoringRegexRule
 import com.payu.kube.log.service.coloring.rules.ColoringQueryRule
 import com.payu.kube.log.service.search.query.Query
+import com.payu.kube.log.util.ClipboardUtils
 import com.payu.kube.log.util.RegexUtils.getOrNull
 import com.payu.kube.log.util.ViewUtils.toggleClass
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleObjectProperty
+import javafx.geometry.Pos
 import javafx.scene.Node
-import javafx.scene.control.ContentDisplay
+import javafx.scene.control.ContextMenu
 import javafx.scene.control.ListCell
+import javafx.scene.control.MenuItem
 import javafx.scene.layout.Region
 import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
 
 
-class LogEntryCell(private val stylingTextService: StylingTextService) : ListCell<StyledText?>() {
+class LogEntryCell(private val stylingTextService: StylingTextService) : ListCell<VirtualItem?>() {
 
     companion object {
         private const val LOG_ENTRY_CLASS = "log-entry"
@@ -77,7 +79,6 @@ class LogEntryCell(private val stylingTextService: StylingTextService) : ListCel
             listOf(COLORED_PURPLE_TEXT_CLASS, "brackets"),
             ".*?(?:\\[([^\\[\\]]*)\\]|\\(([^()]*)\\))".toRegex()
         ) {
-
             override fun findFragments(text: String): List<IntRange> {
                 return super.findFragments(text)
                     .getOrNull(1)
@@ -122,42 +123,99 @@ class LogEntryCell(private val stylingTextService: StylingTextService) : ListCel
     }
 
     val markQueryProperty = SimpleObjectProperty<Query?>(null)
-    val canColorLineProperty = SimpleBooleanProperty(false)
 
     private val textFlow = TextFlow()
 
+    var onClearBefore: ((Int) -> Unit)? = null
+    var onCopySelected: (() -> Unit)? = null
+
     init {
-        contentDisplay = ContentDisplay.GRAPHIC_ONLY
-        text = null
         toggleClass(LOG_ENTRY_CLASS, true)
+        setupLogCellContextMenu()
     }
 
-    override fun updateItem(item: StyledText?, empty: Boolean) {
+    private fun setupLogCellContextMenu() {
+        contextMenu = ContextMenu()
+
+        val clearBeforeItem = MenuItem("Clear before")
+        clearBeforeItem.setOnAction {
+            onClearBefore?.invoke(index)
+        }
+        contextMenu.items.add(clearBeforeItem)
+
+        val copyItem = MenuItem("Copy")
+        copyItem.setOnAction {
+            val value = (it.source as? MenuItem)?.userData as? String ?: return@setOnAction
+            ClipboardUtils.setClipboardContent(value)
+        }
+        contextMenu.items.add(copyItem)
+
+        val copyLineItem = MenuItem("Copy line")
+        copyLineItem.setOnAction {
+            onCopySelected?.invoke()
+        }
+        contextMenu.items.add(copyLineItem)
+
+        setOnContextMenuRequested { contextMenuEvent ->
+            val item = item as? Item
+            if (item == null) {
+                clearBeforeItem.isVisible = false
+                copyItem.isVisible = false
+                return@setOnContextMenuRequested
+            }
+            clearBeforeItem.isVisible = true
+            val inTextIndex = (contextMenuEvent.target as? Text)?.userData as? Int
+            if (inTextIndex == null) {
+                copyItem.isVisible = false
+                return@setOnContextMenuRequested
+            }
+            val textToCopy = stylingTextService.calcSegmentForIndex(item.value.text, RULES, inTextIndex)
+
+            copyItem.isVisible = textToCopy != null
+            copyItem.userData = textToCopy
+        }
+    }
+
+    override fun updateItem(item: VirtualItem?, empty: Boolean) {
         super.updateItem(item, empty)
+        toggleClass(SEARCHED_LOG_ENTRY_CLASS, false)
+        text = null
+        graphic = null
         if (empty || item == null) {
-            toggleClass(SEARCHED_LOG_ENTRY_CLASS, false)
-            graphic = null
             return
         }
 
-        if (isWrapText) {
-            textFlow.prefWidth = Region.USE_PREF_SIZE
-        } else {
-            textFlow.prefWidth = Region.USE_COMPUTED_SIZE
+        when(item) {
+            is Item -> {
+                if (isWrapText) {
+                    textFlow.prefWidth = Region.USE_PREF_SIZE
+                } else {
+                    textFlow.prefWidth = Region.USE_COMPUTED_SIZE
+                }
+
+                val markLine = markQueryProperty.value?.check(item.value.text) ?: false
+                val styleText = markQueryProperty.value?.let {
+                    stylingTextService.styleText(
+                        item.value,
+                        listOf(ColoringQueryRule(listOf(MARKED_SEARCHED_TEXT_CLASS), it))
+                    )
+                } ?: item.value
+                toggleClass(SEARCHED_LOG_ENTRY_CLASS,  markLine)
+                val textNodes = createTextFlowNodes(styleText)
+                textFlow.children.setAll(textNodes)
+
+                alignment = Pos.CENTER_LEFT
+                graphic = textFlow
+            }
+            is ShowMoreAfterItem -> {
+                text = "Show more after..."
+                alignment = Pos.CENTER
+            }
+            is ShowMoreBeforeItem -> {
+                text = "Show more before..."
+                alignment = Pos.CENTER
+            }
         }
-
-        val markLine = canColorLineProperty.value && (markQueryProperty.value?.check(item.text) ?: false)
-        val styleText = markQueryProperty.value?.let {
-            stylingTextService.styleText(
-                item,
-                listOf(ColoringQueryRule(listOf(MARKED_SEARCHED_TEXT_CLASS), it))
-            )
-        } ?: item
-        toggleClass(SEARCHED_LOG_ENTRY_CLASS,  markLine)
-        val textNodes = createTextFlowNodes(styleText)
-        textFlow.children.setAll(textNodes)
-
-        graphic = textFlow
     }
 
     private fun createTextFlowNodes(styledText: StyledText): List<Node> {

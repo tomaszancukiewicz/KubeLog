@@ -37,9 +37,10 @@ class MainController(
 ) : Initializable {
     private val log = logger()
 
-    private val clearSearchCodeCombination = KeyCodeCombination(KeyCode.ESCAPE)
-
-    private val openTabKeyCodeCompanion = KeyCodeCombination(KeyCode.ENTER)
+    companion object {
+        private val CLEAR_SEARCH_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.ESCAPE)
+        private val OPEN_TAB_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.ENTER)
+    }
 
     @FXML
     lateinit var menuBar: MenuBar
@@ -92,7 +93,7 @@ class MainController(
         logsPanel.bindManagedAndVisibility(showStatusPanel.not())
 
         searchTextField.setOnKeyPressed {
-            if (clearSearchCodeCombination.match(it)) {
+            if (CLEAR_SEARCH_KEY_CODE_COMBINATION.match(it)) {
                 searchTextField.text = ""
                 it.consume()
             }
@@ -112,7 +113,7 @@ class MainController(
             listView.selectionModel.clearSelection()
         }
         listView.setOnKeyPressed {
-            if (openTabKeyCodeCompanion.match(it)) {
+            if (OPEN_TAB_KEY_CODE_COMBINATION.match(it)) {
                 openSelectedPod()
                 it.consume()
             }

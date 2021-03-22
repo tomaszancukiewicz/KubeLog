@@ -18,7 +18,6 @@ import com.payu.kube.log.ui.MainController
 import com.payu.kube.log.ui.tab.list.LogEntryCell
 import com.payu.kube.log.ui.tab.list.LogListView
 import com.payu.kube.log.util.BindingsUtils.mapToString
-import com.payu.kube.log.util.ClipboardUtils
 import com.payu.kube.log.util.LoggerUtils.logger
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
@@ -142,7 +141,7 @@ class TabController(
                 event.consume()
             }
             COPY_KEY_CODE_COMBINATION.match(event) -> {
-                ClipboardUtils.copySelectionToClipboard(logListView)
+                logListView.copySelectionToClipboard()
                 event.consume()
             }
             CLEAR_KEY_CODE_COMBINATION.match(event) -> {
@@ -209,21 +208,10 @@ class TabController(
         search ?: return
         Platform.runLater {
             Thread.sleep(50)
-            val indexToScroll =
-                when (search.type) {
-                    SearchBoxView.SearchType.MARK -> {
-                        logListView.indexOfLast { search.query.check(it.text) }
-                            ?.let {
-                                autoscrollCheckbox.isSelected = false
-                                it
-                            }
-                    }
-                    else -> {
-                        autoscrollCheckbox.isSelected = true
-                        logListView.indexOfLast()
-                    }
-                } ?: return@runLater
+            autoscrollCheckbox.isSelected = false
+            val indexToScroll = logListView.indexOfLast { search.query.check(it.text) } ?: return@runLater
             Platform.runLater {
+                logListView.selectionModel.select(indexToScroll)
                 logListView.scrollUntilVisible(indexToScroll)
             }
         }
