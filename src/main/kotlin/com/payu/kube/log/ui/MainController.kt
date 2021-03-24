@@ -12,6 +12,7 @@ import com.payu.kube.log.model.PodListState
 import com.payu.kube.log.service.namespaces.NamespaceStoreService
 import com.payu.kube.log.service.pods.PodService
 import com.payu.kube.log.service.pods.PodStoreService
+import com.payu.kube.log.service.search.SearchQueryCompilerService
 import com.payu.kube.log.service.tab.TabFactoryService
 import com.payu.kube.log.util.BindingsUtils.mapToBoolean
 import com.payu.kube.log.util.BindingsUtils.mapToObject
@@ -33,7 +34,8 @@ class MainController(
     private val podService: PodService,
     private val podStoreService: PodStoreService,
     private val namespaceStoreService: NamespaceStoreService,
-    private val tabFactoryService: TabFactoryService
+    private val tabFactoryService: TabFactoryService,
+    private val searchQueryCompilerService: SearchQueryCompilerService
 ) : Initializable {
     private val log = logger()
 
@@ -98,12 +100,12 @@ class MainController(
                 it.consume()
             }
         }
-        filteredList.predicateProperty().bind(searchTextField.textProperty().mapToObject {
-            val searchText = it?.trim() ?: ""
-            if (searchText.isEmpty())
-                Predicate { true }
-            else
-                Predicate { pod -> searchText in pod.name }
+        filteredList.predicateProperty().bind(searchTextField.textProperty().mapToObject { text ->
+            text?.trim()
+                ?.takeIf { it.isNotEmpty() }
+                ?.let { searchQueryCompilerService.compile(it) }
+                ?.let { Predicate { pod -> it.check(pod.name) } }
+                ?: Predicate { true }
         })
 
         listView.items = filteredList
