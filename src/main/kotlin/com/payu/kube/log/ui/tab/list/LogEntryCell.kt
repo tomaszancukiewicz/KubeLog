@@ -35,7 +35,7 @@ class LogEntryCell(private val stylingTextService: StylingTextService) : ListCel
 
         private val HTTP_METHODS_RULE = ColoringRegexRule(
             listOf(COLORED_BLUE_TEXT_CLASS, "http-method"),
-            "(?<=^|[^a-z-A-Z])(GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH)(?=\$|[^a-z-A-Z])".toRegex()
+            "(?<=[^a-z-A-Z])(GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH)(?=[^a-z-A-Z])".toRegex()
         )
         private val ERROR_LOG_LEVEL_RULE = object : ColoringRegexRule(
             listOf(COLORED_RED_TEXT_CLASS, "log-level"),
