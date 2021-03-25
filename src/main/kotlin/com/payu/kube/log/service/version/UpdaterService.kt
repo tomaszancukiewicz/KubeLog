@@ -62,6 +62,8 @@ class UpdaterService(
         while (i < localVersion.size && i < onlineVersion.size) {
             if (onlineVersion[i] > localVersion[i])
                 return true
+            if (onlineVersion[i] < localVersion[i])
+                return false
             i++
         }
         return i < onlineVersion.size
