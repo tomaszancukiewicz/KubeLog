@@ -5,6 +5,7 @@ import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.service.coloring.rules.ColoringRegexRule
 import com.payu.kube.log.service.coloring.rules.ColoringQueryRule
 import com.payu.kube.log.service.search.query.Query
+import com.payu.kube.log.ui.tab.SearchBoxView
 import com.payu.kube.log.util.ClipboardUtils
 import com.payu.kube.log.util.RegexUtils.getOrNull
 import com.payu.kube.log.util.ViewUtils.toggleClass
@@ -13,6 +14,7 @@ import javafx.geometry.Pos
 import javafx.scene.Node
 import javafx.scene.control.ContextMenu
 import javafx.scene.control.ListCell
+import javafx.scene.control.Menu
 import javafx.scene.control.MenuItem
 import javafx.scene.layout.Region
 import javafx.scene.text.Text
@@ -128,6 +130,7 @@ class LogEntryCell(private val stylingTextService: StylingTextService) : ListCel
 
     var onClearBefore: ((Int) -> Unit)? = null
     var onCopySelected: (() -> Unit)? = null
+    var onAddToSearch: ((SearchBoxView.AddToSearchType, String) -> Unit)? = null
 
     init {
         toggleClass(LOG_ENTRY_CLASS, true)
@@ -137,11 +140,16 @@ class LogEntryCell(private val stylingTextService: StylingTextService) : ListCel
     private fun setupLogCellContextMenu() {
         contextMenu = ContextMenu()
 
-        val clearBeforeItem = MenuItem("Clear before")
-        clearBeforeItem.setOnAction {
-            onClearBefore?.invoke(index)
+        val addToSearchMenu = Menu("Add to search")
+        for (type in SearchBoxView.AddToSearchType.values()) {
+            val addToSearchItem = MenuItem(type.name)
+            addToSearchItem.setOnAction {
+                val value = (it.source as? MenuItem)?.parentMenu?.userData as? String ?: return@setOnAction
+                onAddToSearch?.invoke(type, value)
+            }
+            addToSearchMenu.items.add(addToSearchItem)
         }
-        contextMenu.items.add(clearBeforeItem)
+        contextMenu.items.add(addToSearchMenu)
 
         val copyItem = MenuItem("Copy")
         copyItem.setOnAction {
@@ -156,23 +164,33 @@ class LogEntryCell(private val stylingTextService: StylingTextService) : ListCel
         }
         contextMenu.items.add(copyLineItem)
 
+        val clearBeforeItem = MenuItem("Clear before")
+        clearBeforeItem.setOnAction {
+            onClearBefore?.invoke(index)
+        }
+        contextMenu.items.add(clearBeforeItem)
+
         setOnContextMenuRequested { contextMenuEvent ->
             val item = item as? Item
             if (item == null) {
                 clearBeforeItem.isVisible = false
                 copyItem.isVisible = false
+                addToSearchMenu.isVisible = false
                 return@setOnContextMenuRequested
             }
             clearBeforeItem.isVisible = true
             val inTextIndex = (contextMenuEvent.target as? Text)?.userData as? Int
             if (inTextIndex == null) {
                 copyItem.isVisible = false
+                addToSearchMenu.isVisible = false
                 return@setOnContextMenuRequested
             }
             val textToCopy = stylingTextService.calcSegmentForIndex(item.value.text, RULES, inTextIndex)
 
             copyItem.isVisible = textToCopy != null
             copyItem.userData = textToCopy
+            addToSearchMenu.isVisible = textToCopy != null
+            addToSearchMenu.userData = textToCopy
         }
     }
 

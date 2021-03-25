@@ -25,4 +25,18 @@ abstract class Query {
     open fun phrasesToMark(text: String): List<IntRange> {
         return listOf()
     }
+
+    open fun toQueryString(): String {
+        return ""
+    }
+
+    companion object {
+        @JvmStatic
+        protected fun wrapInBracketsWhenNeeded(query: Query): String {
+            if (query is TextQuery || query is RegexQuery) {
+                return query.toQueryString()
+            }
+            return "(${query.toQueryString()})"
+        }
+    }
 }

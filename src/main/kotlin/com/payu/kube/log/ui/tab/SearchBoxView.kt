@@ -1,7 +1,6 @@
 package com.payu.kube.log.ui.tab
 
-import com.payu.kube.log.service.search.query.Query
-import com.payu.kube.log.service.search.query.TextQuery
+import com.payu.kube.log.service.search.query.*
 import com.payu.kube.log.util.BindingsUtils.mapToBoolean
 import com.payu.kube.log.util.BindingsUtils.mapToString
 import javafx.beans.binding.Bindings
@@ -28,6 +27,10 @@ class SearchBoxView : HBox() {
 
     enum class SearchType {
         MARK, FILTER
+    }
+
+    enum class AddToSearchType {
+        AND, OR, NOT
     }
 
     private val searchTextField: TextField
@@ -111,5 +114,24 @@ class SearchBoxView : HBox() {
         if (isVisible) {
             searchTextField.requestFocus()
         }
+    }
+
+    fun addToSearch(type: AddToSearchType, text: String) {
+        val actualQuery = searchProperty.value?.query
+        val textQuery = TextQuery(text)
+        val newQuery = if (actualQuery != null) {
+            when (type) {
+                AddToSearchType.AND -> AndQuery(actualQuery, textQuery)
+                AddToSearchType.OR -> OrQuery(actualQuery, textQuery)
+                AddToSearchType.NOT -> AndQuery(actualQuery, NotQuery(textQuery))
+            }
+        } else {
+            if (type == AddToSearchType.NOT) {
+                NotQuery(textQuery)
+            } else {
+                textQuery
+            }
+        }
+        searchTextField.text = newQuery.toQueryString()
     }
 }

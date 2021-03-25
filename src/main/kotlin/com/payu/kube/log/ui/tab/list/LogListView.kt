@@ -43,6 +43,8 @@ class LogListView: ListView<VirtualItem>() {
 
     var stylingTextService: StylingTextService? = null
 
+    var onAddToSearch: ((SearchBoxView.AddToSearchType, String) -> Unit)? = null
+
     init {
         skin = CustomListViewSkin(this)
         selectionModel.selectionMode = SelectionMode.MULTIPLE
@@ -53,6 +55,7 @@ class LogListView: ListView<VirtualItem>() {
             cell.markQueryProperty.bind(markedTextProperty)
             cell.onClearBefore = this::clearToIndex
             cell.onCopySelected = this::copySelectionToClipboard
+            cell.onAddToSearch = onAddToSearch
             cell
         }
 

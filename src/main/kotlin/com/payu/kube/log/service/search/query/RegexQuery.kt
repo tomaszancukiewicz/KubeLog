@@ -25,4 +25,9 @@ class RegexQuery(val regex: Regex) : Query() {
     override fun phrasesToMark(text: String): List<IntRange> {
         return regex.findAll(text).map { it.range }.toList()
     }
+
+    override fun toQueryString(): String {
+        val escapedPattern = regex.pattern.replace("\"", "\\\"")
+        return "r\"$escapedPattern\""
+    }
 }

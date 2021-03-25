@@ -32,4 +32,11 @@ class FunctionQuery(val functionName: String, q: Query) : UnaryOperationQuery(q)
             else -> text
         }
     }
+
+    override fun toQueryString(): String {
+        if (functionName == "upperCase" || functionName == "lowerCase") {
+            return "$functionName(${q.toQueryString()})"
+        }
+        return q.toQueryString()
+    }
 }

@@ -117,6 +117,7 @@ class TabController(
 
     private fun setupLogList() {
         logListView.stylingTextService = stylingTextService
+        logListView.onAddToSearch = this::addToSearch
         logListView.wrapTextProperty.bind(wrapCheckbox.selectedProperty())
         logListView.searchProperty.bind(searchBox.searchProperty)
     }
@@ -228,6 +229,12 @@ class TabController(
                 logListView.scrollUntilVisible(indexToScroll)
             }
         }
+    }
+
+    fun addToSearch(type: SearchBoxView.AddToSearchType, text: String) {
+        searchBox.addToSearch(type, text)
+        searchBox.isVisible = true
+        searchBox.requestFocusSearchField()
     }
 
     private fun stopMonitor() {

@@ -24,4 +24,8 @@ abstract class UnaryOperationQuery(val q: Query) : Query() {
     override fun phrasesToMark(text: String): List<IntRange> {
         return q.phrasesToMark(text)
     }
+
+    override fun toQueryString(): String {
+        return q.toQueryString()
+    }
 }

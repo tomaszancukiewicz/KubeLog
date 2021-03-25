@@ -43,4 +43,9 @@ class TextQuery(val searchedText: String) : Query() {
         }
         return indexes
     }
+
+    override fun toQueryString(): String {
+        val escapedText = searchedText.replace("\"", "\\\"")
+        return "\"$escapedText\""
+    }
 }

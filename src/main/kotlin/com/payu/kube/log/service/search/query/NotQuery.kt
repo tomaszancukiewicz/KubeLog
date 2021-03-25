@@ -8,4 +8,8 @@ class NotQuery(q: Query) : UnaryOperationQuery(q) {
     override fun check(text: String): Boolean {
         return !super.check(text)
     }
+
+    override fun toQueryString(): String {
+        return "NOT ${wrapInBracketsWhenNeeded(q)}"
+    }
 }
