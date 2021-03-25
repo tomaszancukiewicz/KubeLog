@@ -8,6 +8,7 @@ import javafx.scene.control.*
 import javafx.scene.input.*
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.GlobalKeyEventHandlerService
+import com.payu.kube.log.service.coloring.StyledText
 import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.service.logs.PodLogsWatcher
 import com.payu.kube.log.service.pods.PodChangeInterface
@@ -23,7 +24,9 @@ import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
 import java.net.URL
 import java.util.*
+import java.util.concurrent.ForkJoinPool
 import kotlin.concurrent.fixedRateTimer
+import kotlin.streams.toList
 
 
 class TabController(
@@ -183,9 +186,19 @@ class TabController(
     }
 
     private fun updateList(newElements: List<String>) {
-        val styledTexts = newElements.map {
-            stylingTextService.styleText(it, LogEntryCell.RULES)
-        }
+        newElements.asSequence()
+            .chunked(100)
+            .forEach { chunk ->
+                val newStyledLines = ForkJoinPool(3).submit<List<StyledText>> {
+                    chunk.parallelStream()
+                        .map { stylingTextService.styleText(it, LogEntryCell.RULES) }
+                        .toList()
+                }.get()
+                addNewLinesToList(newStyledLines)
+            }
+    }
+
+    private fun addNewLinesToList(styledTexts: List<StyledText>) {
         Platform.runLater {
             logListView.addLines(styledTexts)
             if (autoscrollCheckbox.isSelected) {

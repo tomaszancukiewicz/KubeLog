@@ -69,7 +69,7 @@ class LogEntryCell(private val stylingTextService: StylingTextService) : ListCel
         }
         private val EXTRACT_VALUES_FROM_FIRST_3_BRACKETS_RULE = object : ColoringRegexRule(
             listOf(COLORED_BLUE_TEXT_CLASS, "brackets"),
-            ".*?(?:\\[([^\\[\\]]*)\\]|\\(([^()]*)\\))".toRegex()
+            "\\[([^\\[\\]]*)\\]|\\(([^()]*)\\)".toRegex()
         ) {
             override fun findFragments(text: String): List<IntRange> {
                 return super.findFragments(text).take(3)
@@ -77,7 +77,7 @@ class LogEntryCell(private val stylingTextService: StylingTextService) : ListCel
         }
         private val EXTRACT_VALUES_FROM_SECOND_BRACKETS_RULE = object : ColoringRegexRule(
             listOf(COLORED_PURPLE_TEXT_CLASS, "brackets"),
-            ".*?(?:\\[([^\\[\\]]*)\\]|\\(([^()]*)\\))".toRegex()
+            "\\[([^\\[\\]]*)\\]|\\(([^()]*)\\)".toRegex()
         ) {
             override fun findFragments(text: String): List<IntRange> {
                 return super.findFragments(text)
