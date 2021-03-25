@@ -19,7 +19,7 @@ javafx {
 }
 
 group = "com.payu.kube.log"
-version = "1.2.6"
+version = "1.2.8"
 
 java.sourceCompatibility = JavaVersion.VERSION_11
 
