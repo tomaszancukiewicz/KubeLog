@@ -52,8 +52,8 @@ class SearchBoxView : HBox() {
 
         searchTypeChoiceBox = ChoiceBox<SearchType>()
         searchTypeChoiceBox.items.addAll(
-            SearchType.MARK,
-            SearchType.FILTER
+            SearchType.FILTER,
+            SearchType.MARK
         )
         searchTypeChoiceBox.value = searchTypeChoiceBox.items.firstOrNull()
 
