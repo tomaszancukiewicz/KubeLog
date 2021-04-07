@@ -72,8 +72,8 @@ tasks.register("creatAppBundle") {
     dependsOn(tasks.withType<BootJar>())
     doLast {
         val srcAppDir = project.projectDir.resolve("src/main/app")
+        delete(temporaryDir)
         val tempDstDir = temporaryDir.toPath().resolve("dst")
-        delete(tempDstDir)
         mkdir(tempDstDir)
 
         // create app
@@ -106,7 +106,6 @@ tasks.register("creatAppBundle") {
 
         // create temp pkg
         val tempPkgDir = temporaryDir.resolve("temp.pkg")
-        delete(tempPkgDir)
         exec {
             workingDir(temporaryDir)
             commandLine("pkgbuild",
