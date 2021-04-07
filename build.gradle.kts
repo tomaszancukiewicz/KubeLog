@@ -71,21 +71,21 @@ tasks.register("creatAppBundle") {
     group = "build"
     dependsOn(tasks.withType<BootJar>())
     doLast {
-        val buildAppDir = buildDir.toPath().resolve("app")
-        println("Create app bundle in: $buildAppDir")
-        delete(buildAppDir)
-        mkdir(buildAppDir)
+        val srcAppDir = project.projectDir.resolve("src/main/app")
+        val tempDstDir = temporaryDir.toPath().resolve("dst")
+        delete(tempDstDir)
+        mkdir(tempDstDir)
 
-        val appDir = buildAppDir.resolve("${project.name}.app")
-        val contentDir = appDir.resolve("Contents")
+        // create app
+        val tempAppDir = tempDstDir.resolve("${project.name}.app")
+        val contentsDir = tempAppDir.resolve("Contents")
 
-        val appSrc = project.projectDir.resolve("src/main/app")
         copy {
-            from(appSrc.resolve("Contents"))
-            into(contentDir)
+            from(srcAppDir.resolve("Contents"))
+            into(contentsDir)
         }
 
-        val macOsDir = contentDir.resolve("MacOS")
+        val macOsDir = contentsDir.resolve("MacOS")
         val bootJarTask = project.tasks.withType<BootJar>()
         val jarFile = bootJarTask.map { it.outputs.files.singleFile }.first()
         copy {
@@ -97,19 +97,47 @@ tasks.register("creatAppBundle") {
             workingDir(macOsDir)
             commandLine("chmod", "+x", "./run_kubelog")
         }
-
-        val entitlements = appSrc.resolve("java.entitlements")
         exec {
-            workingDir(buildAppDir)
+            workingDir(tempDstDir)
             commandLine("codesign", "-f", "--deep",
-                "--entitlements", entitlements,
-                "-s", "Code Signing Certificate", appDir)
+                "--entitlements", srcAppDir.resolve("java.entitlements"),
+                "-s", "Code Signing Certificate", tempAppDir)
         }
 
-        val zipDir = buildAppDir.resolve("${project.name}.zip")
+        // create temp pkg
+        val tempPkgDir = temporaryDir.resolve("temp.pkg")
+        delete(tempPkgDir)
+        exec {
+            workingDir(temporaryDir)
+            commandLine("pkgbuild",
+                "--install-location", "/Applications",
+                "--identifier", "com.payu.KubeLog",
+                "--root", tempDstDir,
+                "--component-plist", srcAppDir.resolve("component.plist"),
+                tempPkgDir)
+        }
+
+        // output path
+        val buildAppDir = buildDir.toPath().resolve("app")
+        delete(buildAppDir)
+        mkdir(buildAppDir)
+
+        // copy app
+        copy {
+            from(tempAppDir) {
+                into("KubeLog.app")
+            }
+            into(buildAppDir)
+        }
+
+        // create pkg
         exec {
             workingDir(buildAppDir)
-            commandLine("zip", "-r", zipDir, appDir.fileName)
+            commandLine("productbuild",
+                "--package", tempPkgDir,
+                "--product", srcAppDir.resolve("requirements.plist"),
+                "--cert", "Code Signing Certificate",
+                buildAppDir.resolve("${project.name}.pkg"))
         }
     }
 }

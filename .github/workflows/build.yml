@@ -36,7 +36,11 @@ jobs:
           tag_name: v${{ steps.app_version.outputs.APP_VERSION }}-${{ steps.short_sha.outputs.SHA8 }}
           release_name: Release v${{ steps.app_version.outputs.APP_VERSION }}-${{ steps.short_sha.outputs.SHA8 }}
           body: |
-            Run `xattr -cr KubeLog-mac.zip` before unpacking.
+            Pkg installs application in /Applications by default. You can change it to HOME/Applications during
+            installation.
+
+            When you see "unidentified developer" error,
+            open installer in "System Preferences" > "Security & Privacy" > "General" > "Open anyway"
           draft: false
           prerelease: false
       - name: Upload Release Asset
@@ -45,8 +49,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/app/KubeLog.zip
-          asset_name: KubeLog-mac.zip
+          asset_path: ./build/app/KubeLog.pkg
+          asset_name: KubeLog-installer-mac.zip
           asset_content_type: application/zip
       - name: Print release url
         run: echo "Relese ${{ steps.create_release.outputs.html_url }}"

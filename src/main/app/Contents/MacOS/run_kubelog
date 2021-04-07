@@ -3,10 +3,12 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $SCRIPT_DIR
 
-echo "[$$][KubeLogScript] Started in: $SCRIPT_DIR" > logs.log
+LOG_FILE="/tmp/KubeLog-logs-$$-$(date +"%Y_%m_%d_%H_%M_%S").log"
+
+echo "" > $LOG_FILE
 
 function stub_logger() {
-  echo "[$$][KubeLogScript] $1" >> logs.log
+  echo "[$$][KubeLogScript] $1" >> $LOG_FILE
   syslog -s -k \
     Facility com.apple.console \
     Level Notice \
@@ -14,6 +16,7 @@ function stub_logger() {
     Message "[$$][KubeLogScript] $1"
 }
 
+stub_logger "[$$][KubeLogScript] Started in: $SCRIPT_DIR"
 stub_logger "Search for Java"
 
 JH=`/usr/libexec/java_home -X |
@@ -39,7 +42,7 @@ stub_logger "Start KubeLog"
 "${JAVACMD}" \
 		-Xdock:icon="../Resources/AppIcon.icns" \
 		-Xdock:name="KubeLog" \
-		-jar ./KubeLog.jar >> logs.log 2>&1
+		-jar ./KubeLog.jar >> $LOG_FILE 2>&1
 EXIT_CODE=$?
 
 stub_logger "Stop KubeLog with code: $EXIT_CODE"
