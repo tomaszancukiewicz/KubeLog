@@ -7,6 +7,7 @@ import javafx.fxml.Initializable
 import javafx.scene.control.*
 import javafx.scene.input.*
 import com.payu.kube.log.model.PodInfo
+import com.payu.kube.log.service.AppIsReadyService
 import com.payu.kube.log.service.GlobalKeyEventHandlerService
 import com.payu.kube.log.service.coloring.StyledText
 import com.payu.kube.log.service.coloring.StylingTextService
@@ -35,7 +36,8 @@ class TabController(
     private val globalKeyEventHandlerService: GlobalKeyEventHandlerService,
     private val stylingTextService: StylingTextService,
     private val mainController: MainController,
-    private val searchQueryCompilerService: SearchQueryCompilerService
+    private val searchQueryCompilerService: SearchQueryCompilerService,
+    private val appIsReadyService: AppIsReadyService
 ) : Initializable, EventHandler<KeyEvent>, PodChangeInterface, PodWithAppInterface {
 
     companion object {
@@ -170,6 +172,7 @@ class TabController(
 
     private fun startMonitor() {
         val monitoredPod = monitoredPodProperty.value
+        appIsReadyService.startMonitorChangesForApp(monitoredPod.calculatedAppName)
         newestAppPodProperty.set(
             podStoreService.getNewestPodForApp(monitoredPod.calculatedAppName)
                 ?.takeIf { it != monitoredPod }
@@ -238,8 +241,10 @@ class TabController(
     }
 
     private fun stopMonitor() {
-        podStoreService.stopWatchPod(monitoredPodProperty.value, this)
-        podStoreService.stopWatchApp(monitoredPodProperty.value.calculatedAppName, this)
+        val monitoredPod = monitoredPodProperty.value
+        appIsReadyService.stopMonitorChangesForApp(monitoredPod.calculatedAppName)
+        podStoreService.stopWatchPod(monitoredPod, this)
+        podStoreService.stopWatchApp(monitoredPod.calculatedAppName, this)
         podLogsWatcher?.stop()
         timer?.cancel()
     }

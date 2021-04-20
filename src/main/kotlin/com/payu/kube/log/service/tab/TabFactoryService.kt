@@ -8,6 +8,7 @@ import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import com.payu.kube.log.ui.tab.TabController
 import com.payu.kube.log.model.PodInfo
+import com.payu.kube.log.service.AppIsReadyService
 import com.payu.kube.log.service.GlobalKeyEventHandlerService
 import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.service.pods.PodStoreService
@@ -20,7 +21,8 @@ class TabFactoryService(
     private val podStoreService: PodStoreService,
     private val globalKeyEventHandlerService: GlobalKeyEventHandlerService,
     private val stylingTextService: StylingTextService,
-    private val searchQueryCompilerService: SearchQueryCompilerService
+    private val searchQueryCompilerService: SearchQueryCompilerService,
+    private val appIsReadyService: AppIsReadyService
 ) {
 
     fun createTab(pod: PodInfo, mainController: MainController): Tab {
@@ -28,7 +30,7 @@ class TabFactoryService(
         fxmlLoader.setController(
             TabController(
                 pod, podStoreService, globalKeyEventHandlerService, stylingTextService,
-                mainController, searchQueryCompilerService
+                mainController, searchQueryCompilerService, appIsReadyService
             )
         )
         return fxmlLoader.load()
