@@ -17,12 +17,12 @@ abstract class UnaryOperationQuery(val q: Query) : Query() {
         return q == other.q
     }
 
-    override fun check(text: String): Boolean {
-        return q.check(text)
+    override fun check(text: String, ignoreCase: Boolean): Boolean {
+        return q.check(text, ignoreCase)
     }
 
-    override fun phrasesToMark(text: String): List<IntRange> {
-        return q.phrasesToMark(text)
+    override fun phrasesToMark(text: String, ignoreCase: Boolean): List<IntRange> {
+        return q.phrasesToMark(text, ignoreCase)
     }
 
     override fun toQueryString(): String {

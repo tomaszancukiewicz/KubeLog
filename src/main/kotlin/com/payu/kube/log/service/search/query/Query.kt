@@ -19,10 +19,18 @@ abstract class Query {
     }
 
     open fun check(text: String): Boolean {
-        return false
+        return check(text, false)
     }
 
     open fun phrasesToMark(text: String): List<IntRange> {
+        return phrasesToMark(text, false)
+    }
+
+    open fun check(text: String, ignoreCase: Boolean): Boolean {
+        return false
+    }
+
+    open fun phrasesToMark(text: String, ignoreCase: Boolean): List<IntRange> {
         return listOf()
     }
 

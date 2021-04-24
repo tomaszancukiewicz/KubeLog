@@ -17,13 +17,21 @@ class RegexQuery(val regex: Regex) : Query() {
         return regex == other.regex
     }
 
-    override fun check(text: String): Boolean {
-        if (regex.pattern.isEmpty()) return false
-        return regex.containsMatchIn(text)
+    private fun createRegexWith(ignoreCase: Boolean): Regex {
+        return if (ignoreCase) {
+            Regex(regex.pattern, RegexOption.IGNORE_CASE)
+        } else {
+            regex
+        }
     }
 
-    override fun phrasesToMark(text: String): List<IntRange> {
-        return regex.findAll(text).map { it.range }.toList()
+    override fun check(text: String, ignoreCase: Boolean): Boolean {
+        if (regex.pattern.isEmpty()) return false
+        return createRegexWith(ignoreCase).containsMatchIn(text)
+    }
+
+    override fun phrasesToMark(text: String, ignoreCase: Boolean): List<IntRange> {
+        return createRegexWith(ignoreCase).findAll(text).map { it.range }.toList()
     }
 
     override fun toQueryString(): String {

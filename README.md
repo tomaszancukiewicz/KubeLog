@@ -4,6 +4,7 @@
 
 - Logical keywords: `AND`, `OR`, `NOT`
 - Functions, applied to log line, before check query inside: `upperCase()`, `lowerCase()`
+- Function to make case-insensitive queries `ignoreCase()`
 - String literals marked with `"` or `'`, e.g. `"Hello \"World\""` or `'Hello "World"'`
 - Regex patterns, e.g. `r"[0-9]+"` or `r'[0-9]+'`
 

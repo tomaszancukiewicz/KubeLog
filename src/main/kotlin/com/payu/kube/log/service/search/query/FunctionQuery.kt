@@ -17,12 +17,12 @@ class FunctionQuery(val functionName: String, q: Query) : UnaryOperationQuery(q)
         return functionName == other.functionName
     }
 
-    override fun check(text: String): Boolean {
-        return super.check(useFunction(text))
+    override fun check(text: String, ignoreCase: Boolean): Boolean {
+        return super.check(useFunction(text), "ignoreCase" == functionName || ignoreCase)
     }
 
-    override fun phrasesToMark(text: String): List<IntRange> {
-        return super.phrasesToMark(useFunction(text))
+    override fun phrasesToMark(text: String, ignoreCase: Boolean): List<IntRange> {
+        return super.phrasesToMark(useFunction(text), "ignoreCase" == functionName || ignoreCase)
     }
 
     private fun useFunction(text: String): String {
@@ -34,7 +34,7 @@ class FunctionQuery(val functionName: String, q: Query) : UnaryOperationQuery(q)
     }
 
     override fun toQueryString(): String {
-        if (functionName == "upperCase" || functionName == "lowerCase") {
+        if (functionName == "upperCase" || functionName == "lowerCase" || functionName == "ignoreCase") {
             return "$functionName(${q.toQueryString()})"
         }
         return q.toQueryString()

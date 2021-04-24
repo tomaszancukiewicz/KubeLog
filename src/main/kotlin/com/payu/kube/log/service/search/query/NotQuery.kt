@@ -5,8 +5,8 @@ class NotQuery(q: Query) : UnaryOperationQuery(q) {
         return "NotQuery($q, errors=$errors)"
     }
 
-    override fun check(text: String): Boolean {
-        return !super.check(text)
+    override fun check(text: String, ignoreCase: Boolean): Boolean {
+        return !super.check(text, ignoreCase)
     }
 
     override fun toQueryString(): String {

@@ -17,9 +17,9 @@ abstract class BinaryOperationQuery(val q1: Query, val q2: Query) : Query() {
         return q1 == other.q1 && q2 == other.q2
     }
 
-    override fun phrasesToMark(text: String): List<IntRange> {
-        val ranges1 = q1.phrasesToMark(text)
-        val ranges2 = q2.phrasesToMark(text)
+    override fun phrasesToMark(text: String, ignoreCase: Boolean): List<IntRange> {
+        val ranges1 = q1.phrasesToMark(text, ignoreCase)
+        val ranges2 = q2.phrasesToMark(text, ignoreCase)
         val allRanges = (ranges1 + ranges2).sortedBy { it.first }
         val result = mutableListOf<IntRange>()
         for (range in allRanges) {

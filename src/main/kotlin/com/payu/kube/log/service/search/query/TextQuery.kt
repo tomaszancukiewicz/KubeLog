@@ -17,17 +17,17 @@ class TextQuery(val searchedText: String) : Query() {
         return searchedText == other.searchedText
     }
 
-    override fun check(text: String): Boolean {
+    override fun check(text: String, ignoreCase: Boolean): Boolean {
         if (searchedText.isEmpty()) return false
-        return searchedText in text
+        return text.contains(searchedText, ignoreCase)
     }
 
-    override fun phrasesToMark(text: String): List<IntRange> {
-        return findAllIndexes(text)
+    override fun phrasesToMark(text: String, ignoreCase: Boolean): List<IntRange> {
+        return findAllIndexes(text, ignoreCase)
             .map { IntRange(it, it + searchedText.length - 1) }
     }
 
-    private fun findAllIndexes(textString: String): List<Int> {
+    private fun findAllIndexes(textString: String, ignoreCase: Boolean): List<Int> {
         if (searchedText.isEmpty()) {
             return listOf()
         }
@@ -35,7 +35,7 @@ class TextQuery(val searchedText: String) : Query() {
         var wordLength = 0
         var index = 0
         while (index != -1) {
-            index = textString.indexOf(searchedText, index + wordLength)
+            index = textString.indexOf(searchedText, index + wordLength, ignoreCase)
             if (index != -1) {
                 indexes.add(index)
             }
