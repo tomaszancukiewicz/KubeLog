@@ -11,8 +11,8 @@
         </MenuBar>
     </top>
     <center>
-        <SplitPane dividerPositions="0.3" VBox.vgrow="SOMETIMES">
-            <VBox SplitPane.resizableWithParent="false">
+        <SplitPane fx:id="splitPane" dividerPositions="0.3" VBox.vgrow="SOMETIMES">
+            <VBox fx:id="podsListContainer" SplitPane.resizableWithParent="false">
                 <ScrollPane fx:id="statusPanel" VBox.vgrow="ALWAYS">
                     <VBox spacing="5">
                         <Label fx:id="statusLabel" text="Loading" />
@@ -22,7 +22,7 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                     </padding>
                 </ScrollPane>
-                <VBox fx:id="logsPanel" alignment="CENTER" VBox.vgrow="ALWAYS">
+                <VBox fx:id="podsListPanel" alignment="CENTER" VBox.vgrow="ALWAYS">
                     <TextField fx:id="searchTextField" promptText="Search pod" />
                     <ListView fx:id="listView" VBox.vgrow="ALWAYS" />
                 </VBox>

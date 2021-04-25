@@ -9,6 +9,7 @@ import javafx.util.Callback
 import org.springframework.stereotype.Component
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.model.PodListState
+import com.payu.kube.log.service.GlobalKeyEventHandlerService
 import com.payu.kube.log.service.namespaces.NamespaceStoreService
 import com.payu.kube.log.service.pods.PodService
 import com.payu.kube.log.service.pods.PodStoreService
@@ -19,27 +20,34 @@ import com.payu.kube.log.util.BindingsUtils.mapToObject
 import com.payu.kube.log.util.BindingsUtils.mapToString
 import com.payu.kube.log.util.LoggerUtils.logger
 import com.payu.kube.log.util.ViewUtils.bindManagedAndVisibility
-import javafx.beans.binding.BooleanBinding
-import javafx.beans.binding.StringBinding
+import javafx.beans.binding.*
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.value.ObservableObjectValue
 import javafx.collections.ListChangeListener
+import javafx.event.EventHandler
+import javafx.scene.Node
 import javafx.scene.Parent
 import java.net.URL
 import java.util.*
 import java.util.function.Predicate
 import javafx.scene.control.ToggleGroup
+import javafx.scene.input.KeyEvent
+import javafx.scene.layout.VBox
 
 @Component
 class MainController(
+    private val globalKeyEventHandlerService: GlobalKeyEventHandlerService,
     private val podService: PodService,
     private val podStoreService: PodStoreService,
     private val namespaceStoreService: NamespaceStoreService,
     private val tabFactoryService: TabFactoryService,
     private val searchQueryCompilerService: SearchQueryCompilerService
-) : Initializable {
+) : Initializable, EventHandler<KeyEvent> {
     private val log = logger()
 
     companion object {
+        private val TOGGLE_POD_LIST_CODE_COMBINATION = KeyCodeCombination(KeyCode.T, KeyCodeCombination.SHORTCUT_DOWN)
+
         private val CLEAR_SEARCH_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.ESCAPE)
         private val OPEN_TAB_KEY_CODE_COMBINATION = KeyCodeCombination(KeyCode.ENTER)
     }
@@ -51,6 +59,15 @@ class MainController(
     lateinit var menu: Menu
 
     @FXML
+    lateinit var splitPane: SplitPane
+
+    @FXML
+    lateinit var podsListContainer: VBox
+
+    @FXML
+    lateinit var tabPane: TabPane
+
+    @FXML
     lateinit var statusPanel: Parent
 
     @FXML
@@ -60,7 +77,7 @@ class MainController(
     lateinit var reloadButton: Button
 
     @FXML
-    lateinit var logsPanel: Parent
+    lateinit var podsListPanel: Parent
 
     @FXML
     lateinit var searchTextField: TextField
@@ -68,17 +85,20 @@ class MainController(
     @FXML
     lateinit var listView: ListView<PodInfo>
 
-    @FXML
-    lateinit var tabPane: TabPane
-
     private val filteredList = podStoreService.podsSorted.filtered { true }
 
     private val toggleGroup = ToggleGroup()
 
+    private val podsVisible = SimpleBooleanProperty(true)
+
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         log.info("initialize")
+        globalKeyEventHandlerService.registerKeyPressEventHandler(this)
         menuBar.isUseSystemMenuBar = isMacOs()
         initMenuList()
+
+        initSplitPane()
+
         statusLabel.textProperty().bind(podStoreService.status.podListStateToString())
         statusLabel.bindManagedAndVisibility(statusLabel.textProperty().isNotEmpty)
         reloadButton.bindManagedAndVisibility(
@@ -92,7 +112,10 @@ class MainController(
         }
         val showStatusPanel = reloadButton.visibleProperty().or(statusLabel.visibleProperty())
         statusPanel.bindManagedAndVisibility(showStatusPanel)
-        logsPanel.bindManagedAndVisibility(showStatusPanel.not())
+        podsListPanel.bindManagedAndVisibility(showStatusPanel.not())
+
+        tabPane.bindManagedAndVisibility(Bindings.isNotEmpty(tabPane.tabs))
+        podsListContainer.bindManagedAndVisibility(podsVisible.or(showStatusPanel).or(tabPane.visibleProperty().not()))
 
         searchTextField.setOnKeyPressed {
             if (CLEAR_SEARCH_KEY_CODE_COMBINATION.match(it)) {
@@ -120,6 +143,27 @@ class MainController(
                 it.consume()
             }
         }
+    }
+
+    private fun initSplitPane() {
+        val setSplitPaneCallback = {
+            val splitPaneItems = mutableListOf<Node>().apply {
+                if (podsListContainer.visibleProperty().value) {
+                    add(podsListContainer)
+                }
+                if (tabPane.visibleProperty().value) {
+                    add(tabPane)
+                }
+            }
+            splitPane.items.setAll(splitPaneItems)
+        }
+        podsListContainer.visibleProperty().addListener { _, _, _ ->
+            setSplitPaneCallback()
+        }
+        tabPane.visibleProperty().addListener { _, _, _ ->
+            setSplitPaneCallback()
+        }
+        setSplitPaneCallback()
     }
 
     private fun openSelectedPod() {
@@ -168,6 +212,13 @@ class MainController(
 
     private fun isMacOs(): Boolean {
         return System.getProperty("os.name").toLowerCase().contains("mac")
+    }
+
+    override fun handle(event: KeyEvent) {
+        if (TOGGLE_POD_LIST_CODE_COMBINATION.match(event)) {
+            podsVisible.value = !podsVisible.value
+            event.consume()
+        }
     }
 
     private fun ObservableObjectValue<PodListState?>.podListStateToString(): StringBinding {
