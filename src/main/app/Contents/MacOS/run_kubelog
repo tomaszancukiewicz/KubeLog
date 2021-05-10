@@ -3,9 +3,9 @@
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $SCRIPT_DIR
 
-LOG_FILE="/tmp/KubeLog-logs-$$-$(date +"%Y_%m_%d_%H_%M_%S").log"
+LOG_FILE="${TMPDIR:-/tmp}/KubeLog-logs-$(date +"%Y_%m_%d_%H_%M_%S")-$$.log"
 
-echo "" > $LOG_FILE
+touch $LOG_FILE
 
 function stub_logger() {
   echo "[$$][KubeLogScript] $1" >> $LOG_FILE
@@ -16,7 +16,9 @@ function stub_logger() {
     Message "[$$][KubeLogScript] $1"
 }
 
-stub_logger "[$$][KubeLogScript] Started in: $SCRIPT_DIR"
+
+stub_logger "Started in: $SCRIPT_DIR"
+stub_logger "Logs in: $LOG_FILE"
 stub_logger "Search for Java"
 
 JH=`/usr/libexec/java_home -X |
