@@ -58,7 +58,7 @@ data class PodJsonWrapper(val json: JsonNode) {
         get() = containerStatuses.count { it.path("started").asBoolean() }
 
     val restarts: Int
-        get() = containerStatuses.sumBy { it.path("restartCount").asInt() }
+        get() = containerStatuses.sumOf { it.path("restartCount").asInt() }
 
     val states: JsonNode
         get() = containerStatuses.firstOrNull()?.path("state") ?: NullNode.getInstance()

@@ -26,9 +26,9 @@ class FunctionQuery(val functionName: String, q: Query) : UnaryOperationQuery(q)
     }
 
     private fun useFunction(text: String): String {
-        return when(functionName) {
-            "upperCase" -> text.toUpperCase()
-            "lowerCase" -> text.toLowerCase()
+        return when (functionName) {
+            "upperCase" -> text.uppercase()
+            "lowerCase" -> text.lowercase()
             else -> text
         }
     }

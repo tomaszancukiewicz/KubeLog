@@ -211,7 +211,7 @@ class MainController(
     }
 
     private fun isMacOs(): Boolean {
-        return System.getProperty("os.name").toLowerCase().contains("mac")
+        return System.getProperty("os.name").lowercase().contains("mac")
     }
 
     override fun handle(event: KeyEvent) {
