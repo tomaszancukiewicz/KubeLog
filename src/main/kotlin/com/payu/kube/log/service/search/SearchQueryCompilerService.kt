@@ -1,7 +1,7 @@
 package com.payu.kube.log.service.search
 
-import SearchQueryLexer
-import SearchQueryParser
+import com.payu.kube.log.search.query.SearchQueryLexer
+import com.payu.kube.log.search.query.SearchQueryParser
 import com.payu.kube.log.service.search.query.Query
 import com.payu.kube.log.service.search.query.TextQuery
 import org.antlr.v4.runtime.*

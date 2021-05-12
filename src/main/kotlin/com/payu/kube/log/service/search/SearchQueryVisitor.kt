@@ -1,7 +1,7 @@
 package com.payu.kube.log.service.search
 
-import SearchQueryBaseVisitor
-import SearchQueryParser
+import com.payu.kube.log.search.query.SearchQueryBaseVisitor
+import com.payu.kube.log.search.query.SearchQueryParser
 import com.payu.kube.log.service.search.query.*
 
 class SearchQueryVisitor: SearchQueryBaseVisitor<Query?>() {

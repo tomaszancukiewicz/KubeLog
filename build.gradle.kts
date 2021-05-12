@@ -48,7 +48,7 @@ springBoot {
 }
 
 tasks.generateGrammarSource {
-    arguments = arguments + listOf("-visitor", "-long-messages")
+    arguments = arguments + listOf("-visitor", "-long-messages", "-package", "com.payu.kube.log.search.query")
 }
 
 tasks.withType<Test> {
