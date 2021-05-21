@@ -9,6 +9,7 @@ import javafx.scene.input.*
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.AppIsReadyService
 import com.payu.kube.log.service.GlobalKeyEventHandlerService
+import com.payu.kube.log.service.coloring.Rules
 import com.payu.kube.log.service.coloring.StyledText
 import com.payu.kube.log.service.coloring.StylingTextService
 import com.payu.kube.log.service.logs.PodLogsWatcher
@@ -17,7 +18,6 @@ import com.payu.kube.log.service.pods.PodStoreService
 import com.payu.kube.log.service.pods.PodWithAppInterface
 import com.payu.kube.log.service.search.SearchQueryCompilerService
 import com.payu.kube.log.ui.MainController
-import com.payu.kube.log.ui.tab.list.LogEntryCell
 import com.payu.kube.log.ui.tab.list.LogListView
 import com.payu.kube.log.util.BindingsUtils.mapToString
 import com.payu.kube.log.util.LoggerUtils.logger
@@ -195,7 +195,7 @@ class TabController(
             .forEach { chunk ->
                 val newStyledLines = ForkJoinPool(3).submit<List<StyledText>> {
                     chunk.parallelStream()
-                        .map { stylingTextService.styleText(it, LogEntryCell.RULES) }
+                        .map { stylingTextService.styleText(it, Rules.RULES) }
                         .toList()
                 }.get()
                 addNewLinesToList(newStyledLines)
