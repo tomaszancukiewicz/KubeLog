@@ -190,14 +190,20 @@ class TabController(
     }
 
     private fun updateList(newElements: List<String>) {
+        println(newElements.size)
         newElements.asSequence()
             .chunked(100)
             .forEach { chunk ->
-                val newStyledLines = ForkJoinPool(3).submit<List<StyledText>> {
-                    chunk.parallelStream()
-                        .map { stylingTextService.styleText(it, Rules.RULES) }
-                        .toList()
-                }.get()
+                val forkJoinPool = ForkJoinPool(10)
+                val newStyledLines = try {
+                    forkJoinPool.submit<List<StyledText>> {
+                        chunk.parallelStream()
+                            .map { stylingTextService.styleText(it, Rules.RULES) }
+                            .toList()
+                    }.get()
+                } finally {
+                    forkJoinPool.shutdown()
+                }
                 addNewLinesToList(newStyledLines)
             }
     }
