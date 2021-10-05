@@ -15,9 +15,8 @@ internal class QueryTest {
     }
 
     companion object {
-        @Suppress("unused")
         @JvmStatic
-        private fun provideQuery(): List<Arguments> {
+        fun provideQuery(): List<Arguments> {
             return listOf(
                 Arguments.of(
                     "aabbaabbbc",

@@ -27,9 +27,8 @@ internal class StylingTextServiceTest {
         private const val P_CLASS = "pattern"
         private const val S_CLASS = "searched"
 
-        @Suppress("unused")
         @JvmStatic
-        private fun providerStyledText(): List<Arguments> {
+        fun providerStyledText(): List<Arguments> {
             return listOf(
                 Arguments.of(
                     "log line",

@@ -15,9 +15,8 @@ internal class PodInfoTest {
     }
 
     companion object {
-        @Suppress("unused")
         @JvmStatic
-        private fun providePodNames(): List<Arguments> {
+        fun providePodNames(): List<Arguments> {
             val template = PodInfo(
                 "uid", "name", "appNameLabel", "ownerReferenceName", "namespace",
                 "containerImage", "containerName", "nodeName", 3, 1, 1, 1,
