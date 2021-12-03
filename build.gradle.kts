@@ -1,3 +1,5 @@
+import org.jetbrains.compose.compose
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
@@ -11,6 +13,7 @@ plugins {
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.springframework.boot") version "2.5.5"
     id("org.openjfx.javafxplugin") version "0.0.10"
+    id("org.jetbrains.compose") version "1.0.0"
 }
 
 javafx {
@@ -26,7 +29,9 @@ java.sourceCompatibility = JavaVersion.VERSION_11
 repositories {
     jcenter()
     mavenCentral()
+    google()
     maven("https://jitpack.io")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 dependencies {
@@ -36,11 +41,25 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-web")
 
-    antlr("org.antlr:antlr4:4.9.2")
+    antlr("org.antlr:antlr4:4.9.3")
 
     implementation("com.github.Dansoftowner:jSystemThemeDetector:2.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    implementation(compose.desktop.currentOs)
+    implementation("org.jetbrains.compose.components:components-splitpane:1.0.0")
+}
+
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "composeTest"
+            packageVersion = version.toString()
+        }
+    }
 }
 
 springBoot {
