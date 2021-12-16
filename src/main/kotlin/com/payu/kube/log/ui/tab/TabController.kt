@@ -23,6 +23,7 @@ import com.payu.kube.log.util.BindingsUtils.mapToString
 import com.payu.kube.log.util.LoggerUtils.logger
 import javafx.application.Platform
 import javafx.beans.property.SimpleObjectProperty
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.net.URL
 import java.util.*
 import java.util.concurrent.ForkJoinPool
@@ -180,7 +181,7 @@ class TabController(
         podStoreService.startWatchPod(monitoredPod, this)
         podStoreService.startWatchApp(monitoredPod.calculatedAppName, this)
 
-        podLogsWatcher = PodLogsWatcher(monitoredPod)
+        podLogsWatcher = PodLogsWatcher(MutableStateFlow(monitoredPod))
         podLogsWatcher?.start()
         timer = fixedRateTimer(daemon = true, period = 300) {
             val newLines = podLogsWatcher?.getNewLogs()
@@ -223,7 +224,7 @@ class TabController(
     }
 
     override fun onNewPodWithApp(pod: PodInfo) {
-        newestAppPodProperty.set(pod.takeIf { pod != monitoredPodProperty.value })
+        newestAppPodProperty.set(pod.takeIf { !pod.isSamePod(monitoredPodProperty.value) })
     }
 
     private fun search(search: SearchBoxView.Search?) {

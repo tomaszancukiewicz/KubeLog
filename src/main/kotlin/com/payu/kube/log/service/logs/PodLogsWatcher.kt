@@ -4,10 +4,11 @@ import com.payu.kube.log.util.LoggerUtils.logger
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.model.PodState
 import com.payu.kube.log.service.pods.PodChangeInterface
+import kotlinx.coroutines.flow.StateFlow
 import java.time.Instant
 import kotlin.concurrent.thread
 
-data class PodLogsWatcher(var pod: PodInfo) : PodChangeInterface {
+data class PodLogsWatcher(var podFlow: StateFlow<PodInfo>) : PodChangeInterface {
     private val log = logger()
 
     private var loaded = false
@@ -17,8 +18,10 @@ data class PodLogsWatcher(var pod: PodInfo) : PodChangeInterface {
 
     private val logs = mutableListOf<String>()
 
+    private val pod: PodInfo
+        get() = podFlow.value
+
     override fun onPodChange(pod: PodInfo) {
-        this.pod = pod
     }
 
     fun start() {

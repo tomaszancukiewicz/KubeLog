@@ -1,9 +1,15 @@
 package com.payu.kube.log
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.window.application
 import com.payu.kube.log.stage.StageReadyEvent
+import com.payu.kube.log.ui.compose.MainWindow
 import javafx.application.HostServices
 import javafx.application.Platform
 import javafx.stage.Stage
+import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.ApplicationContextInitializer
@@ -45,6 +51,14 @@ class Application : FXApplication() {
     }
 }
 
-fun main(args: Array<String>) {
-    FXApplication.launch(Application::class.java, *args)
+//fun main(args: Array<String>) {
+//    FXApplication.launch(Application::class.java, *args)
+//}
+
+@ExperimentalFoundationApi
+@ExperimentalMaterialApi
+@ExperimentalSplitPaneApi
+@ExperimentalComposeUiApi
+fun main(args: Array<String>) = application {
+    MainWindow(::exitApplication)
 }

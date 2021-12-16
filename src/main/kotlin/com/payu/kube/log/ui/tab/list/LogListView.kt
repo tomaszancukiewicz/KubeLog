@@ -19,7 +19,7 @@ import java.util.function.Predicate
 import kotlin.math.max
 import kotlin.math.min
 
-class LogListView: ListView<VirtualItem>() {
+class LogListView: ListView<VirtualItem<StyledText>>() {
 
     companion object {
         private const val MORE_ELEMENT = 3
@@ -39,7 +39,7 @@ class LogListView: ListView<VirtualItem>() {
     }
 
     private val allLogsList = FXCollections.observableArrayList<StyledText>()
-    private val showedLogList = FXCollections.observableArrayList<VirtualItem>()
+    private val showedLogList = FXCollections.observableArrayList<VirtualItem<StyledText>>()
 
     var stylingTextService: StylingTextService? = null
 
@@ -125,7 +125,7 @@ class LogListView: ListView<VirtualItem>() {
     }
 
     private fun recalculate() {
-        val newShowedList = mutableListOf<VirtualItem>()
+        val newShowedList = mutableListOf<VirtualItem<StyledText>>()
         var areAnyElementsBefore = false
         for (i in allLogsList.indices) {
             val value = allLogsList[i]
@@ -134,7 +134,7 @@ class LogListView: ListView<VirtualItem>() {
                 val lastElement = newShowedList.lastOrNull()
                 val item = Item(value, i)
                 if (areAnyElementsBefore) {
-                    if (lastElement is Item) {
+                    if (lastElement is Item<StyledText>) {
                         newShowedList.add(ShowMoreAfterItem(lastElement))
                     }
                     newShowedList.add(ShowMoreBeforeItem(item))
@@ -189,8 +189,8 @@ class LogListView: ListView<VirtualItem>() {
         }
     }
 
-    private fun showBefore(cellIndex: Int, item: ShowMoreBeforeItem) {
-        var prevItem: Item? = null
+    private fun showBefore(cellIndex: Int, item: ShowMoreBeforeItem<StyledText>) {
+        var prevItem: Item<StyledText>? = null
         var actualIndex = cellIndex + 1
         for (i in cellIndex - 1 downTo 0) {
             prevItem = showedLogList[i] as? Item ?: continue
@@ -198,7 +198,7 @@ class LogListView: ListView<VirtualItem>() {
         }
 
         val minAddedElement = max((prevItem?.originalIndex ?: -1) + 1, item.originalIndex - MORE_ELEMENT)
-        var lastAddedItem: Item? = null
+        var lastAddedItem: Item<StyledText>? = null
         for (i in item.originalIndex - 1 downTo minAddedElement) {
             val newItem = Item(allLogsList[i], i)
             showedLogList.add(actualIndex, newItem)
@@ -222,8 +222,8 @@ class LogListView: ListView<VirtualItem>() {
         }
     }
 
-    private fun showAfter(cellIndex: Int, item: ShowMoreAfterItem) {
-        var nextItem: Item? = null
+    private fun showAfter(cellIndex: Int, item: ShowMoreAfterItem<StyledText>) {
+        var nextItem: Item<StyledText>? = null
         var actualIndex = cellIndex
         for (i in cellIndex + 1 until showedLogList.size) {
             nextItem = showedLogList[i] as? Item ?: continue
@@ -231,7 +231,7 @@ class LogListView: ListView<VirtualItem>() {
         }
 
         val maxAddedElement = min(nextItem?.originalIndex ?: allLogsList.size, item.originalIndex + 1 + MORE_ELEMENT)
-        var lastAddedItem: Item? = null
+        var lastAddedItem: Item<StyledText>? = null
         for (i in item.originalIndex + 1 until maxAddedElement) {
             val newItem = Item(allLogsList[i], i)
             showedLogList.add(actualIndex, newItem)

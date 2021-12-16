@@ -1,88 +1,134 @@
 package com.payu.kube.log.service.pods
 
-import javafx.application.Platform
+import com.payu.kube.log.model.PodInfo
+import com.payu.kube.log.model.PodListState
+import com.payu.kube.log.util.LoggerUtils.logger
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.collections.FXCollections
 import javafx.collections.ObservableList
-import org.springframework.scheduling.annotation.Scheduled
+import kotlinx.coroutines.flow.*
 import org.springframework.stereotype.Service
-import com.payu.kube.log.util.LoggerUtils.logger
-import com.payu.kube.log.model.PodInfo
-import com.payu.kube.log.model.PodListState
 import java.time.Instant
+import java.util.*
 import javax.annotation.PostConstruct
+import javax.annotation.PreDestroy
+import kotlin.concurrent.fixedRateTimer
 
 @Service
 class PodStoreService(private val podService: PodService) : PodListChangeInterface {
     private val log = logger()
 
-    private final val pods: ObservableList<PodInfo> = FXCollections.observableArrayList()
-    final val podsSorted: ObservableList<PodInfo> = pods.sorted(
-        compareBy<PodInfo> { it.calculatedAppName }
-            .thenBy { it.creationTimestamp }
-            .thenBy { it.name }
-    )
-    final val status: ObjectProperty<PodListState> = SimpleObjectProperty(PodListState.LoadingPods)
+    private val pods = MutableStateFlow(listOf<PodInfo>())
 
-    private var podWatchers = mutableMapOf<PodInfo, MutableList<PodChangeInterface>>()
+    val statePodsSorted = pods.map {
+        pods.value.sortedWith(
+            compareBy<PodInfo> { it.calculatedAppName }
+                .thenBy { it.creationTimestamp }
+                .thenBy { it.name }
+        )
+    }
+
+    val podsSorted: ObservableList<PodInfo> = FXCollections.observableArrayList()
+
+    val stateStatus = MutableStateFlow<PodListState>(PodListState.LoadingPods)
+    val status: ObjectProperty<PodListState> = SimpleObjectProperty(PodListState.LoadingPods)
+
+    private var podWatchers = mutableMapOf<String, MutableList<PodChangeInterface>>()
     private var newAppContainerWatchers = mutableMapOf<String, MutableList<PodWithAppInterface>>()
+    private var timer: Timer? = null
 
     @PostConstruct
     fun init() {
         podService.registerOnNewPods(this)
+
+        timer = fixedRateTimer(daemon = true, period = 1000) {
+            scheduleRemoveOldPods()
+        }
     }
 
-    @Scheduled(fixedRate = 1000)
+    @PreDestroy
+    fun destroy() {
+        timer?.cancel()
+    }
+
     fun scheduleRemoveOldPods() {
         val now = Instant.now()
-        val podsToDelete = pods.filter { it.canBeRemoved(now) }.toList()
-        Platform.runLater {
-            podsToDelete.forEach { pod ->
-                podWatchers.remove(pod)
-                pods.removeIf { it == pod }
-            }
+        val podsToDelete = pods.value.filter { it.canBeRemoved(now) }.toList()
+        if (podsToDelete.isEmpty()) {
+            return
         }
+        val newPodsList = pods.value.toMutableList()
+        podsToDelete.forEach { pod ->
+            podWatchers.remove(pod.name)
+            newPodsList.removeIf { it.isSamePod(pod) }
+        }
+        pods.value = newPodsList
     }
 
     override fun onWholeList(map: Map<String, PodInfo>) {
-        Platform.runLater {
-            pods.setAll(map.values)
-            map.values.forEach { pod ->
-                notifyPodChange(pod)
-            }
-            map.values
-                .groupBy { it.calculatedAppName }
-                .forEach { (appName, pods) ->
-                    val newestPod = pods.maxByOrNull { it.creationTimestamp } ?: return@forEach
-                    notifyAppChange(appName, newestPod)
-                }
+        pods.value = map.values.toList()
+        map.values.forEach { pod ->
+            notifyPodChange(pod)
         }
+        map.values
+            .groupBy { it.calculatedAppName }
+            .forEach { (appName, pods) ->
+                val newestPod = pods.maxByOrNull { it.creationTimestamp } ?: return@forEach
+                notifyAppChange(appName, newestPod)
+            }
     }
 
     override fun onPodChange(pod: PodInfo) {
-        Platform.runLater {
-            log.info("Pod changed $pod")
-            val index = pods.indexOf(pod)
-            if (index >= 0) {
-                pods[index] = pod
-            } else if (!pod.canBeRemoved()) {
-                pods.add(pod)
-            }
-            notifyPodChange(pod)
-            val newestPod = getNewestPodForApp(pod.calculatedAppName) ?: return@runLater
-            notifyAppChange(pod.calculatedAppName, newestPod)
+        log.info("Pod changed $pod")
+
+        val newList = pods.value.toMutableList()
+        val index = newList.indexOfFirst { it.isSamePod(pod) }
+        if (index >= 0) {
+            newList[index] = pod
+        } else if (!pod.canBeRemoved()) {
+            newList.add(pod)
         }
+        pods.value = newList
+
+        notifyPodChange(pod)
+        val newestPod = getNewestPodForApp(pod.calculatedAppName) ?: return
+        notifyAppChange(pod.calculatedAppName, newestPod)
+    }
+
+    fun podFlow(podInfo: PodInfo): Flow<PodInfo> {
+        return pods
+            .map { list ->
+                list.firstOrNull { it.isSamePod(podInfo) }
+            }
+            .filterNotNull()
+    }
+
+    fun newestPodAppFlow(podInfo: PodInfo, removeSame: Boolean = true): Flow<PodInfo?> {
+        val appName = podInfo.calculatedAppName
+
+        return pods
+            .map { list ->
+                list.filter { it.calculatedAppName == appName }
+                .maxByOrNull { it.creationTimestamp }
+            }
+            .filter {
+                if (removeSame && it != null) {
+                    !it.isSamePod(podInfo)
+                } else {
+                    true
+                }
+            }
     }
 
     fun getNewestPodForApp(appName: String): PodInfo? {
-        return pods
+        return pods.value
             .filter { it.calculatedAppName == appName }
             .maxByOrNull { it.creationTimestamp }
     }
 
     private fun notifyPodChange(pod: PodInfo) {
-        podWatchers[pod]?.toList()?.forEach {
+        podWatchers[pod.name]?.toList()?.forEach {
             it.onPodChange(pod)
         }
     }
@@ -94,13 +140,11 @@ class PodStoreService(private val podService: PodService) : PodListChangeInterfa
     }
 
     override fun onStateChange(state: PodListState) {
-        Platform.runLater {
-            this.status.set(state)
-        }
+        this.stateStatus.value = state
     }
 
     fun startWatchPod(pod: PodInfo, watcher: PodChangeInterface) {
-        podWatchers.compute(pod) { _, list ->
+        podWatchers.compute(pod.name) { _, list ->
             val nList = list ?: mutableListOf()
             nList.add(watcher)
             nList
@@ -108,7 +152,7 @@ class PodStoreService(private val podService: PodService) : PodListChangeInterfa
     }
 
     fun stopWatchPod(pod: PodInfo, watcher: PodChangeInterface) {
-        podWatchers.compute(pod) { _, list ->
+        podWatchers.compute(pod.name) { _, list ->
             val nList = list ?: mutableListOf()
             nList.remove(watcher)
             nList.takeIf { it.isNotEmpty() }

@@ -46,13 +46,8 @@ data class PodInfo(
     val isReady: Boolean
         get() = readyCount == containerCount
 
-    override fun hashCode(): Int {
-        return name.hashCode()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        val o = other as? PodInfo ?: return false
-        return name == o.name
+    fun isSamePod(podInfo: PodInfo): Boolean {
+        return name == podInfo.name
     }
 
     fun canBeRemoved(instant: Instant = Instant.now()): Boolean {

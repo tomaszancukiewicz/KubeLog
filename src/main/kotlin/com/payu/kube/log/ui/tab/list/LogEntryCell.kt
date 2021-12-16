@@ -20,7 +20,7 @@ import javafx.scene.text.Text
 import javafx.scene.text.TextFlow
 
 
-class LogEntryCell(private val stylingTextService: StylingTextService) : ListCell<VirtualItem?>() {
+class LogEntryCell(private val stylingTextService: StylingTextService) : ListCell<VirtualItem<StyledText>?>() {
 
     companion object {
         private const val LOG_ENTRY_CLASS = "log-entry"
@@ -99,7 +99,7 @@ class LogEntryCell(private val stylingTextService: StylingTextService) : ListCel
         }
     }
 
-    override fun updateItem(item: VirtualItem?, empty: Boolean) {
+    override fun updateItem(item: VirtualItem<StyledText>?, empty: Boolean) {
         super.updateItem(item, empty)
         toggleClass(SEARCHED_LOG_ENTRY_CLASS, false)
         text = null
