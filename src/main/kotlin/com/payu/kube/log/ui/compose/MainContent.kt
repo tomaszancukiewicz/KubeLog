@@ -23,12 +23,11 @@ import org.jetbrains.compose.splitpane.rememberSplitPaneState
 @ExperimentalSplitPaneApi
 @ExperimentalComposeUiApi
 @Composable
-fun MainContent(currentNamespace: String?, podsListVisible: Boolean, logTabsState: LogTabsState) {
+fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState: LogTabsState) {
     val podListStatus by podStoreService.stateStatus.collectAsState()
 
     LaunchedEffect(currentNamespace) {
-        val value = currentNamespace ?: return@LaunchedEffect
-        podService.startMonitorNamespace(value)
+        podService.startMonitorNamespace(currentNamespace)
     }
 
     Box {
@@ -39,7 +38,7 @@ fun MainContent(currentNamespace: String?, podsListVisible: Boolean, logTabsStat
                         PodListState.LoadingPods -> LoadingView()
                         is PodListState.ErrorPods -> ErrorView(
                             status.message ?: "",
-                            onReload = currentNamespace?.let { { podService.startMonitorNamespace(it) } }
+                            onReload = { podService.startMonitorNamespace(currentNamespace) }
                         )
                         PodListState.Data -> PodInfoList { logTabsState.open(it) }
                     }

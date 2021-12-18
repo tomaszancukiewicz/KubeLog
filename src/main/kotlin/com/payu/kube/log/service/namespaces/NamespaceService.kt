@@ -2,6 +2,8 @@ package com.payu.kube.log.service.namespaces
 
 import org.springframework.stereotype.Service
 import com.payu.kube.log.util.LoggerUtils.logger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.lang.IllegalStateException
 import javax.annotation.PreDestroy
 
@@ -10,6 +12,8 @@ class NamespaceService {
     private val log = logger()
 
     private var process: Process? = null
+
+    suspend fun readAllNamespaceSuspending(): List<String> = withContext(Dispatchers.IO) { readAllNamespace() }
 
     fun readAllNamespace(): List<String> {
         log.info("Start read all namespaces")
@@ -28,6 +32,8 @@ class NamespaceService {
         }
         throw IllegalStateException("Wrong output\n$output\nexit code: $exitValue")
     }
+
+    suspend fun readCurrentNamespaceSuspending(): String = withContext(Dispatchers.IO) { readCurrentNamespace() }
 
     fun readCurrentNamespace(): String {
         log.info("Start read current namespace")

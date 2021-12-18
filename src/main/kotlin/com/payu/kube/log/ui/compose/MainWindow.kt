@@ -2,15 +2,19 @@ package com.payu.kube.log.ui.compose
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
-import com.payu.kube.log.service.namespaceStoreService
+import com.payu.kube.log.service.namespaceService
 import com.payu.kube.log.service.podStoreService
+import com.payu.kube.log.ui.compose.component.ErrorView
+import com.payu.kube.log.ui.compose.component.LoadingView
 import com.payu.kube.log.ui.compose.tab.LogTabsState
+import com.payu.kube.log.util.LoadableResult
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 
 @ExperimentalFoundationApi
@@ -20,8 +24,12 @@ import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 @Composable
 @Preview
 fun MainWindow(exitApplication: () -> Unit) {
-    val namespaces by namespaceStoreService.stateAllNamespacesSorted.collectAsState(listOf())
-    val currentNamespace by namespaceStoreService.stateCurrentNamespace.collectAsState(null)
+    val coroutineScope = rememberCoroutineScope()
+    var podsListVisible by mutableStateOf(true)
+    var currentNamespace by mutableStateOf<String?>(null)
+    var namespaces by mutableStateOf(listOf<String>())
+    val logTabsState = remember { LogTabsState(coroutineScope) }
+
     val windowTitle by remember {
         derivedStateOf {
             if (!currentNamespace.isNullOrEmpty()) {
@@ -31,17 +39,22 @@ fun MainWindow(exitApplication: () -> Unit) {
             }
         }
     }
-    var podsListVisible by remember { mutableStateOf(true) }
-    val coroutineScope = rememberCoroutineScope()
-    val logTabsState = remember { LogTabsState(coroutineScope) }
+
+    val isLoadedResult by produceState<LoadableResult<Unit>>(LoadableResult.Loading) {
+        try {
+            namespaces = namespaceService.readAllNamespaceSuspending()
+            currentNamespace = namespaceService.readCurrentNamespaceSuspending()
+            value = LoadableResult.Value(Unit)
+        } catch (e: Exception) {
+            value = LoadableResult.Error(e)
+        }
+    }
 
     DisposableEffect(Unit) {
         podStoreService.init()
-        namespaceStoreService.init()
 
         onDispose {
             podStoreService.destroy()
-            namespaceStoreService.destroy()
         }
     }
 
@@ -72,10 +85,18 @@ fun MainWindow(exitApplication: () -> Unit) {
         }
     }) {
         MenuBar {
-            NamespacesMenu(namespaces, currentNamespace) { namespaceStoreService.stateCurrentNamespace.value = it }
+            NamespacesMenu(namespaces, currentNamespace) {
+                currentNamespace = it
+            }
         }
         MaterialTheme {
-            MainContent(currentNamespace, podsListVisible, logTabsState)
+            val isLoaded = isLoadedResult
+            val namespace = currentNamespace
+            when {
+                isLoaded is LoadableResult.Loading || namespace == null -> LoadingView()
+                isLoaded is LoadableResult.Error -> ErrorView(isLoaded.error.message ?: "")
+                isLoaded is LoadableResult.Value -> MainContent(namespace, podsListVisible, logTabsState)
+            }
         }
     }
 }
