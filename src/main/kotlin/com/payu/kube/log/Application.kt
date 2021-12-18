@@ -6,6 +6,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.application
 import com.payu.kube.log.stage.StageReadyEvent
 import com.payu.kube.log.ui.compose.MainWindow
+import com.payu.kube.log.ui.compose.component.NotificationCenterProvider
 import javafx.application.HostServices
 import javafx.application.Platform
 import javafx.stage.Stage
@@ -60,5 +61,7 @@ class Application : FXApplication() {
 @ExperimentalSplitPaneApi
 @ExperimentalComposeUiApi
 fun main(args: Array<String>) = application {
-    MainWindow(::exitApplication)
+    NotificationCenterProvider {
+        MainWindow(::exitApplication)
+    }
 }

@@ -7,14 +7,18 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.MenuBar
+import androidx.compose.ui.window.Notification
 import androidx.compose.ui.window.Window
 import com.payu.kube.log.service.namespaceService
 import com.payu.kube.log.service.podStoreService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
+import com.payu.kube.log.ui.compose.component.NotificationCenter
 import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.util.LoadableResult
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 
 @ExperimentalFoundationApi
@@ -29,6 +33,15 @@ fun MainWindow(exitApplication: () -> Unit) {
     var currentNamespace by mutableStateOf<String?>(null)
     var namespaces by mutableStateOf(listOf<String>())
     val logTabsState = remember { LogTabsState(coroutineScope) }
+    val notificationCenter = NotificationCenter.current
+
+    LaunchedEffect(Unit) {
+        delay(100)
+        println("send notify")
+        val notification = Notification("Info", "Start", Notification.Type.Info)
+
+        notificationCenter.sendNotification(notification)
+    }
 
     val windowTitle by remember {
         derivedStateOf {
@@ -58,7 +71,7 @@ fun MainWindow(exitApplication: () -> Unit) {
         }
     }
 
-    Window(title = windowTitle, onCloseRequest = exitApplication, onPreviewKeyEvent = {
+    Window(title = windowTitle, onCloseRequest = exitApplication, icon = painterResource("AppIcon.png"), onPreviewKeyEvent = {
         if (it.type != KeyEventType.KeyDown) {
             return@Window false
         }
@@ -92,10 +105,12 @@ fun MainWindow(exitApplication: () -> Unit) {
         MaterialTheme {
             val isLoaded = isLoadedResult
             val namespace = currentNamespace
-            when {
-                isLoaded is LoadableResult.Loading || namespace == null -> LoadingView()
-                isLoaded is LoadableResult.Error -> ErrorView(isLoaded.error.message ?: "")
-                isLoaded is LoadableResult.Value -> MainContent(namespace, podsListVisible, logTabsState)
+            when (isLoaded) {
+                is LoadableResult.Loading -> LoadingView()
+                is LoadableResult.Error -> ErrorView(isLoaded.error.message ?: "")
+                is LoadableResult.Value ->
+                    if (namespace == null) LoadingView()
+                    else MainContent(namespace, podsListVisible, logTabsState)
             }
         }
     }
