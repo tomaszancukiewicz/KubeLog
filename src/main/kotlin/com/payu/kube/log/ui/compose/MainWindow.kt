@@ -9,18 +9,17 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.MenuBar
-import androidx.compose.ui.window.Notification
 import androidx.compose.ui.window.Window
 import com.payu.kube.log.service.namespaceService
 import com.payu.kube.log.service.podStoreService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
-import com.payu.kube.log.ui.compose.component.NotificationCenter
 import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.util.LoadableResult
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.FlowPreview
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 
+@FlowPreview
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @ExperimentalSplitPaneApi
@@ -33,15 +32,6 @@ fun MainWindow(exitApplication: () -> Unit) {
     var currentNamespace by mutableStateOf<String?>(null)
     var namespaces by mutableStateOf(listOf<String>())
     val logTabsState = remember { LogTabsState(coroutineScope) }
-    val notificationCenter = NotificationCenter.current
-
-    LaunchedEffect(Unit) {
-        delay(100)
-        println("send notify")
-        val notification = Notification("Info", "Start", Notification.Type.Info)
-
-        notificationCenter.sendNotification(notification)
-    }
 
     val windowTitle by remember {
         derivedStateOf {

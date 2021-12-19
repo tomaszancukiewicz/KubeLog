@@ -10,6 +10,7 @@ import com.payu.kube.log.ui.compose.component.NotificationCenterProvider
 import javafx.application.HostServices
 import javafx.application.Platform
 import javafx.stage.Stage
+import kotlinx.coroutines.FlowPreview
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
@@ -56,6 +57,7 @@ class Application : FXApplication() {
 //    FXApplication.launch(Application::class.java, *args)
 //}
 
+@FlowPreview
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @ExperimentalSplitPaneApi

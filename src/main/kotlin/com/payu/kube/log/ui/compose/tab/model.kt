@@ -249,6 +249,8 @@ class LogTabsState(private val coroutineScope: CoroutineScope) {
     var logTabs = mutableStateListOf<LogTab>()
         private set
 
+    val openAppsFlow = snapshotFlow { logTabs.map { it.podInfo.calculatedAppName }.toSet() }
+
     val active: LogTab?
         get() = selection.let { logTabs.getOrNull(it) }
 

@@ -39,7 +39,8 @@ fun NotificationCenterProvider(content: @Composable () -> Unit) {
             .launchIn(coroutineScope)
     }
 
-    CompositionLocalProvider(NotificationCenter provides trayState) {
-        content()
-    }
+    CompositionLocalProvider(
+        NotificationCenter provides trayState,
+        content = content
+    )
 }
