@@ -3,7 +3,6 @@ package com.payu.kube.log.ui.compose
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.*
@@ -14,6 +13,7 @@ import com.payu.kube.log.service.namespaceService
 import com.payu.kube.log.service.podStoreService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
+import com.payu.kube.log.ui.compose.component.ThemeProvider
 import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.util.LoadableResult
 import kotlinx.coroutines.FlowPreview
@@ -28,9 +28,9 @@ import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 @Preview
 fun MainWindow(exitApplication: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
-    var podsListVisible by mutableStateOf(true)
-    var currentNamespace by mutableStateOf<String?>(null)
-    var namespaces by mutableStateOf(listOf<String>())
+    var podsListVisible by remember { mutableStateOf(true) }
+    var currentNamespace by remember { mutableStateOf<String?>(null) }
+    var namespaces by remember { mutableStateOf(listOf<String>()) }
     val logTabsState = remember { LogTabsState(coroutineScope) }
 
     val windowTitle by remember {
@@ -92,10 +92,9 @@ fun MainWindow(exitApplication: () -> Unit) {
                 currentNamespace = it
             }
         }
-        MaterialTheme {
-            val isLoaded = isLoadedResult
+        ThemeProvider {
             val namespace = currentNamespace
-            when (isLoaded) {
+            when (val isLoaded = isLoadedResult) {
                 is LoadableResult.Loading -> LoadingView()
                 is LoadableResult.Error -> ErrorView(isLoaded.error.message ?: "")
                 is LoadableResult.Value ->

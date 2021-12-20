@@ -1,7 +1,6 @@
 package com.payu.kube.log.ui.compose
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -67,24 +66,22 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
             .launchIn(coroutineScope)
     }
 
-    Box {
-        HorizontalSplitPane(splitPaneState = rememberSplitPaneState(0.2f)) {
-            if (podsListVisible || logTabsState.logTabs.isEmpty()) {
-                first(minSize = 100.dp) {
-                    when (val status = podListStatus) {
-                        PodListState.LoadingPods -> LoadingView()
-                        is PodListState.ErrorPods -> ErrorView(
-                            status.message ?: "",
-                            onReload = { podService.startMonitorNamespace(currentNamespace) }
-                        )
-                        PodListState.Data -> PodInfoList { logTabsState.open(it) }
-                    }
+    HorizontalSplitPane(splitPaneState = rememberSplitPaneState(0.2f)) {
+        if (podsListVisible || logTabsState.logTabs.isEmpty()) {
+            first(minSize = 100.dp) {
+                when (val status = podListStatus) {
+                    PodListState.LoadingPods -> LoadingView()
+                    is PodListState.ErrorPods -> ErrorView(
+                        status.message ?: "",
+                        onReload = { podService.startMonitorNamespace(currentNamespace) }
+                    )
+                    PodListState.Data -> PodInfoList { logTabsState.open(it) }
                 }
             }
-            if (logTabsState.logTabs.isNotEmpty()) {
-                second(minSize = 100.dp) {
-                    TabsView(logTabsState)
-                }
+        }
+        if (logTabsState.logTabs.isNotEmpty()) {
+            second(minSize = 100.dp) {
+                TabsView(logTabsState)
             }
         }
     }
