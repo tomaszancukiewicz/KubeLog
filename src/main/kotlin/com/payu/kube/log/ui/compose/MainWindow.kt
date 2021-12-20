@@ -93,6 +93,7 @@ fun MainWindow(exitApplication: () -> Unit) {
             }
         }
         ThemeProvider {
+            UpdateDialog()
             val namespace = currentNamespace
             when (val isLoaded = isLoadedResult) {
                 is LoadableResult.Loading -> LoadingView()
