@@ -15,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
@@ -31,6 +33,13 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
     var searchType by search.searchType
     val query by search.query
     val queryErrors by remember { derivedStateOf { query?.errors } }
+    val textFieldFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(isVisible) {
+        if (isVisible) {
+            textFieldFocusRequester.requestFocus()
+        }
+    }
 
     if (isVisible) {
         Row(verticalAlignment = Alignment.CenterVertically,
@@ -39,22 +48,24 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
             TextField(
                 value = searchText,
                 onValueChange = { searchText = it },
-                modifier = Modifier.weight(1.0f).onKeyEvent {
-                    if (it.type != KeyEventType.KeyDown) {
-                        return@onKeyEvent false
-                    }
-                    when (it.key) {
-                        Key.Escape -> {
-                            searchText = ""
-                            true
+                modifier = Modifier.weight(1.0f)
+                    .focusRequester(textFieldFocusRequester)
+                    .onKeyEvent {
+                        if (it.type != KeyEventType.KeyDown) {
+                            return@onKeyEvent false
                         }
-                        Key.Enter -> {
-                            onSearchRequest()
-                            true
+                        when (it.key) {
+                            Key.Escape -> {
+                                searchText = ""
+                                true
+                            }
+                            Key.Enter -> {
+                                onSearchRequest()
+                                true
+                            }
+                            else -> false
                         }
-                        else -> false
-                    }
-                },
+                    },
                 singleLine = true,
                 label = { Text("Search pod") },
                 shape = CutCornerShape(0.dp),
