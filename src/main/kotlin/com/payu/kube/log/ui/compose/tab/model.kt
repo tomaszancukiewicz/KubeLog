@@ -118,7 +118,12 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope) {
         for (item in items) {
             val lastElement = newShowedList.lastOrNull()
             if (predicate(item.value)) {
-                if (lastElement is ShowMoreAfterItem) {
+                if (lastElement == null) {
+                    if (item.index > 0) {
+                        newShowedList.add(ShowMoreBeforeItem(item))
+                    }
+                    newShowedList.add(item)
+                } else if (lastElement is ShowMoreAfterItem) {
                     if (lastElement.originalIndex + 1 == item.originalIndex) {
                         newShowedList[newShowedList.lastIndex] = item
                     } else {
