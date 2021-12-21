@@ -50,8 +50,6 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope) {
 
     val newestAppPodState = podStoreService.newestPodAppFlow(podInfo)
         .stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
-    val newestAppPod: PodInfo?
-        get() = newestAppPodState.value
 
     val settings = SettingsState()
     val search = SearchState()
@@ -59,10 +57,7 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope) {
     private val podLogsWatcher = PodLogsWatcher(podInfoState)
     private val timer: Timer
 
-    private val _allLogs = MutableStateFlow(listOf<String>())
-    private var allLogs: List<String>
-        get() = _allLogs.value
-        set(value) { _allLogs.value = value }
+    private var allLogs = listOf<String>()
     val logs = MutableStateFlow(listOf<VirtualItem<String>>())
 
     init {
@@ -194,12 +189,12 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope) {
 
         if (lastAddedItem.originalIndex == 0 ||
             lastAddedItem.originalIndex - 1 == prevItem?.originalIndex) {
-            logs.value.getOrNull(actualIndex)
+            newLogs.getOrNull(actualIndex)
                 ?.takeIf { it is ShowMoreBeforeItem }
                 ?.let { newLogs.removeAt(actualIndex) }
             actualIndex--
 
-            logs.value.getOrNull(actualIndex)
+            newLogs.getOrNull(actualIndex)
                 ?.takeIf { it is ShowMoreAfterItem }
                 ?.let { newLogs.removeAt(actualIndex) }
         }
@@ -230,13 +225,13 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope) {
         lastAddedItem ?: return
         newLogs[actualIndex] = ShowMoreAfterItem(lastAddedItem)
 
-        if (lastAddedItem.originalIndex == logs.value.lastIndex ||
+        if (lastAddedItem.originalIndex == allLogs.lastIndex ||
             lastAddedItem.originalIndex + 1 == nextItem?.originalIndex) {
-            logs.value.getOrNull(actualIndex)
+            newLogs.getOrNull(actualIndex)
                 ?.takeIf { it is ShowMoreAfterItem }
                 ?.let { newLogs.removeAt(actualIndex) }
 
-            logs.value.getOrNull(actualIndex)
+            newLogs.getOrNull(actualIndex)
                 ?.takeIf { it is ShowMoreBeforeItem }
                 ?.let { newLogs.removeAt(actualIndex) }
         }
