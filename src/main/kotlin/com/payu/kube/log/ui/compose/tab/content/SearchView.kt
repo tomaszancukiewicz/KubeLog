@@ -83,6 +83,7 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
                                 ?.joinToString("\n", "Literal mode.\nNot interpreted because of errors:\n") {
                                     " - $it"
                                 } ?: "Interpreted mode",
+                            color = Color.Black,
                             modifier = Modifier.padding(10.dp)
                         )
                     }
@@ -95,7 +96,11 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
                         .background(if (queryErrors.isNullOrEmpty()) Color(0xFF2979FF) else Color(0xFF2bc140))
                 )
             }
-            Select(SearchType.values().asList(), searchType) { searchType = it }
+            Select(
+                listOf(SearchType.FILTER, SearchType.MARK),
+                searchType, { searchType = it },
+                modifier = Modifier.fillMaxHeight()
+            )
         }
     }
 }

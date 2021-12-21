@@ -25,7 +25,7 @@ enum class SearchType {
 class SearchState {
     val isVisible = mutableStateOf(false)
     val text = mutableStateOf("")
-    val searchType = mutableStateOf(SearchType.MARK)
+    val searchType = mutableStateOf(SearchType.FILTER)
 
     val query = derivedStateOf {
         text.value

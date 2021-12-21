@@ -17,12 +17,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 
 @Composable
-fun <T> Select(items: List<T>, value: T, onSelect: (T) -> Unit) {
+fun <T> Select(items: List<T>, value: T, onSelect: (T) -> Unit, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .border(0.5.dp, MaterialTheme.colors.onSurface.copy(alpha = 0.5f))
             .onGloballyPositioned { coordinates ->
                 textFieldSize = coordinates.size.toSize()
