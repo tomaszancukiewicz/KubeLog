@@ -33,11 +33,12 @@ fun TabContent(logTab: LogTab, openPod: (PodInfo) -> Unit) {
     }
 
     LaunchedEffect(query, searchType) {
-        val q = query
-        if (searchType != SearchType.MARK || q == null) {
+        val q = query ?: return@LaunchedEffect
+        autoScroll = false
+
+        if (searchType != SearchType.MARK) {
             return@LaunchedEffect
         }
-        autoScroll = false
 
         val indexToScroll = logs.indexOfLast {
             (it as? Item)?.let { item -> q.check(item.value) } ?: false
