@@ -16,15 +16,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import com.payu.kube.log.service.namespaceService
-import com.payu.kube.log.service.podStoreService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
 import com.payu.kube.log.ui.compose.component.ThemeProvider
 import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.util.LoadableResult
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 
+@ExperimentalCoroutinesApi
 @FlowPreview
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
@@ -49,6 +50,10 @@ fun MainWindow(exitApplication: () -> Unit) {
         }
     }
 
+    LaunchedEffect(currentNamespace) {
+        logTabsState.closeAll()
+    }
+
     val isLoadedResult by produceState<LoadableResult<Unit>>(LoadableResult.Loading) {
         try {
             namespaces = namespaceService.readAllNamespaceSuspending()
@@ -56,14 +61,6 @@ fun MainWindow(exitApplication: () -> Unit) {
             value = LoadableResult.Value(Unit)
         } catch (e: Exception) {
             value = LoadableResult.Error(e)
-        }
-    }
-
-    DisposableEffect(Unit) {
-        podStoreService.init()
-
-        onDispose {
-            podStoreService.destroy()
         }
     }
 

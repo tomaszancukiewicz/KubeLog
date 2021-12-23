@@ -6,9 +6,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Notification
-import com.payu.kube.log.model.PodListState
+import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.podService
-import com.payu.kube.log.service.podStoreService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
 import com.payu.kube.log.ui.compose.component.NotificationCenter
@@ -16,12 +15,19 @@ import com.payu.kube.log.ui.compose.list.PodInfoList
 import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.ui.compose.tab.TabsView
 import com.payu.kube.log.util.FlowUtils.zipWithNext
+import com.payu.kube.log.util.LoadableResult
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
 
+val CurrentPodListFlow: ProvidableCompositionLocal<Flow<List<PodInfo>>> = compositionLocalOf {
+    MutableStateFlow(listOf())
+}
+
+@ExperimentalCoroutinesApi
 @FlowPreview
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
@@ -31,14 +37,30 @@ import org.jetbrains.compose.splitpane.rememberSplitPaneState
 fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState: LogTabsState) {
     val coroutineScope = rememberCoroutineScope()
     val notificationCenter = NotificationCenter.current
-    val podListStatus by podStoreService.stateStatus.collectAsState()
+    val currentNamespaceChannel = remember { MutableSharedFlow<String>(1)  }
+    val podListDataStateFlow: StateFlow<LoadableResult<List<PodInfo>>> = remember {
+        currentNamespaceChannel
+            .flatMapLatest { currentNamespace ->
+                podService.monitorPods(currentNamespace)
+                    .map { it.sortedWith(PodInfo.COMPARATOR) }
+                    .map { LoadableResult.Value(it) as LoadableResult<List<PodInfo>> }
+                    .catch { LoadableResult.Error(it) }
+                    .onStart { emit(LoadableResult.Loading) }
+            }
+            .stateIn(coroutineScope, SharingStarted.Eagerly, LoadableResult.Loading)
+    }
+    val podListStateFlow: Flow<List<PodInfo>> = remember {
+        podListDataStateFlow
+            .map { (it as? LoadableResult.Value)?.value ?: listOf() }
+    }
+    val podListData by podListDataStateFlow.collectAsState()
 
     LaunchedEffect(currentNamespace) {
-        podService.startMonitorNamespace(currentNamespace)
+        currentNamespaceChannel.tryEmit(currentNamespace)
     }
 
     LaunchedEffect(Unit) {
-        val podOfOpenAppsFlow = podStoreService.statePodsSorted
+        val podOfOpenAppsFlow = podListStateFlow
             .combine(logTabsState.openAppsFlow)  { list, monitoredApps ->
                 list
                     .filter { it.calculatedAppName in monitoredApps }
@@ -66,22 +88,26 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
             .launchIn(coroutineScope)
     }
 
-    HorizontalSplitPane(splitPaneState = rememberSplitPaneState(0.2f)) {
-        if (podsListVisible || logTabsState.logTabs.isEmpty()) {
-            first(minSize = 100.dp) {
-                when (val status = podListStatus) {
-                    PodListState.LoadingPods -> LoadingView()
-                    is PodListState.ErrorPods -> ErrorView(
-                        status.message ?: "",
-                        onReload = { podService.startMonitorNamespace(currentNamespace) }
-                    )
-                    PodListState.Data -> PodInfoList { logTabsState.open(it) }
+    CompositionLocalProvider(CurrentPodListFlow provides podListStateFlow) {
+        HorizontalSplitPane(splitPaneState = rememberSplitPaneState(0.2f)) {
+            if (podsListVisible || logTabsState.tabs.isEmpty()) {
+                first(minSize = 100.dp) {
+                    when (val status = podListData) {
+                        is LoadableResult.Loading -> LoadingView()
+                        is LoadableResult.Error -> ErrorView(
+                            status.error.message ?: "",
+                            onReload = {
+                                currentNamespaceChannel.tryEmit(currentNamespace)
+                            }
+                        )
+                        is LoadableResult.Value -> PodInfoList(status.value) { logTabsState.open(it, podListStateFlow) }
+                    }
                 }
             }
-        }
-        if (logTabsState.logTabs.isNotEmpty()) {
-            second(minSize = 100.dp) {
-                TabsView(logTabsState)
+            if (logTabsState.tabs.isNotEmpty()) {
+                second(minSize = 100.dp) {
+                    TabsView(logTabsState) { logTabsState.open(it, podListStateFlow) }
+                }
             }
         }
     }

@@ -21,14 +21,6 @@ class PodStoreService(private val podService: PodService) : PodListChangeInterfa
 
     private val pods = MutableStateFlow(listOf<PodInfo>())
 
-    val statePodsSorted = pods.map {
-        pods.value.sortedWith(
-            compareBy<PodInfo> { it.calculatedAppName }
-                .thenBy { it.creationTimestamp }
-                .thenBy { it.name }
-        )
-    }
-
     val podsSorted: ObservableList<PodInfo> = FXCollections.observableArrayList()
 
     val stateStatus = MutableStateFlow<PodListState>(PodListState.LoadingPods)
@@ -94,31 +86,6 @@ class PodStoreService(private val podService: PodService) : PodListChangeInterfa
         notifyPodChange(pod)
         val newestPod = getNewestPodForApp(pod.calculatedAppName) ?: return
         notifyAppChange(pod.calculatedAppName, newestPod)
-    }
-
-    fun podFlow(podInfo: PodInfo): Flow<PodInfo> {
-        return pods
-            .map { list ->
-                list.firstOrNull { it.isSamePod(podInfo) }
-            }
-            .filterNotNull()
-    }
-
-    fun newestPodAppFlow(podInfo: PodInfo, removeSame: Boolean = true): Flow<PodInfo?> {
-        val appName = podInfo.calculatedAppName
-
-        return pods
-            .map { list ->
-                list.filter { it.calculatedAppName == appName }
-                .maxByOrNull { it.creationTimestamp }
-            }
-            .filter {
-                if (removeSame && it != null) {
-                    !it.isSamePod(podInfo)
-                } else {
-                    true
-                }
-            }
     }
 
     fun getNewestPodForApp(appName: String): PodInfo? {

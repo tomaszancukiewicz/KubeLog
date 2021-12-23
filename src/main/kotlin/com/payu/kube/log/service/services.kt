@@ -8,6 +8,5 @@ import com.payu.kube.log.service.version.VersionService
 
 val searchQueryCompilerService = SearchQueryCompilerService()
 val podService = PodService()
-val podStoreService = PodStoreService(podService)
 val namespaceService = NamespaceService()
 val versionService = VersionService()

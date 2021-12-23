@@ -20,13 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import com.payu.kube.log.model.PodInfo
-import com.payu.kube.log.service.podStoreService
 import com.payu.kube.log.service.searchQueryCompilerService
 
 @ExperimentalComposeUiApi
 @Composable
-fun PodInfoList(onPodClick: (PodInfo) -> Unit) {
-    val podList by podStoreService.statePodsSorted.collectAsState(listOf())
+fun PodInfoList(podList: List<PodInfo>, onPodClick: (PodInfo) -> Unit) {
     var searchText by remember { mutableStateOf("") }
     val filteredPodList by remember {
         derivedStateOf {

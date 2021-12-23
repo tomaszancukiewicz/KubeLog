@@ -3,7 +3,6 @@ package com.payu.kube.log.ui.compose.tab
 import androidx.compose.runtime.*
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.logs.PodLogsWatcher
-import com.payu.kube.log.service.podStoreService
 import com.payu.kube.log.service.searchQueryCompilerService
 import com.payu.kube.log.ui.tab.list.*
 import kotlinx.coroutines.*
@@ -38,18 +37,18 @@ class SearchState {
     }
 }
 
-class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope) {
+class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: Flow<List<PodInfo>>) {
     private val coroutineScope = parentScope + SupervisorJob()
 
     val MORE_ELEMENT = 3
 
-    val podInfoState = podStoreService.podFlow(initialPodInfo)
-        .stateIn(coroutineScope, SharingStarted.WhileSubscribed(), initialPodInfo)
+    val podInfoState = allListFlow
+        .map { list -> list.firstOrNull { it.isSamePod(initialPodInfo) } }
+        .filterNotNull()
+        .stateIn(coroutineScope, SharingStarted.Eagerly, initialPodInfo)
     val podInfo: PodInfo
         get() = podInfoState.value
 
-    val newestAppPodState = podStoreService.newestPodAppFlow(podInfo)
-        .stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
 
     val settings = SettingsState()
     val search = SearchState()
@@ -246,23 +245,29 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope) {
 
 class LogTabsState(private val coroutineScope: CoroutineScope) {
     var selection by mutableStateOf(0)
-    var logTabs = mutableStateListOf<LogTab>()
+    var tabs = mutableStateListOf<LogTab>()
         private set
 
-    val openAppsFlow = snapshotFlow { logTabs.map { it.podInfo.calculatedAppName }.toSet() }
+    val openAppsFlow = snapshotFlow { tabs.map { it.podInfo.calculatedAppName }.toSet() }
 
     val active: LogTab?
-        get() = selection.let { logTabs.getOrNull(it) }
+        get() = selection.let { tabs.getOrNull(it) }
 
-    fun open(podInfo: PodInfo) {
-        val editor = LogTab(podInfo, coroutineScope)
-        logTabs.add(editor)
-        selection = logTabs.lastIndex
+    fun open(podInfo: PodInfo, allPodsFlow: Flow<List<PodInfo>>) {
+        val editor = LogTab(podInfo, coroutineScope, allPodsFlow)
+        tabs.add(editor)
+        selection = tabs.lastIndex
     }
 
     fun close(logTab: LogTab) {
         logTab.destroy()
-        logTabs.remove(logTab)
-        selection = selection.coerceAtMost(logTabs.lastIndex)
+        tabs.remove(logTab)
+        selection = selection.coerceAtMost(tabs.lastIndex)
+    }
+
+    fun closeAll() {
+        tabs.forEach { it.destroy() }
+        tabs.clear()
+        selection = 0
     }
 }

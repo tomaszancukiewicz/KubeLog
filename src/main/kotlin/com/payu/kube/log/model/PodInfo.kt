@@ -53,4 +53,11 @@ data class PodInfo(
     fun canBeRemoved(instant: Instant = Instant.now()): Boolean {
         return deletionTimestamp != null && deletionTimestamp.plusSeconds(5).isBefore(instant)
     }
+
+    companion object {
+        val COMPARATOR =
+            compareBy<PodInfo> { it.calculatedAppName }
+                .thenBy { it.creationTimestamp }
+                .thenBy { it.name }
+    }
 }

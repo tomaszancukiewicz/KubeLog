@@ -1,12 +1,15 @@
 package com.payu.kube.log.ui.compose.tab.content
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import com.payu.kube.log.model.PodInfo
+import com.payu.kube.log.ui.compose.CurrentPodListFlow
 import com.payu.kube.log.ui.compose.tab.LogTab
 import com.payu.kube.log.ui.compose.tab.SearchType
 import com.payu.kube.log.ui.tab.list.Item
@@ -17,8 +20,13 @@ import kotlinx.coroutines.flow.map
 @Composable
 fun TabContent(logTab: LogTab, openPod: (PodInfo) -> Unit) {
     val podInfo by logTab.podInfoState.collectAsState()
-    val newestAppPod by logTab.newestAppPodState
-        .map { pod -> pod?.takeIf { !it.isSamePod(podInfo) } }
+    val currentPodList = CurrentPodListFlow.current
+    val newestAppPod by currentPodList
+        .map { list ->
+            list.filter { it.calculatedAppName == podInfo.calculatedAppName }
+                .maxByOrNull { it.creationTimestamp }
+                ?.takeIf { !it.isSamePod(podInfo) }
+        }
         .collectAsState(null)
     val logs by logTab.logs.collectAsState()
     val searchType by logTab.search.searchType

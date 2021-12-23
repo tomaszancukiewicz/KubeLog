@@ -5,15 +5,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
+import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.ui.compose.tab.content.TabContent
 
 @ExperimentalFoundationApi
 @ExperimentalComposeUiApi
 @Composable
-fun TabsView(logTabsState: LogTabsState) {
+fun TabsView(logTabsState: LogTabsState, openPod: (PodInfo) -> Unit) {
     Column {
         ScrollableTabRow(selectedTabIndex = logTabsState.selection) {
-            logTabsState.logTabs.forEachIndexed { index, logTab ->
+            logTabsState.tabs.forEachIndexed { index, logTab ->
                 CustomTab(
                     podInfoState = logTab.podInfoState,
                     selected = logTabsState.selection == index,
@@ -23,7 +24,7 @@ fun TabsView(logTabsState: LogTabsState) {
             }
         }
         logTabsState.active?.let {
-            TabContent(it, logTabsState::open)
+            TabContent(it, openPod)
         }
     }
 }
