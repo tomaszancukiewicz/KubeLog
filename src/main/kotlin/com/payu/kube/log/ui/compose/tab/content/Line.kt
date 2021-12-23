@@ -42,7 +42,7 @@ fun Line(
     when (item) {
         is Item -> {
             val queryColoringRule by derivedStateOf {
-                query?.let { ColoringQueryRule(listOf(), it) }
+                query?.let { ColoringQueryRule(it) }
             }
             val markLine = query?.check(item.value) ?: false
 
