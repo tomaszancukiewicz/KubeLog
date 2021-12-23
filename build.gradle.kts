@@ -12,13 +12,7 @@ plugins {
     kotlin("plugin.spring") version "1.5.31"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.springframework.boot") version "2.5.5"
-    id("org.openjfx.javafxplugin") version "0.0.10"
     id("org.jetbrains.compose") version "1.0.0"
-}
-
-javafx {
-    version = "15.0.1"
-    modules("javafx.controls", "javafx.fxml")
 }
 
 group = "com.payu.kube.log"
@@ -42,8 +36,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
 
     antlr("org.antlr:antlr4:4.9.3")
-
-    implementation("com.github.Dansoftowner:jSystemThemeDetector:2.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 

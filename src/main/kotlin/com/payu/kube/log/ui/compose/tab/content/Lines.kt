@@ -15,7 +15,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import com.payu.kube.log.ui.compose.tab.SearchState
 import com.payu.kube.log.ui.compose.tab.SettingsState
-import com.payu.kube.log.ui.tab.list.VirtualItem
+import com.payu.kube.log.util.VirtualItem
 
 @ExperimentalFoundationApi
 @ExperimentalComposeUiApi

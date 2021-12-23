@@ -1,4 +1,4 @@
-package com.payu.kube.log.ui.tab.list
+package com.payu.kube.log.util
 
 sealed class VirtualItem<T> {
     abstract var originalIndex: Int

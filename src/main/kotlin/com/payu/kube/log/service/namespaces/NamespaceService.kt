@@ -34,8 +34,6 @@ class NamespaceService {
         }
     }
 
-    fun readAllNamespace(): List<String> = runBlocking { readAllNamespace() }
-
     suspend fun readCurrentNamespaceSuspending(): String = withContext(Dispatchers.IO) {
         suspendCancellableCoroutine { continuation ->
             log.info("Start read current namespace")
@@ -58,7 +56,5 @@ class NamespaceService {
             }
         }
     }
-
-    fun readCurrentNamespace(): String = runBlocking { readCurrentNamespaceSuspending() }
 }
 

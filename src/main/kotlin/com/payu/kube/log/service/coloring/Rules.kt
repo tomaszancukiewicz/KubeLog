@@ -84,18 +84,4 @@ object Rules {
         listOf(COLORED_GRAY_TEXT_CLASS, "qq-id"),
         "QQ[0-9A-Z]{16}QQ|TT[0-9]{10}TT".toRegex()
     )
-
-    val RULES = listOf(
-        HTTP_METHODS_RULE,
-        ERROR_LOG_LEVEL_RULE,
-        WARN_LOG_LEVEL_RULE,
-        INFO_LOG_LEVEL_RULE,
-        EXTRACT_VALUES_FROM_FIRST_3_BRACKETS_RULE,
-        EXTRACT_VALUES_FROM_SECOND_BRACKETS_RULE,
-        EXTRACT_VALUES_FROM_BRACKETS_RULE,
-        EXTRACT_VALUES_RULE,
-        IP_RULE,
-        EMAIL_RULE,
-        QQ_ID_RULE
-    )
 }

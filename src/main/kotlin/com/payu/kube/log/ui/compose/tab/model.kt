@@ -4,7 +4,10 @@ import androidx.compose.runtime.*
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.logs.PodLogsWatcher
 import com.payu.kube.log.service.searchQueryCompilerService
-import com.payu.kube.log.ui.tab.list.*
+import com.payu.kube.log.util.Item
+import com.payu.kube.log.util.ShowMoreAfterItem
+import com.payu.kube.log.util.ShowMoreBeforeItem
+import com.payu.kube.log.util.VirtualItem
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.util.*

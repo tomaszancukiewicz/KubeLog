@@ -12,7 +12,7 @@ import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.ui.compose.CurrentPodListFlow
 import com.payu.kube.log.ui.compose.tab.LogTab
 import com.payu.kube.log.ui.compose.tab.SearchType
-import com.payu.kube.log.ui.tab.list.Item
+import com.payu.kube.log.util.Item
 import kotlinx.coroutines.flow.map
 
 @ExperimentalFoundationApi

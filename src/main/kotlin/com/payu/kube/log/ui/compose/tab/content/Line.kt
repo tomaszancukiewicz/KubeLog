@@ -16,7 +16,10 @@ import com.payu.kube.log.service.coloring.Rules
 import com.payu.kube.log.service.coloring.rules.ColoringQueryRule
 import com.payu.kube.log.service.coloring.rules.ColoringRule
 import com.payu.kube.log.service.search.query.Query
-import com.payu.kube.log.ui.tab.list.*
+import com.payu.kube.log.util.Item
+import com.payu.kube.log.util.ShowMoreAfterItem
+import com.payu.kube.log.util.ShowMoreBeforeItem
+import com.payu.kube.log.util.VirtualItem
 
 object Code {
     val black: SpanStyle = SpanStyle(Color.Unspecified)
