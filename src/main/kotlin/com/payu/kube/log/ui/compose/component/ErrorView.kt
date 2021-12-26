@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,7 +18,7 @@ fun ErrorView(message: String, onReload: (() -> Unit)? = null) {
     val scrollState = rememberScrollState()
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.padding(10.dp).verticalScroll(scrollState)) {
-            Text("Error $message")
+            Text("Error $message", style = MaterialTheme.typography.subtitle1)
             onReload?.let {
                 Button(onClick = it) {
                     Text("Reload")

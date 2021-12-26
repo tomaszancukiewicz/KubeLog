@@ -22,7 +22,7 @@ import com.payu.kube.log.util.ShowMoreBeforeItem
 import com.payu.kube.log.util.VirtualItem
 
 object Code {
-    val black: SpanStyle = SpanStyle(Color.Unspecified)
+    val unspecified: SpanStyle = SpanStyle(Color.Unspecified)
     val green: SpanStyle = SpanStyle(Color(0xFF2E7D32))
     val yellow: SpanStyle = SpanStyle(Color(0xFFF57F17))
     val red: SpanStyle = SpanStyle(Color(0xFFB71C1C))
@@ -30,6 +30,35 @@ object Code {
     val purple: SpanStyle = SpanStyle(Color(0xFF6200EA))
     val gray: SpanStyle = SpanStyle(Color(0xFF616161))
     val marked: SpanStyle = red.copy(textDecoration = TextDecoration.Underline)
+}
+
+private fun styleText(item: String, queryColoringRule: ColoringQueryRule?) = buildAnnotatedString {
+    withStyle(Code.unspecified) {
+        append(item)
+
+        addStyle(Code.blue, item, Rules.HTTP_METHODS_RULE)
+        addStyle(Code.red, item, Rules.ERROR_LOG_LEVEL_RULE)
+        addStyle(Code.yellow, item, Rules.WARN_LOG_LEVEL_RULE)
+        addStyle(Code.green, item, Rules.INFO_LOG_LEVEL_RULE)
+        addStyle(Code.blue, item, Rules.EXTRACT_VALUES_FROM_FIRST_3_BRACKETS_RULE)
+        addStyle(Code.purple, item, Rules.EXTRACT_VALUES_FROM_SECOND_BRACKETS_RULE)
+//        addStyle(Code.gray, item, Rules.EXTRACT_VALUES_FROM_BRACKETS_RULE)
+//        addStyle(Code.gray, item, Rules.EXTRACT_VALUES_RULE)
+//        addStyle(Code.gray, item, Rules.IP_RULE)
+//        addStyle(Code.gray, item, Rules.EMAIL_RULE)
+//        addStyle(Code.gray, item, Rules.QQ_ID_RULE)
+        queryColoringRule?.let { addStyle(Code.marked, item, it) }
+    }
+}
+
+private fun AnnotatedString.Builder.addStyle(style: SpanStyle, text: String, rule: ColoringRule) {
+    for (result in rule.findFragments(text)) {
+        addStyle(style, result)
+    }
+}
+
+private fun AnnotatedString.Builder.addStyle(style: SpanStyle, range: IntRange) {
+    addStyle(style, range.first, range.last + 1)
 }
 
 @ExperimentalComposeUiApi
@@ -48,50 +77,32 @@ fun Line(
 
             Text(
                 styleText(item.value, queryColoringRule),
+                style = MaterialTheme.typography.body2,
                 fontFamily = FontFamily.Monospace,
                 modifier =
-                    if (markLine) Modifier.background(MaterialTheme.colors.secondary.copy(alpha = 0.5f))
-                    else Modifier
+                if (markLine) Modifier.background(MaterialTheme.colors.secondary.copy(alpha = 0.5f))
+                else Modifier
             )
         }
         is ShowMoreAfterItem -> {
             DisableSelection {
-                Text("Show more after...", textAlign = TextAlign.Center, modifier = modifier.clickable { onAfterClick() })
+                Text(
+                    "Show more after...",
+                    style = MaterialTheme.typography.body2,
+                    textAlign = TextAlign.Center,
+                    modifier = modifier.clickable { onAfterClick() }
+                )
             }
         }
         is ShowMoreBeforeItem -> {
             DisableSelection {
-                Text("Show more before...", textAlign = TextAlign.Center, modifier = modifier.clickable { onPrevClick() })
+                Text(
+                    "Show more before...",
+                    style = MaterialTheme.typography.body2,
+                    textAlign = TextAlign.Center,
+                    modifier = modifier.clickable { onPrevClick() }
+                )
             }
         }
     }
-}
-
-private fun styleText(item: String, queryColoringRule: ColoringQueryRule?) = buildAnnotatedString {
-    withStyle(Code.black) {
-        append(item)
-
-        addStyle(Code.blue, item, Rules.HTTP_METHODS_RULE)
-        addStyle(Code.red, item, Rules.ERROR_LOG_LEVEL_RULE)
-        addStyle(Code.yellow, item, Rules.WARN_LOG_LEVEL_RULE)
-        addStyle(Code.green, item, Rules.INFO_LOG_LEVEL_RULE)
-        addStyle(Code.blue, item, Rules.EXTRACT_VALUES_FROM_FIRST_3_BRACKETS_RULE)
-        addStyle(Code.purple, item, Rules.EXTRACT_VALUES_FROM_SECOND_BRACKETS_RULE)
-        addStyle(Code.gray, item, Rules.EXTRACT_VALUES_FROM_BRACKETS_RULE)
-        addStyle(Code.gray, item, Rules.EXTRACT_VALUES_RULE)
-        addStyle(Code.gray, item, Rules.IP_RULE)
-        addStyle(Code.gray, item, Rules.EMAIL_RULE)
-        addStyle(Code.gray, item, Rules.QQ_ID_RULE)
-        queryColoringRule?.let { addStyle(Code.marked, item, it) }
-    }
-}
-
-private fun AnnotatedString.Builder.addStyle(style: SpanStyle, text: String, rule: ColoringRule) {
-    for (result in rule.findFragments(text)) {
-        addStyle(style, result)
-    }
-}
-
-private fun AnnotatedString.Builder.addStyle(style: SpanStyle, range: IntRange) {
-    addStyle(style, range.first, range.last + 1)
 }

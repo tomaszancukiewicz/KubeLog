@@ -1,5 +1,6 @@
 package com.payu.kube.log.ui.compose.tab.content
 
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.payu.kube.log.model.PodInfo
+import com.payu.kube.log.model.PodState
+import com.payu.kube.log.ui.compose.component.ThemeProvider
+import java.time.Instant
 
 @Composable
 fun NewestPodView(newestPodInfo: PodInfo, openPod: (PodInfo) -> Unit) {
@@ -25,5 +29,19 @@ fun NewestPodView(newestPodInfo: PodInfo, openPod: (PodInfo) -> Unit) {
         Button(onClick = { openPod(newestPodInfo) }) {
             Text("Open")
         }
+    }
+}
+
+@Preview
+@Composable
+private fun NewestPodViewPreview() {
+    ThemeProvider {
+        NewestPodView(
+            PodInfo(
+                "", "name", "name", "", "namespace", "image",
+                "", "", 0, 0, 0, 0,
+                PodState.Running, "", Instant.now(), null
+            )
+        ) {}
     }
 }

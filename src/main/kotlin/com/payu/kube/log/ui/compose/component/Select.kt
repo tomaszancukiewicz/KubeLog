@@ -1,7 +1,5 @@
 package com.payu.kube.log.ui.compose.component
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -21,40 +19,34 @@ fun <T> Select(items: List<T>, value: T, onSelect: (T) -> Unit, modifier: Modifi
     var expanded by remember { mutableStateOf(false) }
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
-    Box(
-        modifier = modifier
-            .border(0.5.dp, MaterialTheme.colors.onSurface.copy(alpha = 0.5f))
-            .onGloballyPositioned { coordinates ->
-                textFieldSize = coordinates.size.toSize()
-            }
-            .clickable(
-                onClick = {
-                    expanded = true
-                },
-            ),
+    Box(modifier = modifier
+        .onGloballyPositioned { coordinates ->
+            textFieldSize = coordinates.size.toSize()
+        }
+        .clickable(
+            onClick = {
+                expanded = true
+            },
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .wrapContentWidth(unbounded = false)
-        ) {
-            Text(
-                text = value.toString()
-            )
-            Icon(
-                if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(20.dp, 20.dp),
-                tint = MaterialTheme.colors.onSurface
-            )
+        InputLayout {
+            Row {
+                Text(
+                    text = value.toString()
+                )
+                Icon(
+                    if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp, 16.dp),
+                    tint = MaterialTheme.colors.onSurface
+                )
+            }
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
                 .requiredWidth(with(LocalDensity.current) { textFieldSize.width.toDp() })
-                .background(MaterialTheme.colors.surface)
         ) {
             items.forEach { title ->
                 DropdownMenuItem(

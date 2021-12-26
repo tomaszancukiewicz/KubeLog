@@ -68,15 +68,9 @@ fun MainWindow(exitApplication: () -> Unit) {
         if (it.type != KeyEventType.KeyDown) {
             return@Window false
         }
-
-        println("pressed ${it.isCtrlPressed} ${it.isMetaPressed} ${it.key}")
         when {
             it.isMetaPressed && it.key == Key.T -> {
                 podsListVisible = !podsListVisible
-                true
-            }
-            it.isMetaPressed && it.key == Key.C -> {
-                logTabsState.active?.clear()
                 true
             }
             it.isMetaPressed && it.key == Key.F -> {
@@ -85,6 +79,10 @@ fun MainWindow(exitApplication: () -> Unit) {
             }
             it.isMetaPressed && it.key == Key.W -> {
                 logTabsState.active?.let { active -> logTabsState.close(active) }
+                true
+            }
+            it.isMetaPressed && it.isShiftPressed && it.key == Key.C -> {
+                logTabsState.active?.clear()
                 true
             }
             else -> false

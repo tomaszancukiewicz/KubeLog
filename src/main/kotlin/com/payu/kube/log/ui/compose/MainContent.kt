@@ -91,7 +91,7 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
     CompositionLocalProvider(CurrentPodListFlow provides podListStateFlow) {
         HorizontalSplitPane(splitPaneState = rememberSplitPaneState(0.2f)) {
             if (podsListVisible || logTabsState.tabs.isEmpty()) {
-                first(minSize = 100.dp) {
+                first(minSize = 400.dp) {
                     when (val status = podListData) {
                         is LoadableResult.Loading -> LoadingView()
                         is LoadableResult.Error -> ErrorView(

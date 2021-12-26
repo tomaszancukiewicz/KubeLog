@@ -1,15 +1,14 @@
 package com.payu.kube.log.ui.compose.tab.content
 
+import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -21,6 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import com.payu.kube.log.ui.compose.component.Select
+import com.payu.kube.log.ui.compose.component.TextField
+import com.payu.kube.log.ui.compose.component.ThemeProvider
 import com.payu.kube.log.ui.compose.tab.SearchState
 import com.payu.kube.log.ui.compose.tab.SearchType
 
@@ -66,9 +67,7 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
                             else -> false
                         }
                     },
-                singleLine = true,
-                label = { Text("Search pod") },
-                shape = CutCornerShape(0.dp),
+                placeholder = "Search in logs e.g. \"Hello\" OR \"world\""
             )
             TooltipArea(
                 tooltip = {
@@ -102,5 +101,15 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
                 modifier = Modifier.fillMaxHeight()
             )
         }
+    }
+}
+
+@Preview
+@ExperimentalFoundationApi
+@ExperimentalComposeUiApi
+@Composable
+private fun SearchViewPreview() {
+    ThemeProvider {
+        SearchView(SearchState().apply { isVisible.value = true }) {}
     }
 }
