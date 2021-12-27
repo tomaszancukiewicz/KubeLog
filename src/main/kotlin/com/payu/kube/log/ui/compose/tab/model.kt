@@ -3,7 +3,7 @@ package com.payu.kube.log.ui.compose.tab
 import androidx.compose.runtime.*
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.logs.PodLogsWatcher
-import com.payu.kube.log.service.searchQueryCompilerService
+import com.payu.kube.log.service.search.SearchQueryCompilerService
 import com.payu.kube.log.util.Item
 import com.payu.kube.log.util.ShowMoreAfterItem
 import com.payu.kube.log.util.ShowMoreBeforeItem
@@ -32,7 +32,7 @@ class SearchState {
     val query = derivedStateOf {
         text.value
             .takeIf { it.isNotEmpty() && isVisible.value }
-            ?.let { searchQueryCompilerService.compile(it) }
+            ?.let { SearchQueryCompilerService.compile(it) }
     }
 
     fun toggleVisible() {

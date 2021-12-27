@@ -1,14 +1,12 @@
 package com.payu.kube.log.service.namespaces
 
-import org.springframework.stereotype.Service
 import com.payu.kube.log.util.LoggerUtils.logger
 import kotlinx.coroutines.*
 import java.lang.IllegalStateException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-@Service
-class NamespaceService {
+object NamespaceService {
     private val log = logger()
 
     suspend fun readAllNamespaceSuspending(): List<String> = withContext(Dispatchers.IO) {

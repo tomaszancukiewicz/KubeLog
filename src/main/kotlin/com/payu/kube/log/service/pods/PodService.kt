@@ -11,16 +11,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
-import org.springframework.stereotype.Service
 import java.time.Instant
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-@Service
-class PodService {
-    companion object {
-        private const val POD_WATCHING_TERMINATION_SEQUENCE = "\n}\n"
-    }
+object PodService {
+    private const val POD_WATCHING_TERMINATION_SEQUENCE = "\n}\n"
 
     private val log = logger()
     private val objectMapper = ObjectMapper()

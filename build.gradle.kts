@@ -8,8 +8,6 @@ plugins {
     kotlin("plugin.serialization") version "1.5.31"
     kotlin("jvm") version "1.5.31"
     kotlin("kapt") version "1.5.31"
-    kotlin("plugin.allopen") version "1.5.31"
-    kotlin("plugin.jpa") version "1.5.31"
     kotlin("plugin.spring") version "1.5.31"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.springframework.boot") version "2.5.5"
@@ -34,11 +32,12 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("ch.qos.logback:logback-classic:1.2.10")
 
     antlr("org.antlr:antlr4:4.9.3")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(platform("org.junit:junit-bom:5.8.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.compose.components:components-splitpane:1.0.0")

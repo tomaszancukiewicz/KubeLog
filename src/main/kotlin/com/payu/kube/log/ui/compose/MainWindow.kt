@@ -15,7 +15,7 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
-import com.payu.kube.log.service.namespaceService
+import com.payu.kube.log.service.namespaces.NamespaceService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
 import com.payu.kube.log.ui.compose.component.ThemeProvider
@@ -56,8 +56,8 @@ fun MainWindow(exitApplication: () -> Unit) {
 
     val isLoadedResult by produceState<LoadableResult<Unit>>(LoadableResult.Loading) {
         try {
-            namespaces = namespaceService.readAllNamespaceSuspending()
-            currentNamespace = namespaceService.readCurrentNamespaceSuspending()
+            namespaces = NamespaceService.readAllNamespaceSuspending()
+            currentNamespace = NamespaceService.readCurrentNamespaceSuspending()
             value = LoadableResult.Value(Unit)
         } catch (e: Exception) {
             value = LoadableResult.Error(e)

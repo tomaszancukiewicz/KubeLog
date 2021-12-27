@@ -11,9 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import com.payu.kube.log.service.config.BuildPropertiesConfiguration
+import com.payu.kube.log.service.version.VersionService
 import com.payu.kube.log.service.version.github.GithubClientService
 import com.payu.kube.log.service.version.github.Release
-import com.payu.kube.log.service.versionService
 
 data class UpdateData(
     val release: Release,
@@ -31,9 +31,9 @@ fun UpdateDialog() {
         val latestRelease: Release = runCatching {
             GithubClientService.getLatestReleaseUrl()
         }.getOrNull() ?: return@produceState
-        val newestVersion = versionService.extractVersionTable(latestRelease.tagName) ?: return@produceState
-        val localVersion = versionService.extractVersionTable("v${BuildPropertiesConfiguration.version}") ?: return@produceState
-        if (versionService.needsUpdate(newestVersion, localVersion)) {
+        val newestVersion = VersionService.extractVersionTable(latestRelease.tagName) ?: return@produceState
+        val localVersion = VersionService.extractVersionTable("v${BuildPropertiesConfiguration.version}") ?: return@produceState
+        if (VersionService.needsUpdate(newestVersion, localVersion)) {
             value = UpdateData(latestRelease, newestVersion, localVersion)
         }
     }

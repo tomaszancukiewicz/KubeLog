@@ -7,7 +7,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Notification
 import com.payu.kube.log.model.PodInfo
-import com.payu.kube.log.service.podService
+import com.payu.kube.log.service.pods.PodService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
 import com.payu.kube.log.ui.compose.component.NotificationCenter
@@ -41,7 +41,7 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
     val podListDataStateFlow: StateFlow<LoadableResult<List<PodInfo>>> = remember {
         currentNamespaceChannel
             .flatMapLatest { currentNamespace ->
-                podService.monitorPods(currentNamespace)
+                PodService.monitorPods(currentNamespace)
                     .map { it.sortedWith(PodInfo.COMPARATOR) }
                     .map { LoadableResult.Value(it) as LoadableResult<List<PodInfo>> }
                     .catch { LoadableResult.Error(it) }

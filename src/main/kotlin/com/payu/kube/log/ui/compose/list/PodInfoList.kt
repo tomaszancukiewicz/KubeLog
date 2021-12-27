@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import com.payu.kube.log.model.PodInfo
-import com.payu.kube.log.service.searchQueryCompilerService
+import com.payu.kube.log.service.search.SearchQueryCompilerService
 
 @ExperimentalComposeUiApi
 @Composable
@@ -31,7 +31,7 @@ fun PodInfoList(podList: List<PodInfo>, onPodClick: (PodInfo) -> Unit) {
             val filterPredicate: (PodInfo) -> Boolean =
                 searchText.trim()
                     .takeIf { it.isNotEmpty() }
-                    ?.let { searchQueryCompilerService.compile(it) }
+                    ?.let { SearchQueryCompilerService.compile(it) }
                     ?.let { { pod -> it.check(pod.name) } }
                     ?: { true }
             podList.filter(filterPredicate)

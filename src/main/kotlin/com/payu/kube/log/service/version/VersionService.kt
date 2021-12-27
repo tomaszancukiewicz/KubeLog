@@ -1,10 +1,8 @@
 package com.payu.kube.log.service.version
 
 import com.payu.kube.log.util.RegexUtils.getOrNull
-import org.springframework.stereotype.Service
 
-@Service
-class VersionService {
+object VersionService {
     private val versionRegex = "v([0-9]+\\.[0-9]+\\.[0-9]+)(?:-.*)?".toRegex()
 
     fun extractVersionTable(versionText: String): List<Int>? {
