@@ -1,9 +1,10 @@
 package com.payu.kube.log.service.pods
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.payu.kube.log.model.PodInfo
-import com.payu.kube.log.model.PodJsonWrapper
+import com.payu.kube.log.service.config.JsonConfiguration
+import com.payu.kube.log.util.JsonElementUtils.asText
+import com.payu.kube.log.util.JsonElementUtils.jsonArrayOrNull
+import com.payu.kube.log.util.JsonElementUtils.path
 import com.payu.kube.log.util.LoggerUtils.logger
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.trySendBlocking
@@ -11,15 +12,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.serialization.json.JsonElement
 import java.time.Instant
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 object PodService {
     private const val POD_WATCHING_TERMINATION_SEQUENCE = "\n}\n"
-
     private val log = logger()
-    private val objectMapper = ObjectMapper()
 
     @ExperimentalCoroutinesApi
     fun monitorPods(namespace: String): Flow<List<PodInfo>> = channelFlow {
@@ -79,18 +79,18 @@ object PodService {
                 return@suspendCancellableCoroutine
             }
 
-            val jsonNode = runCatching { objectMapper.readTree(output) }.getOrNull()
+            val jsonNode = runCatching { JsonConfiguration.json.parseToJsonElement(output) }.getOrNull()
             if (jsonNode == null) {
                 continuation.resumeWithException(IllegalStateException("Wrong output\n$output\nexit code: $exitValue"))
                 return@suspendCancellableCoroutine
             }
 
-            if (jsonNode.path("kind").asText() != "List") {
+            if (jsonNode.path("kind")?.asText() != "List") {
                 continuation.resumeWithException(IllegalStateException("Wrong output\n$output\nexit code: $exitValue"))
                 return@suspendCancellableCoroutine
             }
 
-            continuation.resume(jsonNode.path("items").mapNotNull { parsePod(it) })
+            continuation.resume(jsonNode.path("items")?.jsonArrayOrNull?.mapNotNull { parsePod(it) } ?: listOf())
             log.info("Stop processing all pods")
         }
     }
@@ -137,10 +137,10 @@ object PodService {
                         buffer = buffer.substring(endIndex)
 
 
-                        val jsonNode = runCatching { objectMapper.readTree(wholeJson) }.getOrNull()
+                        val jsonNode = runCatching { JsonConfiguration.json.parseToJsonElement(wholeJson) }.getOrNull()
                         val isSent = parsePod(jsonNode)?.let(onNewPod) ?: true
                         if (!isSent) {
-                            break;
+                            break
                         }
                     }
                 }
@@ -157,11 +157,10 @@ object PodService {
             }
         }
 
-    private fun parsePod(item: JsonNode?): PodInfo? {
+    private fun parsePod(item: JsonElement?): PodInfo? {
         return item
-            ?.takeIf { it.path("kind").asText() == "Pod" }
-            ?.let { PodJsonWrapper(it) }
-            ?.create()
+            ?.takeIf { it.path("kind")?.asText() == "Pod" }
+            ?.let { PodInfo(it) }
     }
 }
 
