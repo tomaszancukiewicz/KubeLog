@@ -10,20 +10,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.res.useResource
+import com.payu.kube.log.service.config.BuildPropertiesConfiguration
+import com.payu.kube.log.service.version.github.GithubClientService
 import com.payu.kube.log.service.version.github.Release
 import com.payu.kube.log.service.versionService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.springframework.boot.info.BuildProperties
-import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.web.client.getForObject
-import java.time.Duration
-import java.util.*
-
-val buildProperties = useResource("META-INF/build-info.properties") {
-    BuildProperties(Properties().apply { load(it) })
-}
 
 data class UpdateData(
     val release: Release,
@@ -38,21 +28,14 @@ fun UpdateDialog() {
     val uriHandler = LocalUriHandler.current
 
     val updateData by produceState<UpdateData?>(null) {
-        val restTemplate = RestTemplateBuilder()
-            .rootUri("https://api.github.com")
-            .setConnectTimeout(Duration.ofSeconds(3))
-            .build()
-
         val latestRelease: Release = runCatching {
-            withContext(Dispatchers.IO) {
-                restTemplate.getForObject<Release>("/repos/tomaszancukiewicz/KubeLog/releases/latest")
-            }
+            GithubClientService.getLatestReleaseUrl()
         }.getOrNull() ?: return@produceState
-
         val newestVersion = versionService.extractVersionTable(latestRelease.tagName) ?: return@produceState
-        val localVersion = versionService.extractVersionTable("v${buildProperties.version}") ?: return@produceState
-
-        value = UpdateData(latestRelease, newestVersion, localVersion)
+        val localVersion = versionService.extractVersionTable("v${BuildPropertiesConfiguration.version}") ?: return@produceState
+        if (versionService.needsUpdate(newestVersion, localVersion)) {
+            value = UpdateData(latestRelease, newestVersion, localVersion)
+        }
     }
 
     updateData

@@ -10,6 +10,7 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
 import org.springframework.stereotype.Service
 import java.time.Instant
 import kotlin.coroutines.resume
@@ -103,7 +104,7 @@ class PodService {
         watchingPodsSuspending(namespace) {
             trySendBlocking(it).isSuccess
         }
-    }
+    }.flowOn(Dispatchers.IO)
 
     private suspend fun watchingPodsSuspending(namespace: String, onNewPod: (PodInfo) -> Boolean) =
         withContext(Dispatchers.IO) {

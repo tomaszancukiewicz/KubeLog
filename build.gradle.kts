@@ -5,6 +5,7 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("antlr")
+    kotlin("plugin.serialization") version "1.5.31"
     kotlin("jvm") version "1.5.31"
     kotlin("kapt") version "1.5.31"
     kotlin("plugin.allopen") version "1.5.31"
@@ -41,6 +42,12 @@ dependencies {
 
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.compose.components:components-splitpane:1.0.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+
+    implementation("io.ktor:ktor-client-core:1.6.7")
+    implementation("io.ktor:ktor-client-cio:1.6.7")
+    implementation("io.ktor:ktor-client-serialization:1.6.7")
 }
 
 compose.desktop {
