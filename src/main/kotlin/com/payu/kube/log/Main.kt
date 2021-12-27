@@ -10,8 +10,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 
-class Application
-
 @ExperimentalCoroutinesApi
 @FlowPreview
 @ExperimentalFoundationApi

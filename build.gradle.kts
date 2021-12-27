@@ -1,6 +1,7 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.buildinfo.BuildInfo
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
@@ -50,16 +51,17 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "com.payu.kube.log.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "composeTest"
-            packageVersion = version.toString()
+            packageName = project.name
+            packageVersion = project.version.toString()
         }
     }
 }
 
 springBoot {
+    mainClass.set("com.payu.kube.log.MainKt")
     buildInfo()
 }
 
@@ -72,6 +74,7 @@ tasks.withType<Test> {
 }
 
 tasks.withType<KotlinCompile> {
+    dependsOn(tasks.withType<BuildInfo>())
     dependsOn(tasks.generateGrammarSource)
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
