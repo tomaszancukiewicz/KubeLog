@@ -82,7 +82,7 @@ fun PodInfo(json: JsonElement): PodInfo {
     val creationTimestamp = objectMetadata?.path("creationTimestamp")?.asText() ?: ""
     val deletionTimestamp = objectMetadata?.path("deletionTimestamp")?.asText()
     val podSpec = json.path("spec")
-    val firstContainer = podSpec?.jsonArrayOrNull?.firstOrNull()
+    val firstContainer = podSpec?.path("containers")?.jsonArrayOrNull?.firstOrNull()
     val containerImage = firstContainer?.path("image")?.asText() ?: ""
     val containerName = firstContainer?.path("name")?.asText() ?: ""
     val nodeName = podSpec?.path("nodeName")?.asText() ?: ""
