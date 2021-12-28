@@ -6,13 +6,11 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("antlr")
-    kotlin("plugin.serialization") version "1.5.31"
-    kotlin("jvm") version "1.5.31"
-    kotlin("kapt") version "1.5.31"
-    kotlin("plugin.spring") version "1.5.31"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.springframework.boot") version "2.5.5"
-    id("org.jetbrains.compose") version "1.0.0"
+    kotlin("jvm") version "1.6.10"
+    kotlin("kapt") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
+    id("org.springframework.boot") version "2.6.2"
+    id("org.jetbrains.compose") version "1.0.1"
 }
 
 group = "com.payu.kube.log"
@@ -40,7 +38,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation(compose.desktop.currentOs)
-    implementation("org.jetbrains.compose.components:components-splitpane:1.0.0")
+    implementation("org.jetbrains.compose.components:components-splitpane:1.0.1")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
 

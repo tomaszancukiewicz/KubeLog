@@ -60,7 +60,6 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: 
     private var allLogs = listOf<String>()
     val logs = MutableStateFlow(listOf<VirtualItem<String>>())
 
-    @ExperimentalCoroutinesApi
     fun init() {
         snapshotFlow {
             val query by search.query
@@ -252,7 +251,6 @@ class LogTabsState(private val coroutineScope: CoroutineScope) {
     val active: LogTab?
         get() = selection.let { tabs.getOrNull(it) }
 
-    @ExperimentalCoroutinesApi
     fun open(podInfo: PodInfo, allPodsFlow: Flow<List<PodInfo>>) {
         val tab = LogTab(podInfo, coroutineScope, allPodsFlow)
         tab.init()

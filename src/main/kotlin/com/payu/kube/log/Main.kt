@@ -16,7 +16,7 @@ import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 @ExperimentalMaterialApi
 @ExperimentalSplitPaneApi
 @ExperimentalComposeUiApi
-fun main(args: Array<String>) = application {
+fun main() = application {
     NotificationCenterProvider {
         MainWindow(::exitApplication)
     }

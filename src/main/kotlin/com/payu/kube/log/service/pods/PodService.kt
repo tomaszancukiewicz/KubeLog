@@ -10,7 +10,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.serialization.json.JsonElement
 import java.time.Instant
@@ -21,7 +20,6 @@ object PodService {
     private const val POD_WATCHING_TERMINATION_SEQUENCE = "\n}\n"
     private val log = logger()
 
-    @ExperimentalCoroutinesApi
     fun monitorPods(namespace: String): Flow<List<PodInfo>> = channelFlow {
         val podMap = readAllPodsSuspending(namespace)
             .associateBy { it.name }
@@ -95,7 +93,6 @@ object PodService {
         }
     }
 
-    @ExperimentalCoroutinesApi
     private fun watchingPodsSuspending(namespace: String): Flow<PodInfo> = channelFlow {
         watchingPodsSuspending(namespace) {
             trySendBlocking(it).isSuccess

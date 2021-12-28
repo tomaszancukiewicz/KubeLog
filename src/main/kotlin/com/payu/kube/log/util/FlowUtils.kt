@@ -1,11 +1,9 @@
 package com.payu.kube.log.util
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.sync.Mutex
@@ -20,7 +18,6 @@ object FlowUtils {
         }
     }
 
-    @ExperimentalCoroutinesApi
     fun <T> Flow<T>.debounceWithCache(timeout: Long): Flow<List<T>> = channelFlow {
         val list = mutableListOf<T>()
         val listMutex = Mutex()

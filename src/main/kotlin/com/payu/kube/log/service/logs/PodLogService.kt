@@ -14,7 +14,6 @@ import java.time.Instant
 object PodLogService {
     private val log = logger()
 
-    @ExperimentalCoroutinesApi
     fun watchingLogsSuspending(podFlow: StateFlow<PodInfo>): Flow<String> = channelFlow {
         waitForReady(podFlow)
         readLogsSuspending(podFlow.value) {
