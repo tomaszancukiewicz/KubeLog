@@ -2,16 +2,15 @@ package com.payu.kube.log.ui.compose.tab
 
 import androidx.compose.runtime.*
 import com.payu.kube.log.model.PodInfo
-import com.payu.kube.log.service.logs.PodLogsWatcher
+import com.payu.kube.log.service.logs.PodLogService
 import com.payu.kube.log.service.search.SearchQueryCompilerService
+import com.payu.kube.log.util.FlowUtils.debounceWithCache
 import com.payu.kube.log.util.Item
 import com.payu.kube.log.util.ShowMoreAfterItem
 import com.payu.kube.log.util.ShowMoreBeforeItem
 import com.payu.kube.log.util.VirtualItem
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import java.util.*
-import kotlin.concurrent.fixedRateTimer
 import kotlin.math.max
 import kotlin.math.min
 
@@ -41,9 +40,11 @@ class SearchState {
 }
 
 class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: Flow<List<PodInfo>>) {
-    private val coroutineScope = parentScope + SupervisorJob()
+    companion object {
+        private const val MORE_ELEMENT = 3
+    }
 
-    val MORE_ELEMENT = 3
+    private val coroutineScope = parentScope + SupervisorJob()
 
     val podInfoState = allListFlow
         .map { list -> list.firstOrNull { it.isSamePod(initialPodInfo) } }
@@ -56,13 +57,11 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: 
     val settings = SettingsState()
     val search = SearchState()
 
-    private val podLogsWatcher = PodLogsWatcher(podInfoState)
-    private val timer: Timer
-
     private var allLogs = listOf<String>()
     val logs = MutableStateFlow(listOf<VirtualItem<String>>())
 
-    init {
+    @ExperimentalCoroutinesApi
+    fun init() {
         snapshotFlow {
             val query by search.query
             val searchType by search.searchType
@@ -76,14 +75,13 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: 
             }
         }.launchIn(coroutineScope)
 
-        podLogsWatcher.start()
-        timer = fixedRateTimer(daemon = true, period = 300) {
-            val newLines = podLogsWatcher
-                .getNewLogs()
-                .takeIf { it.isNotEmpty() } ?: return@fixedRateTimer
-
-            addLogLines(newLines)
-        }
+        PodLogService.watchingLogsSuspending(podInfoState)
+            .debounceWithCache(300)
+            .filter { it.isNotEmpty() }
+            .buffer()
+            .flowOn(Dispatchers.IO)
+            .onEach { addLogLines(it) }
+            .launchIn(coroutineScope)
     }
 
     fun clear() {
@@ -93,8 +91,6 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: 
 
     fun destroy() {
         coroutineScope.cancel()
-        podLogsWatcher.stop()
-        timer.cancel()
     }
 
     private fun addLogLines(newLines: List<String>) {
@@ -256,9 +252,11 @@ class LogTabsState(private val coroutineScope: CoroutineScope) {
     val active: LogTab?
         get() = selection.let { tabs.getOrNull(it) }
 
+    @ExperimentalCoroutinesApi
     fun open(podInfo: PodInfo, allPodsFlow: Flow<List<PodInfo>>) {
-        val editor = LogTab(podInfo, coroutineScope, allPodsFlow)
-        tabs.add(editor)
+        val tab = LogTab(podInfo, coroutineScope, allPodsFlow)
+        tab.init()
+        tabs.add(tab)
         selection = tabs.lastIndex
     }
 

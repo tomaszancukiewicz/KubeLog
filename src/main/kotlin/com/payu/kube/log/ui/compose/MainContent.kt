@@ -43,7 +43,7 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
             .flatMapLatest { currentNamespace ->
                 PodService.monitorPods(currentNamespace)
                     .map { it.sortedWith(PodInfo.COMPARATOR) }
-                    .map { LoadableResult.Value(it) as LoadableResult<List<PodInfo>> }
+                    .map<List<PodInfo>, LoadableResult<List<PodInfo>>> { LoadableResult.Value(it) }
                     .catch { LoadableResult.Error(it) }
                     .onStart { emit(LoadableResult.Loading) }
             }
