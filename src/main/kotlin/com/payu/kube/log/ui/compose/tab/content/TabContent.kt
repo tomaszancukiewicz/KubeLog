@@ -1,13 +1,13 @@
 package com.payu.kube.log.ui.compose.tab.content
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.ui.compose.tab.LogTab
 import com.payu.kube.log.ui.compose.tab.SearchType
@@ -46,9 +46,14 @@ fun TabContent(logTab: LogTab, openPod: (PodInfo) -> Unit) {
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        PodInfoView(podInfo, settingsState = logTab.settings, onClear = {
-            logTab.clear()
-        })
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
+        ) {
+            PodInfoView(podInfo, modifier = Modifier.weight(1.0f))
+            SettingsView(logTab.settings) { logTab.clear() }
+        }
         SearchView(logTab.search) { }
         Box(modifier = Modifier.weight(1.0f)) {
             Lines(
