@@ -23,10 +23,6 @@ import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
 
-val CurrentPodListFlow: ProvidableCompositionLocal<Flow<List<PodInfo>>> = compositionLocalOf {
-    MutableStateFlow(listOf())
-}
-
 @ExperimentalCoroutinesApi
 @FlowPreview
 @ExperimentalFoundationApi
@@ -37,7 +33,7 @@ val CurrentPodListFlow: ProvidableCompositionLocal<Flow<List<PodInfo>>> = compos
 fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState: LogTabsState) {
     val coroutineScope = rememberCoroutineScope()
     val notificationCenter = NotificationCenter.current
-    val currentNamespaceChannel = remember { MutableSharedFlow<String>(1)  }
+    val currentNamespaceChannel = remember { MutableSharedFlow<String>(1) }
     val podListDataStateFlow: StateFlow<LoadableResult<List<PodInfo>>> = remember {
         currentNamespaceChannel
             .flatMapLatest { currentNamespace ->
@@ -61,7 +57,7 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
 
     LaunchedEffect(Unit) {
         val podOfOpenAppsFlow = podListStateFlow
-            .combine(logTabsState.openAppsFlow)  { list, monitoredApps ->
+            .combine(logTabsState.openAppsFlow) { list, monitoredApps ->
                 list
                     .filter { it.calculatedAppName in monitoredApps }
                     .sortedBy { it.creationTimestamp }
@@ -79,7 +75,7 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
         newReadyAppsFlow
             .flatMapConcat { it.asFlow() }
             .onEach {
-                val notification =  Notification(
+                val notification = Notification(
                     "KubeLog - ${it.calculatedAppName}",
                     "${it.name} is ready", Notification.Type.Info
                 )
@@ -88,26 +84,24 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
             .launchIn(coroutineScope)
     }
 
-    CompositionLocalProvider(CurrentPodListFlow provides podListStateFlow) {
-        HorizontalSplitPane(splitPaneState = rememberSplitPaneState(0.2f)) {
-            if (podsListVisible || logTabsState.tabs.isEmpty()) {
-                first(minSize = 400.dp) {
-                    when (val status = podListData) {
-                        is LoadableResult.Loading -> LoadingView()
-                        is LoadableResult.Error -> ErrorView(
-                            status.error.message ?: "",
-                            onReload = {
-                                currentNamespaceChannel.tryEmit(currentNamespace)
-                            }
-                        )
-                        is LoadableResult.Value -> PodInfoList(status.value) { logTabsState.open(it, podListStateFlow) }
-                    }
+    HorizontalSplitPane(splitPaneState = rememberSplitPaneState(0.2f)) {
+        if (podsListVisible || logTabsState.tabs.isEmpty()) {
+            first(minSize = 400.dp) {
+                when (val status = podListData) {
+                    is LoadableResult.Loading -> LoadingView()
+                    is LoadableResult.Error -> ErrorView(
+                        status.error.message ?: "",
+                        onReload = {
+                            currentNamespaceChannel.tryEmit(currentNamespace)
+                        }
+                    )
+                    is LoadableResult.Value -> PodInfoList(status.value) { logTabsState.open(it, podListStateFlow) }
                 }
             }
-            if (logTabsState.tabs.isNotEmpty()) {
-                second(minSize = 100.dp) {
-                    TabsView(logTabsState) { logTabsState.open(it, podListStateFlow) }
-                }
+        }
+        if (logTabsState.tabs.isNotEmpty()) {
+            second(minSize = 100.dp) {
+                TabsView(logTabsState) { logTabsState.open(it, podListStateFlow) }
             }
         }
     }

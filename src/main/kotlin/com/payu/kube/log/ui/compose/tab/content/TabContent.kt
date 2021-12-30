@@ -9,25 +9,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import com.payu.kube.log.model.PodInfo
-import com.payu.kube.log.ui.compose.CurrentPodListFlow
 import com.payu.kube.log.ui.compose.tab.LogTab
 import com.payu.kube.log.ui.compose.tab.SearchType
 import com.payu.kube.log.util.Item
-import kotlinx.coroutines.flow.map
 
 @ExperimentalFoundationApi
 @ExperimentalComposeUiApi
 @Composable
 fun TabContent(logTab: LogTab, openPod: (PodInfo) -> Unit) {
     val podInfo by logTab.podInfoState.collectAsState()
-    val currentPodList = CurrentPodListFlow.current
-    val newestAppPod by currentPodList
-        .map { list ->
-            list.filter { it.calculatedAppName == podInfo.calculatedAppName }
-                .maxByOrNull { it.creationTimestamp }
-                ?.takeIf { !it.isSamePod(podInfo) }
-        }
-        .collectAsState(null)
+    val newestAppPod by logTab.newestAppPodState.collectAsState()
     val logs by logTab.logs.collectAsState()
     val searchType by logTab.search.searchType
     val query by logTab.search.query

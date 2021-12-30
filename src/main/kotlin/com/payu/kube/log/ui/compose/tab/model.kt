@@ -53,6 +53,13 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: 
     val podInfo: PodInfo
         get() = podInfoState.value
 
+    val newestAppPodState = allListFlow
+        .map { list ->
+            list.filter { it.calculatedAppName == podInfo.calculatedAppName }
+                .maxByOrNull { it.creationTimestamp }
+                ?.takeIf { !it.isSamePod(podInfo) }
+        }
+        .stateIn(coroutineScope, SharingStarted.Eagerly, initialPodInfo)
 
     val settings = SettingsState()
     val search = SearchState()
