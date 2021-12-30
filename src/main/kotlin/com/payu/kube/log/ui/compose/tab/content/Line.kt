@@ -1,6 +1,7 @@
 package com.payu.kube.log.ui.compose.tab.content
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -12,6 +13,7 @@ import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
 import com.payu.kube.log.service.coloring.Rules
 import com.payu.kube.log.service.coloring.rules.ColoringQueryRule
 import com.payu.kube.log.service.coloring.rules.ColoringRule
@@ -83,6 +85,7 @@ fun Line(
                 if (markLine) Modifier.background(MaterialTheme.colors.secondary.copy(alpha = 0.5f))
                 else Modifier
             )
+            Text("\n", modifier = Modifier.size(0.dp))
         }
         is ShowMoreAfterItem -> {
             DisableSelection {
