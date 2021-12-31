@@ -11,14 +11,11 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import com.payu.kube.log.ui.compose.tab.SearchState
 import com.payu.kube.log.ui.compose.tab.SettingsState
 import com.payu.kube.log.util.VirtualItem
 
-@ExperimentalFoundationApi
-@ExperimentalComposeUiApi
 @Composable
 fun Lines(
     logs: List<VirtualItem<String>>, settings: SettingsState, search: SearchState, scrollState: LazyListState,
@@ -28,8 +25,8 @@ fun Lines(
     val isWrap by settings.isWrap
     val stateHorizontal = rememberScrollState()
 
-    SelectionContainer {
-        Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        SelectionContainer {
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
@@ -44,16 +41,16 @@ fun Lines(
                     }
                 }
             }
-            VerticalScrollbar(
-                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                adapter = rememberScrollbarAdapter(scrollState)
+        }
+        VerticalScrollbar(
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+            adapter = rememberScrollbarAdapter(scrollState)
+        )
+        if (!isWrap) {
+            HorizontalScrollbar(
+                modifier = Modifier.align(Alignment.BottomStart).fillMaxWidth(),
+                adapter = rememberScrollbarAdapter(stateHorizontal)
             )
-            if (!isWrap) {
-                HorizontalScrollbar(
-                    modifier = Modifier.align(Alignment.BottomStart).fillMaxWidth(),
-                    adapter = rememberScrollbarAdapter(stateHorizontal)
-                )
-            }
         }
     }
 }

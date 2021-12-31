@@ -1,18 +1,28 @@
 package com.payu.kube.log.ui.compose.tab.content
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.payu.kube.log.service.coloring.Rules
 import com.payu.kube.log.service.coloring.rules.ColoringQueryRule
@@ -63,49 +73,67 @@ private fun AnnotatedString.Builder.addStyle(style: SpanStyle, range: IntRange) 
     addStyle(style, range.first, range.last + 1)
 }
 
-@ExperimentalComposeUiApi
-@ExperimentalFoundationApi
 @Composable
 fun Line(
     item: VirtualItem<String>, query: Query?, onPrevClick: () -> Unit, onAfterClick: () -> Unit,
     modifier: Modifier = Modifier
-) {
-    when (item) {
-        is Item -> {
-            val queryColoringRule by derivedStateOf {
-                query?.let { ColoringQueryRule(it) }
-            }
-            val markLine = query?.check(item.value) ?: false
+) = when (item) {
+    is Item -> ItemLine(item, query, modifier)
+    is ShowMoreAfterItem -> ShowAfterLine(onAfterClick, modifier)
+    is ShowMoreBeforeItem -> ShowBeforeLine(onPrevClick, modifier)
+}
 
-            Text(
-                styleText(item.value, queryColoringRule),
-                style = MaterialTheme.typography.body2,
-                fontFamily = FontFamily.Monospace,
-                modifier =
-                if (markLine) Modifier.background(MaterialTheme.colors.secondary.copy(alpha = 0.5f))
-                else Modifier
-            )
-            Text("\n", modifier = Modifier.size(0.dp))
-        }
-        is ShowMoreAfterItem -> {
-            DisableSelection {
-                Text(
-                    "Show more after...",
-                    style = MaterialTheme.typography.body2,
-                    textAlign = TextAlign.Center,
-                    modifier = modifier.clickable { onAfterClick() }
-                )
-            }
-        }
-        is ShowMoreBeforeItem -> {
-            DisableSelection {
-                Text(
-                    "Show more before...",
-                    style = MaterialTheme.typography.body2,
-                    textAlign = TextAlign.Center,
-                    modifier = modifier.clickable { onPrevClick() }
-                )
-            }
-        }
+@Composable
+fun ItemLine(
+    item: Item<String>, query: Query?,
+    modifier: Modifier = Modifier
+) {
+    val queryColoringRule by derivedStateOf {
+        query?.let { ColoringQueryRule(it) }
+    }
+    val markLine = query?.check(item.value) ?: false
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val clickModifier = modifier
+        .hoverable(interactionSource)
+        .indication(interactionSource, rememberRipple())
+
+    Text(
+        styleText(item.value, queryColoringRule),
+        style = MaterialTheme.typography.body2,
+        fontFamily = FontFamily.Monospace,
+        modifier = clickModifier
+            .let { if (markLine) it.background(MaterialTheme.colors.secondary.copy(alpha = 0.5f)) else it }
+    )
+    Text("\n", modifier = Modifier.size(0.dp))
+}
+
+@Composable
+fun ShowBeforeLine(
+    onPrevClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    DisableSelection {
+        Text(
+            "Show more before...",
+            style = MaterialTheme.typography.body2,
+            textAlign = TextAlign.Center,
+            modifier = modifier.clickable { onPrevClick() }
+        )
+    }
+}
+
+@Composable
+fun ShowAfterLine(
+    onAfterClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    DisableSelection {
+        Text(
+            "Show more after...",
+            style = MaterialTheme.typography.body2,
+            textAlign = TextAlign.Center,
+            modifier = modifier.clickable { onAfterClick() }
+        )
     }
 }
