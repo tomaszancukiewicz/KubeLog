@@ -15,6 +15,7 @@ object PodLogService {
     private val log = logger()
 
     fun watchingLogsSuspending(podFlow: StateFlow<PodInfo>): Flow<String> = channelFlow {
+        send("waiting for logs...")
         waitForReady(podFlow)
         readLogsSuspending(podFlow.value) {
             trySendBlocking(it).isSuccess
