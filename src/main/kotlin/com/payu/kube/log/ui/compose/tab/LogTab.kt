@@ -1,9 +1,11 @@
 package com.payu.kube.log.ui.compose.tab
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshotFlow
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.PodLogService
-import com.payu.kube.log.service.search.SearchQueryCompilerService
+import com.payu.kube.log.ui.compose.tab.content.SearchState
+import com.payu.kube.log.ui.compose.tab.content.SearchType
+import com.payu.kube.log.ui.compose.tab.content.SettingsState
 import com.payu.kube.log.util.FlowUtils.debounceWithCache
 import com.payu.kube.log.util.Item
 import com.payu.kube.log.util.ShowMoreAfterItem
@@ -13,31 +15,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlin.math.max
 import kotlin.math.min
-
-class SettingsState {
-    val autoscroll = mutableStateOf(true)
-    val isWrap = mutableStateOf(true)
-}
-
-enum class SearchType {
-    MARK, FILTER
-}
-
-class SearchState {
-    val isVisible = mutableStateOf(false)
-    val text = mutableStateOf("")
-    val searchType = mutableStateOf(SearchType.FILTER)
-
-    val query = derivedStateOf {
-        text.value
-            .takeIf { it.isNotEmpty() && isVisible.value }
-            ?.let { SearchQueryCompilerService.compile(it) }
-    }
-
-    fun toggleVisible() {
-        isVisible.value = !isVisible.value
-    }
-}
 
 class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: Flow<List<PodInfo>>) {
     companion object {
@@ -69,10 +46,7 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: 
 
     fun init() {
         snapshotFlow {
-            val query by search.query
-            val searchType by search.searchType
-
-            query to searchType
+            search.query.value to search.searchType
         }.onEach { (query, searchType) ->
             if (searchType == SearchType.FILTER && query != null) {
                 logs.value = recalculate(allLogs) { query.check(it) }
@@ -106,8 +80,7 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: 
             .mapIndexed { index, line -> Item(line, startRealIndex + index) }
 
         val query = search.query.value
-        val searchType = search.searchType.value
-        if (searchType == SearchType.FILTER && query != null) {
+        if (search.searchType == SearchType.FILTER && query != null) {
             logs.value = addNewItems(logs.value, newItems) { query.check(it) }
         } else {
             logs.value += newItems
@@ -245,35 +218,5 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: 
                 ?.let { newLogs.removeAt(actualIndex) }
         }
         logs.value = newLogs
-    }
-}
-
-class LogTabsState(private val coroutineScope: CoroutineScope) {
-    var selection by mutableStateOf(0)
-    var tabs = mutableStateListOf<LogTab>()
-        private set
-
-    val openAppsFlow = snapshotFlow { tabs.map { it.podInfo.calculatedAppName }.toSet() }
-
-    val active: LogTab?
-        get() = selection.let { tabs.getOrNull(it) }
-
-    fun open(podInfo: PodInfo, allPodsFlow: Flow<List<PodInfo>>) {
-        val tab = LogTab(podInfo, coroutineScope, allPodsFlow)
-        tab.init()
-        tabs.add(tab)
-        selection = tabs.lastIndex
-    }
-
-    fun close(logTab: LogTab) {
-        logTab.destroy()
-        tabs.remove(logTab)
-        selection = selection.coerceAtMost(tabs.lastIndex)
-    }
-
-    fun closeAll() {
-        tabs.forEach { it.destroy() }
-        tabs.clear()
-        selection = 0
     }
 }

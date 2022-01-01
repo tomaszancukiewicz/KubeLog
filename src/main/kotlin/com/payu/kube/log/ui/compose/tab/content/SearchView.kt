@@ -19,36 +19,51 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
+import com.payu.kube.log.service.search.SearchQueryCompilerService
 import com.payu.kube.log.ui.compose.component.Select
 import com.payu.kube.log.ui.compose.component.TextField
 import com.payu.kube.log.ui.compose.component.ThemeProvider
-import com.payu.kube.log.ui.compose.tab.SearchState
-import com.payu.kube.log.ui.compose.tab.SearchType
+
+enum class SearchType {
+    FILTER, MARK,
+}
+
+class SearchState {
+    var isVisible by mutableStateOf(false)
+    var text by mutableStateOf("")
+    var searchType by mutableStateOf(SearchType.FILTER)
+
+    val query = derivedStateOf {
+        text.takeIf { it.isNotEmpty() && isVisible }
+            ?.let { SearchQueryCompilerService.compile(it) }
+    }
+
+    fun toggleVisible() {
+        isVisible = !isVisible
+    }
+}
 
 @ExperimentalFoundationApi
 @ExperimentalComposeUiApi
 @Composable
 fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
-    val isVisible by search.isVisible
-    var searchText by search.text
-    var searchType by search.searchType
     val query by search.query
     val queryErrors by remember { derivedStateOf { query?.errors } }
     val textFieldFocusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(isVisible) {
-        if (isVisible) {
+    LaunchedEffect(search.isVisible) {
+        if (search.isVisible) {
             textFieldFocusRequester.requestFocus()
         }
     }
 
-    if (isVisible) {
+    if (search.isVisible) {
         Row(verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.height(IntrinsicSize.Min)
         ) {
             TextField(
-                value = searchText,
-                onValueChange = { searchText = it },
+                value = search.text,
+                onValueChange = { search.text = it },
                 modifier = Modifier.weight(1.0f)
                     .focusRequester(textFieldFocusRequester)
                     .onKeyEvent {
@@ -57,7 +72,7 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
                         }
                         when (it.key) {
                             Key.Escape -> {
-                                searchText = ""
+                                search.text = ""
                                 true
                             }
                             Key.Enter -> {
@@ -96,8 +111,8 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
                 )
             }
             Select(
-                listOf(SearchType.FILTER, SearchType.MARK),
-                searchType, { searchType = it },
+                SearchType.values().toList(),
+                search.searchType, { search.searchType = it },
                 modifier = Modifier.fillMaxHeight()
             )
         }
@@ -110,6 +125,6 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
 @Composable
 private fun SearchViewPreview() {
     ThemeProvider {
-        SearchView(SearchState().apply { isVisible.value = true }) {}
+        SearchView(SearchState().apply { isVisible = true }) {}
     }
 }

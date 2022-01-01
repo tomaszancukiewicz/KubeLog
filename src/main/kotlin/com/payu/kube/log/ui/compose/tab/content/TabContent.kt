@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.ui.compose.tab.LogTab
-import com.payu.kube.log.ui.compose.tab.SearchType
 import com.payu.kube.log.util.Item
 
 @ExperimentalFoundationApi
@@ -20,22 +19,20 @@ fun TabContent(logTab: LogTab, openPod: (PodInfo) -> Unit) {
     val podInfo by logTab.podInfoState.collectAsState()
     val newestAppPod by logTab.newestAppPodState.collectAsState()
     val logs by logTab.logs.collectAsState()
-    val searchType by logTab.search.searchType
     val query by logTab.search.query
-    var autoScroll by logTab.settings.autoscroll
     val scrollState = rememberLazyListState()
 
-    LaunchedEffect(logs, autoScroll) {
+    LaunchedEffect(logs, logTab.settings.autoscroll) {
         logs.lastIndex
-            .takeIf { it >= 0 && autoScroll }
+            .takeIf { it >= 0 && logTab.settings.autoscroll }
             ?.let { scrollState.scrollToItem(it) }
     }
 
-    LaunchedEffect(query, searchType) {
+    LaunchedEffect(query, logTab.search.searchType) {
         val q = query ?: return@LaunchedEffect
-        autoScroll = false
+        logTab.settings.autoscroll = false
 
-        if (searchType != SearchType.MARK) {
+        if (logTab.search.searchType != SearchType.MARK) {
             return@LaunchedEffect
         }
 

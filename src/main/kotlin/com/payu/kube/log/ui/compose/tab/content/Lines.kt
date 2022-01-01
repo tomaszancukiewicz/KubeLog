@@ -12,8 +12,6 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.payu.kube.log.ui.compose.tab.SearchState
-import com.payu.kube.log.ui.compose.tab.SettingsState
 import com.payu.kube.log.util.VirtualItem
 
 @Composable
@@ -22,7 +20,6 @@ fun Lines(
     onPrevClick: (Int) -> Unit, onAfterClick: (Int) -> Unit
 ) {
     val query by search.query
-    val isWrap by settings.isWrap
     val stateHorizontal = rememberScrollState()
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -30,7 +27,7 @@ fun Lines(
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .let { if (!isWrap) it.horizontalScroll(stateHorizontal) else it }
+                    .let { if (!settings.isWrap) it.horizontalScroll(stateHorizontal) else it }
             ) {
                 LazyColumn(state = scrollState) {
                     items(logs.size) { index ->
@@ -46,7 +43,7 @@ fun Lines(
             modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
             adapter = rememberScrollbarAdapter(scrollState)
         )
-        if (!isWrap) {
+        if (!settings.isWrap) {
             HorizontalScrollbar(
                 modifier = Modifier.align(Alignment.BottomStart).fillMaxWidth(),
                 adapter = rememberScrollbarAdapter(stateHorizontal)
