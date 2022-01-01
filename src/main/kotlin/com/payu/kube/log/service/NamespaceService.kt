@@ -1,4 +1,4 @@
-package com.payu.kube.log.service.namespaces
+package com.payu.kube.log.service
 
 import com.payu.kube.log.util.LoggerUtils.logger
 import kotlinx.coroutines.*

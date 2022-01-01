@@ -15,7 +15,7 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
-import com.payu.kube.log.service.namespaces.NamespaceService
+import com.payu.kube.log.service.NamespaceService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
 import com.payu.kube.log.ui.compose.component.ThemeProvider

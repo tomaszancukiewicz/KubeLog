@@ -2,7 +2,7 @@ package com.payu.kube.log.ui.compose.tab
 
 import androidx.compose.runtime.*
 import com.payu.kube.log.model.PodInfo
-import com.payu.kube.log.service.logs.PodLogService
+import com.payu.kube.log.service.PodLogService
 import com.payu.kube.log.service.search.SearchQueryCompilerService
 import com.payu.kube.log.util.FlowUtils.debounceWithCache
 import com.payu.kube.log.util.Item

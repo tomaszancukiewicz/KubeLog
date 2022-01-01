@@ -7,7 +7,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Notification
 import com.payu.kube.log.model.PodInfo
-import com.payu.kube.log.service.pods.PodService
+import com.payu.kube.log.service.PodService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
 import com.payu.kube.log.ui.compose.component.NotificationCenter

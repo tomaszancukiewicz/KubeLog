@@ -1,4 +1,4 @@
-package com.payu.kube.log.service.pods
+package com.payu.kube.log.service
 
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.config.JsonConfiguration

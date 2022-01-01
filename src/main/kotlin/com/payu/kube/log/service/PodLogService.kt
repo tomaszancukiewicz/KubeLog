@@ -1,4 +1,4 @@
-package com.payu.kube.log.service.logs
+package com.payu.kube.log.service
 
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.model.PodState
