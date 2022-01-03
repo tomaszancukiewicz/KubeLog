@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.payu.kube.log.service.coloring.Rules
 import com.payu.kube.log.service.coloring.rules.ColoringQueryRule
 import com.payu.kube.log.service.coloring.rules.ColoringRule
@@ -73,6 +74,8 @@ private fun AnnotatedString.Builder.addStyle(style: SpanStyle, range: IntRange) 
     addStyle(style, range.first, range.last + 1)
 }
 
+val LINE_HEIGHT = 14.sp
+
 @Composable
 fun Line(
     item: VirtualItem<String>, query: Query?, onPrevClick: () -> Unit, onAfterClick: () -> Unit,
@@ -100,7 +103,7 @@ fun ItemLine(
 
     Text(
         styleText(item.value, queryColoringRule),
-        style = MaterialTheme.typography.body2,
+        style = MaterialTheme.typography.body2.copy(lineHeight = LINE_HEIGHT),
         fontFamily = FontFamily.Monospace,
         modifier = clickModifier
             .let { if (markLine) it.background(MaterialTheme.colors.secondary.copy(alpha = 0.5f)) else it }
@@ -116,7 +119,7 @@ fun ShowBeforeLine(
     DisableSelection {
         Text(
             "Show more before...",
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.body2.copy(lineHeight = LINE_HEIGHT),
             textAlign = TextAlign.Center,
             modifier = modifier.clickable { onPrevClick() }
         )
@@ -131,7 +134,7 @@ fun ShowAfterLine(
     DisableSelection {
         Text(
             "Show more after...",
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.body2.copy(lineHeight = LINE_HEIGHT),
             textAlign = TextAlign.Center,
             modifier = modifier.clickable { onAfterClick() }
         )

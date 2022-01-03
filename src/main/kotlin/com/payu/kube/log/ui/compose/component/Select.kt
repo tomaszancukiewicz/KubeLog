@@ -9,7 +9,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
@@ -20,20 +20,14 @@ fun <T> Select(items: List<T>, value: T, onSelect: (T) -> Unit, modifier: Modifi
     var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
     Box(modifier = modifier
-        .onGloballyPositioned { coordinates ->
-            textFieldSize = coordinates.size.toSize()
-        }
-        .clickable(
-            onClick = {
-                expanded = true
-            },
-        )
+        .onSizeChanged { textFieldSize = it.toSize() }
+        .clickable {
+            expanded = true
+        },
     ) {
         InputLayout {
             Row {
-                Text(
-                    text = value.toString()
-                )
+                Text(value.toString())
                 Icon(
                     if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = null,
@@ -46,7 +40,7 @@ fun <T> Select(items: List<T>, value: T, onSelect: (T) -> Unit, modifier: Modifi
             expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
-                .requiredWidth(with(LocalDensity.current) { textFieldSize.width.toDp() })
+                .widthIn(min = with(LocalDensity.current) { textFieldSize.width.toDp() })
         ) {
             items.forEach { title ->
                 DropdownMenuItem(
