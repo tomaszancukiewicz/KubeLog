@@ -33,6 +33,7 @@ import org.jetbrains.compose.splitpane.rememberSplitPaneState
 fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState: LogTabsState) {
     val coroutineScope = rememberCoroutineScope()
     val notificationCenter = NotificationCenter.current
+    val podFilterText = remember { mutableStateOf("") }
     val currentNamespaceChannel = remember { MutableSharedFlow<String>(1) }
     val podListDataStateFlow: StateFlow<LoadableResult<List<PodInfo>>> = remember {
         currentNamespaceChannel
@@ -95,7 +96,7 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
                             currentNamespaceChannel.tryEmit(currentNamespace)
                         }
                     )
-                    is LoadableResult.Value -> PodInfoList(status.value) { logTabsState.open(it, podListStateFlow) }
+                    is LoadableResult.Value -> PodInfoList(status.value, podFilterText) { logTabsState.open(it, podListStateFlow) }
                 }
             }
         }

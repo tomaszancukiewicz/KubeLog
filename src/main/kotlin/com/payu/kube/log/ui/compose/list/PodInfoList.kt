@@ -23,12 +23,13 @@ import com.payu.kube.log.ui.compose.component.TextField
 
 @ExperimentalComposeUiApi
 @Composable
-fun PodInfoList(podList: List<PodInfo>, onPodClick: (PodInfo) -> Unit) {
-    var searchText by remember { mutableStateOf("") }
-    val filteredPodList by remember {
+fun PodInfoList(podList: List<PodInfo>,
+                searchTextState: MutableState<String> =  remember { mutableStateOf("") },
+                onPodClick: (PodInfo) -> Unit) {
+    val filteredPodList by remember(podList, searchTextState) {
         derivedStateOf {
             val filterPredicate: (PodInfo) -> Boolean =
-                searchText.trim()
+                searchTextState.value.trim()
                     .takeIf { it.isNotEmpty() }
                     ?.let { SearchQueryCompilerService.compile(it) }
                     ?.let { { pod -> it.check(pod.name) } }
@@ -42,15 +43,15 @@ fun PodInfoList(podList: List<PodInfo>, onPodClick: (PodInfo) -> Unit) {
             modifier = Modifier.fillMaxWidth()
                 .onKeyEvent {
                     if (it.type == KeyEventType.KeyDown && it.key == Key.Escape) {
-                        searchText = ""
+                        searchTextState.value = ""
                         true
                     } else {
                         false
                     }
                 },
             placeholder = "Search pod",
-            value = searchText,
-            onValueChange = { searchText = it },
+            value = searchTextState.value,
+            onValueChange = { searchTextState.value = it },
         )
         PodList(filteredPodList, onPodClick)
     }
