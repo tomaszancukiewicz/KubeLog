@@ -86,7 +86,7 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
 
     HorizontalSplitPane(splitPaneState = rememberSplitPaneState(0.2f)) {
         if (podsListVisible || logTabsState.tabs.isEmpty()) {
-            first(minSize = 400.dp) {
+            first(minSize = 250.dp) {
                 when (val status = podListData) {
                     is LoadableResult.Loading -> LoadingView()
                     is LoadableResult.Error -> ErrorView(
@@ -100,7 +100,7 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
             }
         }
         if (logTabsState.tabs.isNotEmpty()) {
-            second(minSize = 100.dp) {
+            second(minSize = 200.dp) {
                 TabsView(logTabsState) { logTabsState.open(it, podListStateFlow) }
             }
         }

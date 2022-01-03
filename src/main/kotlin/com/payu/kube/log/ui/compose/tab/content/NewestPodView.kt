@@ -20,7 +20,8 @@ import java.time.Instant
 fun NewestPodView(newestPodInfo: PodInfo, openPod: (PodInfo) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
-        modifier = Modifier.padding(10.dp).fillMaxWidth()
+        modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
+            .fillMaxWidth()
     ) {
         Text(
             "There is newer pod(${newestPodInfo.name}) with this app(${newestPodInfo.calculatedAppName})",
