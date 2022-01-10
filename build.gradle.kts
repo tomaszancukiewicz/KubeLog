@@ -1,21 +1,16 @@
+import org.jetbrains.compose.compose
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.buildinfo.BuildInfo
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("antlr")
-    kotlin("jvm") version "1.5.31"
-    kotlin("kapt") version "1.5.31"
-    kotlin("plugin.allopen") version "1.5.31"
-    kotlin("plugin.jpa") version "1.5.31"
-    kotlin("plugin.spring") version "1.5.31"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.springframework.boot") version "2.5.5"
-    id("org.openjfx.javafxplugin") version "0.0.10"
-}
-
-javafx {
-    version = "15.0.1"
-    modules("javafx.controls", "javafx.fxml")
+    kotlin("jvm") version "1.6.10"
+    kotlin("kapt") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
+    id("org.springframework.boot") version "2.6.2"
+    id("org.jetbrains.compose") version "1.0.1"
 }
 
 group = "com.payu.kube.log"
@@ -26,24 +21,49 @@ java.sourceCompatibility = JavaVersion.VERSION_11
 repositories {
     jcenter()
     mavenCentral()
+    google()
     maven("https://jitpack.io")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("ch.qos.logback:logback-classic:1.2.10")
 
-    antlr("org.antlr:antlr4:4.9.2")
+    antlr("org.antlr:antlr4:4.9.3")
 
-    implementation("com.github.Dansoftowner:jSystemThemeDetector:2.1")
+    testImplementation(platform("org.junit:junit-bom:5.8.2"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation(compose.desktop.currentOs)
+    implementation("org.jetbrains.compose.components:components-splitpane:1.0.1")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+
+    implementation("io.ktor:ktor-client-core:1.6.7")
+    implementation("io.ktor:ktor-client-cio:1.6.7")
+    implementation("io.ktor:ktor-client-serialization:1.6.7")
+}
+
+compose.desktop {
+    application {
+        mainClass = "com.payu.kube.log.MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = project.name
+            packageVersion = project.version.toString()
+        }
+    }
 }
 
 springBoot {
+    mainClass.set("com.payu.kube.log.MainKt")
     buildInfo()
 }
 
@@ -56,6 +76,7 @@ tasks.withType<Test> {
 }
 
 tasks.withType<KotlinCompile> {
+    dependsOn(tasks.withType<BuildInfo>())
     dependsOn(tasks.generateGrammarSource)
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")

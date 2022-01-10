@@ -1,14 +1,14 @@
 package com.payu.kube.log.service.version.github
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Serializable
 data class Release(
     val name: String,
     val body: String,
-    @JsonProperty("tag_name")
+    @SerialName("tag_name")
     val tagName: String,
-    @JsonProperty("html_url")
+    @SerialName("html_url")
     val htmlUrl: String,
 )

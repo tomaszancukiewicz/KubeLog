@@ -1,5 +1,14 @@
 package com.payu.kube.log.model
 
+import com.payu.kube.log.util.JsonElementUtils.asBoolean
+import com.payu.kube.log.util.JsonElementUtils.asInt
+import com.payu.kube.log.util.JsonElementUtils.asText
+import com.payu.kube.log.util.JsonElementUtils.jsonArrayOrNull
+import com.payu.kube.log.util.JsonElementUtils.jsonObjectOrNull
+import com.payu.kube.log.util.JsonElementUtils.path
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
 import java.time.Instant
 
 data class PodInfo(
@@ -46,16 +55,64 @@ data class PodInfo(
     val isReady: Boolean
         get() = readyCount == containerCount
 
-    override fun hashCode(): Int {
-        return name.hashCode()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        val o = other as? PodInfo ?: return false
-        return name == o.name
+    fun isSamePod(podInfo: PodInfo): Boolean {
+        return name == podInfo.name
     }
 
     fun canBeRemoved(instant: Instant = Instant.now()): Boolean {
         return deletionTimestamp != null && deletionTimestamp.plusSeconds(5).isBefore(instant)
     }
+
+    companion object {
+        val COMPARATOR =
+            compareBy<PodInfo> { it.calculatedAppName }
+                .thenBy { it.creationTimestamp }
+                .thenBy { it.name }
+    }
+}
+
+fun PodInfo(json: JsonElement): PodInfo {
+    val objectMetadata = json.path("metadata")
+    val uid = objectMetadata?.path("uid")?.asText() ?: ""
+    val name = objectMetadata?.path("name")?.asText() ?: ""
+    val appNameLabel = objectMetadata?.path("labels")?.path("app.kubernetes.io/name")?.asText() ?: ""
+    val ownerReferencesName = objectMetadata?.path("ownerReferences")?.jsonArrayOrNull?.firstOrNull()
+        ?.path("name")?.asText() ?: ""
+    val namespace = objectMetadata?.path("namespace")?.asText() ?: ""
+    val creationTimestamp = objectMetadata?.path("creationTimestamp")?.asText() ?: ""
+    val deletionTimestamp = objectMetadata?.path("deletionTimestamp")?.asText()
+    val podSpec = json.path("spec")
+    val firstContainer = podSpec?.path("containers")?.jsonArrayOrNull?.firstOrNull()
+    val containerImage = firstContainer?.path("image")?.asText() ?: ""
+    val containerName = firstContainer?.path("name")?.asText() ?: ""
+    val nodeName = podSpec?.path("nodeName")?.asText() ?: ""
+    val podStatus = json.path("status")
+    val phase = podStatus?.path("phase")?.asText() ?: ""
+    val containerStatuses = podStatus?.path("containerStatuses")?.jsonArrayOrNull ?: buildJsonArray {}
+    val readyCount = containerStatuses.count { it.path("ready")?.asBoolean() ?: false }
+    val startedCount = containerStatuses.count { it.path("started")?.asBoolean() ?: false }
+    val restarts = containerStatuses.sumOf { it.path("restartCount")?.asInt() ?: 0 }
+    val states = containerStatuses.firstOrNull()?.path("state") ?: buildJsonObject {}
+    val stateCode = states.jsonObjectOrNull?.keys?.firstOrNull() ?: "waiting"
+    val stateObj = states.path(stateCode)
+    val state: PodState = when(stateCode) {
+        "running" -> PodState.Running
+        "terminated" -> {
+            val reason = stateObj?.path("reason")?.asText() ?: ""
+            val exitCode = stateObj?.path("exitCode")?.asInt() ?: 0
+            val finishedAt = stateObj?.path("finishedAt")?.asText() ?: ""
+            PodState.Terminated(reason, exitCode, finishedAt)
+        }
+        "waiting" -> PodState.Waiting(stateObj?.path("reason")?.asText() ?: "")
+        else -> PodState.Waiting()
+    }
+    val creationTimestampInstant = Instant.parse(creationTimestamp)
+    val deletionTimestampInstant = deletionTimestamp?.let { Instant.parse(it) }
+    return PodInfo(
+        uid, name, appNameLabel, ownerReferencesName, namespace, containerImage, containerName, nodeName,
+        containerStatuses.count(),
+        startedCount, readyCount, restarts,
+        state, phase,
+        creationTimestampInstant, deletionTimestampInstant
+    )
 }

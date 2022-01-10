@@ -6,7 +6,10 @@ sealed class PodState {
 
     data class Waiting(val reason: String? = null) : PodState() {
         override fun short(): String {
-            return reason ?: "Waiting"
+            if (reason.isNullOrBlank()) {
+                return "Waiting"
+            }
+            return reason
         }
 
         override fun long(): String {

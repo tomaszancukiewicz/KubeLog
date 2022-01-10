@@ -5,10 +5,8 @@ import com.payu.kube.log.search.query.SearchQueryParser
 import com.payu.kube.log.service.search.query.Query
 import com.payu.kube.log.service.search.query.TextQuery
 import org.antlr.v4.runtime.*
-import org.springframework.stereotype.Service
 
-@Service
-class SearchQueryCompilerService {
+object SearchQueryCompilerService {
 
     fun compile(text: String) : Query {
         val errorListener = ParseErrorListener()

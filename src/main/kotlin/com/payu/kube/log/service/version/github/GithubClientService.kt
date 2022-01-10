@@ -1,14 +1,13 @@
 package com.payu.kube.log.service.version.github
 
-import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.getForObject
+import com.payu.kube.log.service.config.HttpClientConfiguration
+import io.ktor.client.request.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-@Service
-class GithubClientService(private val githubRestTemplate: RestTemplate) {
-
-    fun getLatestReleaseUrl(): Release {
-        return githubRestTemplate
-            .getForObject("/repos/tomaszancukiewicz/KubeLog/releases/latest")
+object GithubClientService {
+    suspend fun getLatestReleaseUrl(): Release = withContext(Dispatchers.IO) {
+        HttpClientConfiguration.client
+            .get("https://api.github.com/repos/tomaszancukiewicz/KubeLog/releases/latest")
     }
 }
