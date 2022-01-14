@@ -51,8 +51,8 @@ object PodService {
             }
         }
 
-        removingJob.await()
         watchingJob.await()
+        removingJob.await()
     }
 
     private suspend fun readAllPodsSuspending(namespace: String): List<PodInfo> = withContext(Dispatchers.IO) {
