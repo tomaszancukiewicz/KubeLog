@@ -146,7 +146,7 @@ object PodService {
                 val exitValue = p.onExit().get().exitValue()
                 log.info("Stop watch pods - $exitValue")
 
-                if (isActive && exitValue != 0) {
+                if (exitValue != 0) {
                     continuation.resumeWithException(IllegalStateException("No data\nexit code: $exitValue"))
                 } else {
                     continuation.resume(Unit)
