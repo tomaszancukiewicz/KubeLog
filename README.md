@@ -8,7 +8,7 @@
 - String literals marked with `"` or `'`, e.g. `"Hello \"World\""` or `'Hello "World"'`
 - Regex patterns, e.g. `r"[0-9]+"` or `r'[0-9]+'`
 
-For more, check [grammar file](src/main/antlr/SearchQuery.g4)
+For more, check [grammar file](src/main/antlr/com/payu/kube/log/search/query/SearchQuery.g4)
 
 ### Example
 
