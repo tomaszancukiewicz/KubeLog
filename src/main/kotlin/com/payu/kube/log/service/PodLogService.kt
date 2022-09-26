@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 object PodLogService {
     private val log = logger()
@@ -24,8 +25,8 @@ object PodLogService {
 
     private suspend fun waitForReady(podFlow: StateFlow<PodInfo>) {
         while (
-            podFlow.value.creationTimestamp.plusSeconds(15).isAfter(Instant.now())
-            && podFlow.value.state != PodState.Running
+            podFlow.value.creationTimestamp.plus(15, ChronoUnit.MINUTES).isAfter(Instant.now())
+            && podFlow.value.state is PodState.Waiting
         ) {
             delay(100)
         }
