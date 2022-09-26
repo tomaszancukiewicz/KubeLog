@@ -53,7 +53,7 @@ data class PodInfo(
     }
 
     val isReady: Boolean
-        get() = readyCount == containerCount
+        get() = readyCount == containerCount && containerCount > 0
 
     fun isSamePod(podInfo: PodInfo): Boolean {
         return name == podInfo.name
