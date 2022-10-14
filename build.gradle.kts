@@ -1,4 +1,3 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.buildinfo.BuildInfo
@@ -6,11 +5,11 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("antlr")
-    kotlin("jvm") version "1.6.10"
-    kotlin("kapt") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
-    id("org.springframework.boot") version "2.6.2"
-    id("org.jetbrains.compose") version "1.1.1"
+    kotlin("jvm") version "1.7.20"
+    kotlin("kapt") version "1.7.20"
+    kotlin("plugin.serialization") version "1.7.20"
+    id("org.springframework.boot") version "2.7.4"
+    id("org.jetbrains.compose") version "1.2.0"
 }
 
 group = "com.payu.kube.log"
@@ -30,9 +29,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    implementation("ch.qos.logback:logback-classic:1.2.10")
+    implementation("ch.qos.logback:logback-classic:1.4.4")
 
-    antlr("org.antlr:antlr4:4.9.3")
+    antlr("org.antlr:antlr4:4.11.1")
 
     testImplementation(platform("org.junit:junit-bom:5.8.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -40,15 +39,16 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.compose.components:components-splitpane:1.1.1")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
 
-    implementation("io.ktor:ktor-client-core:1.6.7")
-    implementation("io.ktor:ktor-client-cio:1.6.7")
-    implementation("io.ktor:ktor-client-serialization:1.6.7")
+    implementation("io.ktor:ktor-client-core:2.1.2")
+    implementation("io.ktor:ktor-client-cio:2.1.2")
+    implementation("io.ktor:ktor-client-content-negotiation:2.1.2")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.2")
 }
 
 compose.desktop {
