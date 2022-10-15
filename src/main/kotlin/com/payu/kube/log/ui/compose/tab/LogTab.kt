@@ -1,5 +1,6 @@
 package com.payu.kube.log.ui.compose.tab
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.snapshotFlow
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.PodLogService
@@ -43,6 +44,8 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: 
 
     private var allLogs = listOf<String>()
     val logs = MutableStateFlow(listOf<VirtualItem<String>>())
+
+    val scrollState = LazyListState(0, 0)
 
     fun init() {
         snapshotFlow {

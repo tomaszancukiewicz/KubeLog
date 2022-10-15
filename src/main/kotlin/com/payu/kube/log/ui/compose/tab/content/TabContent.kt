@@ -2,7 +2,6 @@ package com.payu.kube.log.ui.compose.tab.content
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -20,7 +19,7 @@ fun TabContent(logTab: LogTab, openPod: (PodInfo) -> Unit) {
     val newestAppPod by logTab.newestAppPodState.collectAsState()
     val logs by logTab.logs.collectAsState()
     val query by logTab.search.query
-    val scrollState = rememberLazyListState()
+    val scrollState = logTab.scrollState
 
     LaunchedEffect(logs, logTab.settings.autoscroll) {
         logs.lastIndex
