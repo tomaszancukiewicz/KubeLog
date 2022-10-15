@@ -11,8 +11,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -91,10 +89,15 @@ fun ItemLine(
     item: Item<String>, query: Query?,
     modifier: Modifier = Modifier
 ) {
-    val queryColoringRule by derivedStateOf {
+    val markLine = remember(item, query) {
+        query?.check(item.value) ?: false
+    }
+    val queryColoringRule = remember(query) {
         query?.let { ColoringQueryRule(it) }
     }
-    val markLine = query?.check(item.value) ?: false
+    val text = remember(item, queryColoringRule) {
+        styleText(item.value, queryColoringRule)
+    }
 
     val interactionSource = remember { MutableInteractionSource() }
     val clickModifier = modifier
@@ -102,7 +105,7 @@ fun ItemLine(
         .indication(interactionSource, rememberRipple())
 
     Text(
-        styleText(item.value, queryColoringRule),
+        text,
         style = MaterialTheme.typography.body2.copy(lineHeight = LINE_HEIGHT),
         fontFamily = FontFamily.Monospace,
         modifier = clickModifier
