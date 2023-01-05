@@ -1,4 +1,8 @@
 name: Build and release
+on:
+  push:
+    branches:
+      - main
 jobs:
   macos:
     runs-on: macos-11
