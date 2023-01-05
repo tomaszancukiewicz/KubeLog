@@ -1,9 +1,8 @@
 name: Build and release
-on: [push, pull_request]
 jobs:
   macos:
     runs-on: macos-11
-#    if: "startsWith(github.event.head_commit.message, 'Release: ')"
+    if: "startsWith(github.event.head_commit.message, 'Release: ')"
     steps:
       - uses: actions/checkout@v3
       - name: Setup Java JDK 11
@@ -11,8 +10,8 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 11
-#      - name: Run all test
-#        run: ./gradlew test
+      - name: Run all test
+        run: ./gradlew test
       - name: Install the Apple certificate
         env:
           BUILD_CERTIFICATE_BASE64: ${{ secrets.CERTIFICATE_BASE64 }}
@@ -42,30 +41,30 @@ jobs:
       - name: Get short SHA
         id: short_sha
         run: echo "SHA8=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_OUTPUT
-#      - name: Create Release
-#        id: create_release
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: v${{ steps.app_version.outputs.APP_VERSION }}-${{ steps.short_sha.outputs.SHA8 }}
-#          release_name: Release v${{ steps.app_version.outputs.APP_VERSION }}-${{ steps.short_sha.outputs.SHA8 }}
-#          body: |
-#            Pkg installs application in /Applications by default. You can change it to HOME/Applications during
-#            installation.
-#
-#            When you see "unidentified developer" error,
-#            open installer in "System Preferences" > "Security & Privacy" > "General" > "Open anyway"
-#          draft: false
-#          prerelease: false
-#      - name: Upload Release Asset
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create_release.outputs.upload_url }}
-#          asset_path: ./build/app/KubeLog.pkg
-#          asset_name: KubeLog-installer-mac.pkg
-#          asset_content_type: application/x-xar
-#      - name: Print release url
-#        run: echo "Relese ${{ steps.create_release.outputs.html_url }}"
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.app_version.outputs.APP_VERSION }}-${{ steps.short_sha.outputs.SHA8 }}
+          release_name: Release v${{ steps.app_version.outputs.APP_VERSION }}-${{ steps.short_sha.outputs.SHA8 }}
+          body: |
+            Pkg installs application in /Applications by default. You can change it to HOME/Applications during
+            installation.
+
+            When you see "unidentified developer" error,
+            open installer in "System Preferences" > "Security & Privacy" > "General" > "Open anyway"
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./build/app/KubeLog.pkg
+          asset_name: KubeLog-installer-mac.pkg
+          asset_content_type: application/x-xar
+      - name: Print release url
+        run: echo "Relese ${{ steps.create_release.outputs.html_url }}"
