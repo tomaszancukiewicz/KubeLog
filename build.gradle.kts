@@ -9,7 +9,7 @@ plugins {
     kotlin("kapt") version "1.7.20"
     kotlin("plugin.serialization") version "1.7.20"
     id("org.springframework.boot") version "2.7.4"
-    id("org.jetbrains.compose") version "1.2.0"
+    id("org.jetbrains.compose") version "1.2.2"
 }
 
 group = "com.payu.kube.log"
@@ -21,7 +21,6 @@ repositories {
     jcenter()
     mavenCentral()
     google()
-    maven("https://jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
@@ -29,7 +28,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    implementation("ch.qos.logback:logback-classic:1.4.4")
+    implementation("ch.qos.logback:logback-classic:1.4.5")
 
     antlr("org.antlr:antlr4:4.11.1")
 
@@ -43,12 +42,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
 
-    implementation("io.ktor:ktor-client-core:2.1.2")
-    implementation("io.ktor:ktor-client-cio:2.1.2")
-    implementation("io.ktor:ktor-client-content-negotiation:2.1.2")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.2")
+    implementation("io.ktor:ktor-client-core:2.2.2")
+    implementation("io.ktor:ktor-client-cio:2.2.2")
+    implementation("io.ktor:ktor-client-content-negotiation:2.2.2")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.2")
 }
 
 compose.desktop {
