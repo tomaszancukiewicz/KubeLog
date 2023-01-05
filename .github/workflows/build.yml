@@ -1,4 +1,5 @@
 name: Build and release
+on: [push, pull_request]
 jobs:
   macos:
     runs-on: macos-11
