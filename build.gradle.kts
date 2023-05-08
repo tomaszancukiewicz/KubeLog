@@ -38,9 +38,9 @@ dependencies {
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.compose.components:components-splitpane:1.1.1")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
 
