@@ -8,7 +8,7 @@ plugins {
     kotlin("jvm") version "1.8.20"
     kotlin("kapt") version "1.8.20"
     kotlin("plugin.serialization") version "1.8.20"
-    id("org.springframework.boot") version "2.7.9"
+    id("org.springframework.boot") version "2.7.12"
     id("org.jetbrains.compose") version "1.4.0"
 }
 
@@ -28,26 +28,26 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    implementation("ch.qos.logback:logback-classic:1.4.5")
+    implementation("ch.qos.logback:logback-classic:1.4.7")
 
-    antlr("org.antlr:antlr4:4.12.0")
+    antlr("org.antlr:antlr4:4.13.0")
 
-    testImplementation(platform("org.junit:junit-bom:5.8.2"))
+    testImplementation(platform("org.junit:junit-bom:5.9.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.compose.components:components-splitpane:1.1.1")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.1")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
-    implementation("io.ktor:ktor-client-core:2.2.4")
-    implementation("io.ktor:ktor-client-cio:2.2.4")
-    implementation("io.ktor:ktor-client-content-negotiation:2.2.4")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
+    implementation("io.ktor:ktor-client-core:2.3.0")
+    implementation("io.ktor:ktor-client-cio:2.3.0")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.0")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.0")
 }
 
 compose.desktop {
