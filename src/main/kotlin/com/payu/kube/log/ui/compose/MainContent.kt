@@ -4,12 +4,12 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Notification
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.PodService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
+import com.payu.kube.log.ui.compose.component.MyHorizontalSplitPane
 import com.payu.kube.log.ui.compose.component.NotificationCenter
 import com.payu.kube.log.ui.compose.list.PodInfoList
 import com.payu.kube.log.ui.compose.tab.LogTabsState
@@ -20,7 +20,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
-import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
 
 @ExperimentalCoroutinesApi
@@ -85,9 +84,9 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
             .launchIn(coroutineScope)
     }
 
-    HorizontalSplitPane(splitPaneState = rememberSplitPaneState(0.2f)) {
+    val firstColumnCompose: (@Composable () -> Unit)? =
         if (podsListVisible || logTabsState.tabs.isEmpty()) {
-            first(minSize = 250.dp) {
+            {
                 when (val status = podListData) {
                     is LoadableResult.Loading -> LoadingView()
                     is LoadableResult.Error -> ErrorView(
@@ -96,14 +95,25 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
                             currentNamespaceChannel.tryEmit(currentNamespace)
                         }
                     )
-                    is LoadableResult.Value -> PodInfoList(status.value, podFilterText) { logTabsState.open(it, podListStateFlow) }
+
+                    is LoadableResult.Value -> PodInfoList(status.value, podFilterText) {
+                        logTabsState.open(
+                            it,
+                            podListStateFlow
+                        )
+                    }
                 }
             }
-        }
+        } else null
+
+    val secondColumnCompose: (@Composable () -> Unit)? =
         if (logTabsState.tabs.isNotEmpty()) {
-            second(minSize = 200.dp) {
-                TabsView(logTabsState) { logTabsState.open(it, podListStateFlow) }
-            }
-        }
-    }
+            { TabsView(logTabsState) { logTabsState.open(it, podListStateFlow) } }
+        } else null
+
+    MyHorizontalSplitPane(
+        splitPaneState = rememberSplitPaneState(0.2f),
+        firstColumnCompose = firstColumnCompose,
+        secondColumnCompose = secondColumnCompose
+    )
 }
