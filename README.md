@@ -1,5 +1,13 @@
 # KubeLog
 
+## Shortcuts
+
+* `CMD + T` - close/open pod list
+* `CMD + F` - open/close log search
+* `CMD + SHIFT + C` - clear logs in active tab
+* `CMD + W` - close active tab
+* `CMD + SHIFT + W` - close all tabs
+
 ## Log query language
 
 - Logical keywords: `AND`, `OR`, `NOT`

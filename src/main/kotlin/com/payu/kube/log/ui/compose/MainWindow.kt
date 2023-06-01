@@ -77,6 +77,10 @@ fun MainWindow(exitApplication: () -> Unit) {
                 logTabsState.active?.search?.toggleVisible()
                 true
             }
+            it.isMetaPressed && it.isShiftPressed && it.key == Key.W -> {
+                logTabsState.closeAll()
+                true
+            }
             it.isMetaPressed && it.key == Key.W -> {
                 logTabsState.active?.let { active -> logTabsState.close(active) }
                 true
