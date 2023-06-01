@@ -59,7 +59,7 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: 
         }.launchIn(coroutineScope)
 
         PodLogService.watchingLogsSuspending(podInfoState)
-            .debounceWithCache(300)
+            .debounceWithCache(50)
             .filter { it.isNotEmpty() }
             .buffer()
             .flowOn(Dispatchers.IO)
