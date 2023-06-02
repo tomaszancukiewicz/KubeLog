@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "com.payu.kube.log"
-version = "1.4.4"
+version = "1.4.5"
 
 java.sourceCompatibility = JavaVersion.VERSION_11
 
