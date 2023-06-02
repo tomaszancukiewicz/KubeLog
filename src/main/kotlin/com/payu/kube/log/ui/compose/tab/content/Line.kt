@@ -111,7 +111,7 @@ fun ItemLine(
         modifier = clickModifier
             .let { if (markLine) it.background(MaterialTheme.colors.secondary.copy(alpha = 0.5f)) else it }
     )
-    Text("\n", modifier = Modifier.size(0.dp))
+    Text("\n", modifier = Modifier.size(1.dp))
 }
 
 @Composable
