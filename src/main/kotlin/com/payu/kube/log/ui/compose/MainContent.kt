@@ -40,7 +40,7 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
                 PodService.monitorPods(currentNamespace)
                     .map { it.sortedWith(PodInfo.COMPARATOR) }
                     .map<List<PodInfo>, LoadableResult<List<PodInfo>>> { LoadableResult.Value(it) }
-                    .catch { LoadableResult.Error(it) }
+                    .catch { emit(LoadableResult.Error(it)) }
                     .onStart { emit(LoadableResult.Loading) }
             }
             .stateIn(coroutineScope, SharingStarted.Eagerly, LoadableResult.Loading)
