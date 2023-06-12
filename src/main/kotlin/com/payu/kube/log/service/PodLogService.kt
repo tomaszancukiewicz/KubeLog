@@ -48,24 +48,25 @@ object PodLogService {
 
                 val reader = p.inputStream.bufferedReader()
 
-                var line: String?
-                do {
-                    line = reader.readLine()
-                    if (line == null) {
-                        break
-                    }
-                    if (line.isEmpty()) {
-                        continue
-                    }
+                reader.use {
+                    var line: String?
+                    do {
+                        line = it.readLine()
+                        if (line == null) {
+                            break
+                        }
+                        if (line.isEmpty()) {
+                            continue
+                        }
 
-                    val isSent = onNewLine(line)
-                    if (!isSent) {
-                        break
-                    }
-                } while (isActive)
-                reader.close()
+                        val isSent = onNewLine(line)
+                        if (!isSent) {
+                            break
+                        }
+                    } while (isActive)
+                }
 
-                val exitValue = p.onExit().get().exitValue()
+                val exitValue = p.waitFor()
                 onNewLine("terminated with code: $exitValue")
 
                 log.info("stop pod monitoring ${pod.name} - $exitValue")

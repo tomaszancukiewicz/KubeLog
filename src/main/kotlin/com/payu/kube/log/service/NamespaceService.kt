@@ -20,9 +20,12 @@ object NamespaceService {
                 p.destroy()
             }
             val reader = p.inputStream.bufferedReader()
-            val output = reader.readText()
-            reader.close()
-            val exitValue = p.onExit().get().exitValue()
+
+            val output = reader.use {
+                it.readText()
+            }
+
+            val exitValue = p.waitFor()
             log.info("Stop read all namespaces $exitValue")
             if (exitValue == 0 && output.isNotEmpty()) {
                 continuation.resume(output.lines().filter { it.isNotEmpty() })
@@ -43,9 +46,12 @@ object NamespaceService {
                 p.destroy()
             }
             val reader = p.inputStream.bufferedReader()
-            val output = reader.readText().trim()
-            reader.close()
-            val exitValue = p.onExit().get().exitValue()
+
+            val output = reader.use {
+                it.readText().trim()
+            }
+
+            val exitValue = p.waitFor()
             log.info("Stop read current namespace $exitValue")
             if (exitValue == 0 && output.isNotEmpty()) {
                 continuation.resume(output)

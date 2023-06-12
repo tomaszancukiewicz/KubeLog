@@ -68,9 +68,12 @@ object PodService {
                 p.destroy()
             }
             val reader = p.inputStream.bufferedReader()
-            val output = reader.readText()
-            reader.close()
-            val exitValue = p.onExit().get().exitValue()
+
+            val output = reader.use {
+                it.readText()
+            }
+
+            val exitValue = p.waitFor()
             log.info("Stop read all pods $exitValue")
             if (exitValue != 0 || output.isEmpty()) {
                 continuation.resumeWithException(IllegalStateException("No data\nexit code: $exitValue"))
@@ -115,35 +118,36 @@ object PodService {
 
                 val reader = p.inputStream.bufferedReader()
 
-                var buffer = ""
-                var line: String?
-                while (isActive) {
-                    line = reader.readLine()
-                    if (line == null) {
-                        break
-                    }
-                    if (line.isEmpty()) {
-                        continue
-                    }
-                    buffer += "$line\n"
-
-                    val startIndex = buffer.indexOf(POD_WATCHING_TERMINATION_SEQUENCE)
-                    if (startIndex >= 0) {
-                        val endIndex = startIndex + POD_WATCHING_TERMINATION_SEQUENCE.length
-                        val wholeJson = buffer.substring(0, endIndex)
-                        buffer = buffer.substring(endIndex)
-
-
-                        val jsonNode = runCatching { JsonConfiguration.json.parseToJsonElement(wholeJson) }.getOrNull()
-                        val isSent = parsePod(jsonNode)?.let(onNewPod) ?: true
-                        if (!isSent) {
+                reader.use {
+                    var buffer = ""
+                    var line: String?
+                    while (isActive) {
+                        line = it.readLine()
+                        if (line == null) {
                             break
+                        }
+                        if (line.isEmpty()) {
+                            continue
+                        }
+                        buffer += "$line\n"
+
+                        val startIndex = buffer.indexOf(POD_WATCHING_TERMINATION_SEQUENCE)
+                        if (startIndex >= 0) {
+                            val endIndex = startIndex + POD_WATCHING_TERMINATION_SEQUENCE.length
+                            val wholeJson = buffer.substring(0, endIndex)
+                            buffer = buffer.substring(endIndex)
+
+
+                            val jsonNode = runCatching { JsonConfiguration.json.parseToJsonElement(wholeJson) }.getOrNull()
+                            val isSent = parsePod(jsonNode)?.let(onNewPod) ?: true
+                            if (!isSent) {
+                                break
+                            }
                         }
                     }
                 }
-                reader.close()
 
-                val exitValue = p.onExit().get().exitValue()
+                val exitValue = p.waitFor()
                 log.info("Stop watch pods - $exitValue")
 
                 if (exitValue != 0) {
