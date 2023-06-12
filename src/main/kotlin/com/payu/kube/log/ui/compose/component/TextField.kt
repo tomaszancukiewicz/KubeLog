@@ -3,7 +3,7 @@ package com.payu.kube.log.ui.compose.component
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -24,14 +24,14 @@ fun TextField(
         onValueChange = onValueChange,
         modifier = modifier,
         singleLine = singleLine,
-        textStyle = TextStyle.Default.copy(color = MaterialTheme.colors.onSurface),
-        cursorBrush = SolidColor(MaterialTheme.colors.onSurface),
+        textStyle = TextStyle.Default.copy(color = MaterialTheme.colorScheme.onSurface),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
         decorationBox = { innerTextField ->
             InputLayout {
                 placeholder
                     ?.takeIf { value.isEmpty() }
                     ?.let {
-                        Text(it, color = MaterialTheme.colors.onSurface.copy(alpha = 0.5f))
+                        Text(it, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                         Spacer(Modifier.width(8.dp))
                     }
                 innerTextField()

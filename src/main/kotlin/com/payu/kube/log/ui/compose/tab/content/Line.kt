@@ -7,8 +7,8 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.DisableSelection
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -106,12 +106,17 @@ fun ItemLine(
 
     Text(
         text,
-        style = MaterialTheme.typography.body2.copy(lineHeight = LINE_HEIGHT),
+        style = MaterialTheme.typography.bodyMedium,
+        lineHeight = LINE_HEIGHT,
         fontFamily = FontFamily.Monospace,
         modifier = clickModifier
-            .let { if (markLine) it.background(MaterialTheme.colors.secondary.copy(alpha = 0.5f)) else it }
+            .let { if (markLine) it.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)) else it }
     )
-    Text("\n", modifier = Modifier.size(1.dp))
+    Text(
+        "\n",
+        lineHeight = 0.sp,
+        modifier = Modifier.size(1.dp)
+    )
 }
 
 @Composable
@@ -122,7 +127,8 @@ fun ShowBeforeLine(
     DisableSelection {
         Text(
             "Show more before...",
-            style = MaterialTheme.typography.body2.copy(lineHeight = LINE_HEIGHT),
+            style = MaterialTheme.typography.bodyMedium,
+            lineHeight = LINE_HEIGHT,
             textAlign = TextAlign.Center,
             modifier = modifier.clickable { onPrevClick() }
         )
@@ -137,7 +143,8 @@ fun ShowAfterLine(
     DisableSelection {
         Text(
             "Show more after...",
-            style = MaterialTheme.typography.body2.copy(lineHeight = LINE_HEIGHT),
+            style = MaterialTheme.typography.bodyMedium,
+            lineHeight = LINE_HEIGHT,
             textAlign = TextAlign.Center,
             modifier = modifier.clickable { onAfterClick() }
         )

@@ -3,8 +3,8 @@ package com.payu.kube.log.ui.compose.list
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -30,14 +30,14 @@ fun PodInfoViewCell(
             .size(10.dp)
         )
         Column {
-            Text(item.name, style = MaterialTheme.typography.subtitle2)
+            Text(item.name, style = MaterialTheme.typography.titleSmall)
             Text(
                 "${item.state.short()} " +
                         "${item.readyCount}/${item.startedCount}/${item.containerCount} " +
                         "R:${item.restarts}",
-                style = MaterialTheme.typography.caption
+                style = MaterialTheme.typography.bodySmall
             )
-            Text(item.creationTimestamp.fullFormat(), style = MaterialTheme.typography.caption)
+            Text(item.creationTimestamp.fullFormat(), style = MaterialTheme.typography.bodySmall)
         }
     }
 }

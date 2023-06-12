@@ -36,6 +36,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation(compose.desktop.currentOs)
+    implementation(compose.material3)
     implementation("org.jetbrains.compose.components:components-splitpane:1.4.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")

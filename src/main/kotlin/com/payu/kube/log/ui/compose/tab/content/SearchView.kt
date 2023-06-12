@@ -7,8 +7,8 @@ import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -89,6 +89,7 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
                     Surface(
                         modifier = Modifier.shadow(4.dp),
                         color = Color(255, 255, 210),
+                        contentColor = Color.Black,
                         shape = RoundedCornerShape(4.dp)
                     ) {
                         Text(
@@ -97,16 +98,16 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
                                 ?.joinToString("\n", "Literal mode.\nNot interpreted because of errors:\n") {
                                     " - $it"
                                 } ?: "Interpreted mode",
-                            color = Color.Black,
                             modifier = Modifier.padding(10.dp)
                         )
                     }
                 },
                 delayMillis = 0,
-                tooltipPlacement = TooltipPlacement.CursorPoint(alignment = Alignment.BottomEnd)
+                tooltipPlacement = TooltipPlacement.CursorPoint()
             ) {
                 Box(
-                    modifier = Modifier.width(20.dp).fillMaxHeight()
+                    modifier = Modifier.width(20.dp)
+                        .fillMaxHeight()
                         .background(if (queryErrors.isNullOrEmpty()) Color(0xFF2979FF) else Color(0xFF2bc140))
                 )
             }

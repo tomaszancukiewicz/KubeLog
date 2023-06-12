@@ -1,33 +1,52 @@
 package com.payu.kube.log.ui.compose.component
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Typography
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material.Colors
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
-val primary = Color(0xFF2962ff)
-val primaryVariant = Color(0xFF0039cb)
-val secondary = Color(0xFF29cdff)
+fun toM2(colorScheme: ColorScheme, isDark: Boolean) = Colors(
+    colorScheme.primary,
+    colorScheme.secondary,
+    colorScheme.tertiary,
+    colorScheme.tertiary,
+    colorScheme.background,
+    colorScheme.surface,
+    colorScheme.error,
+    colorScheme.onPrimary,
+    colorScheme.onSecondary,
+    colorScheme.onBackground,
+    colorScheme.onSurface,
+    colorScheme.onError,
+    isDark
+)
 
-val lightColors = lightColors(
+val primary = Color(0xFF2962ff)
+val secondary = Color(0xFF0039cb)
+val tertiary = Color(0xFF29cdff)
+
+val lightColor = lightColorScheme(
     primary = primary,
-    primaryVariant = primaryVariant,
     secondary = secondary,
+    tertiary = tertiary,
     background = Color(0xFFE8E4ED),
     surface = Color(0xFFFFFFFF),
 )
 
-val darkColors = darkColors(
+val lightColors2 = toM2(lightColor, true)
+
+val darkColor = darkColorScheme(
     primary = primary,
-    primaryVariant = primaryVariant,
     secondary = secondary,
+    tertiary = tertiary,
     background = Color(0xFF2C2F31),
     surface = Color(0xFF202020),
 )
+
+val darkColors2 = toM2(darkColor, false)
 
 val typography = Typography().let {
     val fontSize1 = 14.sp
@@ -35,14 +54,30 @@ val typography = Typography().let {
     val fontSize3 = 10.sp
 
     it.copy(
-        subtitle1 = it.subtitle1.copy(fontSize = fontSize1),
-        subtitle2 = it.subtitle2.copy(fontSize = fontSize2),
-        body1 = it.body1.copy(fontSize = fontSize1),
-        body2 = it.body2.copy(fontSize = fontSize2),
-        caption = it.caption.copy(fontSize = fontSize3),
-        overline = it.overline.copy(fontSize = fontSize2)
+        titleMedium = it.titleMedium.copy(fontSize = fontSize1, lineHeight = TextUnit.Unspecified),
+        titleSmall = it.titleSmall.copy(fontSize = fontSize2, lineHeight = TextUnit.Unspecified),
+        bodyLarge = it.bodyLarge.copy(fontSize = fontSize1, lineHeight = TextUnit.Unspecified),
+        bodyMedium = it.bodyMedium.copy(fontSize = fontSize2, lineHeight = TextUnit.Unspecified),
+        bodySmall = it.bodySmall.copy(fontSize = fontSize3, lineHeight = TextUnit.Unspecified),
+        labelSmall = it.labelSmall.copy(fontSize = fontSize2, lineHeight = TextUnit.Unspecified)
     )
 }
+
+val typography2 = androidx.compose.material.Typography(
+    h1 = typography.displayLarge,
+    h2 = typography.displayMedium,
+    h3 = typography.displaySmall,
+    h4 = typography.headlineMedium,
+    h5 = typography.headlineSmall,
+    h6 = typography.titleLarge,
+    subtitle1 = typography.titleMedium,
+    subtitle2 = typography.titleSmall,
+    body1 = typography.bodyLarge,
+    body2 = typography.bodyMedium,
+    caption = typography.bodySmall,
+    button = typography.labelLarge,
+    overline = typography.labelSmall
+)
 
 @Composable
 fun ThemeProvider(
@@ -50,9 +85,14 @@ fun ThemeProvider(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(
-        colors = if (darkTheme) darkColors else lightColors,
+        colorScheme = if (darkTheme) darkColor else lightColor,
         typography = typography
     ) {
-        content()
+        androidx.compose.material.MaterialTheme(
+            colors = if (darkTheme) darkColors2 else lightColors2,
+            typography = typography2
+        ) {
+            content()
+        }
     }
 }

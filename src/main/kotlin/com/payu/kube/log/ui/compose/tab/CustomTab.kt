@@ -5,10 +5,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Tab
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
@@ -32,7 +32,7 @@ fun CustomTab(podInfoState: StateFlow<PodInfo>, selected: Boolean, onClick: () -
         onClick = onClick
     ) {
         Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(podInfo.name, style = MaterialTheme.typography.subtitle1)
+            Text(podInfo.name, style = MaterialTheme.typography.titleMedium)
             Icon(
                 Icons.Default.Close,
                 contentDescription = "Close",
