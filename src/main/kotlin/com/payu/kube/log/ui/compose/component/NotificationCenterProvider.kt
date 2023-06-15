@@ -18,9 +18,11 @@ val NotificationCenter = staticCompositionLocalOf { TrayState() }
 val isTraySupported: Boolean get() = SystemTray.isSupported()
 
 @Composable
-fun NotificationCenterProvider(content: @Composable () -> Unit) {
+fun NotificationCenterProvider(
+    trayState: TrayState = rememberTrayState(),
+    content: @Composable () -> Unit
+) {
     val coroutineScope = rememberCoroutineScope()
-    val trayState = rememberTrayState()
     val icon = painterResource("AppIcon.png")
     val localDensity = LocalDensity.current
     val trayIcon = remember {

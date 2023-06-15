@@ -6,6 +6,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.application
 import com.payu.kube.log.ui.compose.MainWindow
 import com.payu.kube.log.ui.compose.component.NotificationCenterProvider
+import com.payu.kube.log.ui.compose.component.SnackbarStateProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
@@ -18,6 +19,8 @@ import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 @ExperimentalComposeUiApi
 fun main() = application {
     NotificationCenterProvider {
-        MainWindow(::exitApplication)
+        SnackbarStateProvider {
+            MainWindow(::exitApplication)
+        }
     }
 }

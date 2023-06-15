@@ -4,8 +4,7 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -14,15 +13,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import com.payu.kube.log.service.NamespaceService
-import com.payu.kube.log.ui.compose.component.ErrorView
-import com.payu.kube.log.ui.compose.component.LoadingView
-import com.payu.kube.log.ui.compose.component.ThemeProvider
+import com.payu.kube.log.ui.compose.component.*
 import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.util.LoadableResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 
+@OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalCoroutinesApi
 @FlowPreview
 @ExperimentalFoundationApi
@@ -33,6 +31,7 @@ import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 @Preview
 fun MainWindow(exitApplication: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
+    val snackbarState = SnackbarState.current
     var podsListVisible by remember { mutableStateOf(true) }
     var currentNamespace by remember { mutableStateOf<String?>(null) }
     var namespaces by remember { mutableStateOf(listOf<String>()) }
@@ -96,19 +95,21 @@ fun MainWindow(exitApplication: () -> Unit) {
             }
         }
         ThemeProvider {
-            UpdateDialog()
-            Surface(
-                color = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val namespace = currentNamespace
-                when (val isLoaded = isLoadedResult) {
-                    is LoadableResult.Loading -> LoadingView()
-                    is LoadableResult.Error -> ErrorView(isLoaded.error.message ?: "")
-                    is LoadableResult.Value ->
-                        if (namespace == null) LoadingView()
-                        else MainContent(namespace, podsListVisible, logTabsState)
+            Scaffold(snackbarHost = { SnackbarHost(snackbarState) }) {
+                UpdateDialog()
+                Surface(
+                    color = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    val namespace = currentNamespace
+                    when (val isLoaded = isLoadedResult) {
+                        is LoadableResult.Loading -> LoadingView()
+                        is LoadableResult.Error -> ErrorView(isLoaded.error.message ?: "")
+                        is LoadableResult.Value ->
+                            if (namespace == null) LoadingView()
+                            else MainContent(namespace, podsListVisible, logTabsState)
+                    }
                 }
             }
         }
