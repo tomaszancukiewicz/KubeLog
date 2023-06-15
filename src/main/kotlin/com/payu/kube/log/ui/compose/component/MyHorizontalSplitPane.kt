@@ -1,10 +1,17 @@
 package com.payu.kube.log.ui.compose.component
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.SplitPaneState
+import java.awt.Cursor
 
 @ExperimentalSplitPaneApi
 @Composable
@@ -21,6 +28,24 @@ fun MyHorizontalSplitPane(
                 }
                 second(minSize = 200.dp) {
                     secondColumnCompose()
+                }
+                splitter {
+                    visiblePart {
+                        Box(
+                            Modifier
+                                .width(1.dp)
+                                .fillMaxHeight()
+                        )
+                    }
+                    handle {
+                        Box(
+                            Modifier
+                                .markAsHandle()
+                                .pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
+                                .width(8.dp)
+                                .fillMaxHeight()
+                        )
+                    }
                 }
             }
         }
