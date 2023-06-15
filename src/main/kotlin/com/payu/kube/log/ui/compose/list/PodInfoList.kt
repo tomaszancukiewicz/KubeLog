@@ -21,7 +21,7 @@ import com.payu.kube.log.service.search.SearchQueryCompilerService
 import com.payu.kube.log.ui.compose.component.ThemeProvider
 import com.payu.kube.log.ui.compose.component.TextField
 
-@ExperimentalComposeUiApi
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PodInfoList(podList: List<PodInfo>,
                 searchTextState: MutableState<String> =  remember { mutableStateOf("") },
@@ -77,7 +77,6 @@ fun PodList(podList: List<PodInfo>, onPodClick: (PodInfo) -> Unit) {
 }
 
 @Preview
-@ExperimentalComposeUiApi
 @Composable
 private fun PodInfoListPreview() {
     ThemeProvider {

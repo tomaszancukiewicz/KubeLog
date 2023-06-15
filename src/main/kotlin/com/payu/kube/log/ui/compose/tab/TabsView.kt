@@ -1,16 +1,12 @@
 package com.payu.kube.log.ui.compose.tab
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.ui.compose.tab.content.TabContent
 
-@ExperimentalFoundationApi
-@ExperimentalComposeUiApi
 @Composable
 fun TabsView(logTabsState: LogTabsState, openPod: (PodInfo) -> Unit) {
     Column {

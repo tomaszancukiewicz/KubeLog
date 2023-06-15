@@ -1,9 +1,6 @@
 package com.payu.kube.log.ui.compose
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -13,22 +10,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import com.payu.kube.log.service.NamespaceService
-import com.payu.kube.log.ui.compose.component.*
+import com.payu.kube.log.ui.compose.component.ErrorView
+import com.payu.kube.log.ui.compose.component.LoadingView
+import com.payu.kube.log.ui.compose.component.SnackbarState
+import com.payu.kube.log.ui.compose.component.ThemeProvider
 import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.util.LoadableResult
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 
-@OptIn(ExperimentalMaterial3Api::class)
-@ExperimentalCoroutinesApi
-@FlowPreview
-@ExperimentalFoundationApi
-@ExperimentalMaterialApi
-@ExperimentalSplitPaneApi
-@ExperimentalComposeUiApi
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-@Preview
 fun MainWindow(exitApplication: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = SnackbarState.current

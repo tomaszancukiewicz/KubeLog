@@ -104,7 +104,7 @@ object PodService {
 
     private suspend fun watchingPodsSuspending(namespace: String, onNewPod: (PodInfo) -> Boolean) =
         withContext(Dispatchers.IO) {
-            suspendCancellableCoroutine<Unit> { continuation ->
+            suspendCancellableCoroutine { continuation ->
                 log.info("Start watch pods")
                 val p = ProcessBuilder(
                     "/usr/local/bin/kubectl", "--namespace", namespace,

@@ -21,7 +21,7 @@ data class UpdateData(
     val localVersion: List<Int>
 )
 
-@ExperimentalMaterialApi
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UpdateDialog() {
     var isDialogVisible by remember { mutableStateOf(true) }

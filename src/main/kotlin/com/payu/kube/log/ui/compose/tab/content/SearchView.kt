@@ -43,8 +43,7 @@ class SearchState {
     }
 }
 
-@ExperimentalFoundationApi
-@ExperimentalComposeUiApi
+@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
     val query by search.query
@@ -121,8 +120,6 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
 }
 
 @Preview
-@ExperimentalFoundationApi
-@ExperimentalComposeUiApi
 @Composable
 private fun SearchViewPreview() {
     ThemeProvider {

@@ -13,7 +13,7 @@ import org.jetbrains.compose.splitpane.HorizontalSplitPane
 import org.jetbrains.compose.splitpane.SplitPaneState
 import java.awt.Cursor
 
-@ExperimentalSplitPaneApi
+@OptIn(ExperimentalSplitPaneApi::class)
 @Composable
 fun MyHorizontalSplitPane(
     splitPaneState: SplitPaneState,

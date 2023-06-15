@@ -1,9 +1,6 @@
 package com.payu.kube.log.ui.compose
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.Notification
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.PodService
@@ -14,17 +11,11 @@ import com.payu.kube.log.ui.compose.tab.TabsView
 import com.payu.kube.log.util.FlowUtils.zipWithNext
 import com.payu.kube.log.util.LoadableResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
 
-@ExperimentalCoroutinesApi
-@FlowPreview
-@ExperimentalFoundationApi
-@ExperimentalMaterialApi
-@ExperimentalSplitPaneApi
-@ExperimentalComposeUiApi
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalSplitPaneApi::class)
 @Composable
 fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState: LogTabsState) {
     val coroutineScope = rememberCoroutineScope()
