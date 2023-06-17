@@ -1,7 +1,10 @@
 package com.payu.kube.log.ui.compose.tab.content
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -37,11 +40,13 @@ fun TabContent(logTab: LogTab, openPod: (PodInfo) -> Unit) {
         scrollState.scrollToItem(indexToScroll)
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxSize()
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             PodInfoView(podInfo, modifier = Modifier.weight(1.0f))
             SettingsView(logTab.settings) { logTab.clear() }

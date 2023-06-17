@@ -15,7 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.payu.kube.log.ui.compose.component.CheckboxWithLabel
-import com.payu.kube.log.ui.compose.component.ThemeProvider
+import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 
 class SettingsState {
     var autoscroll by mutableStateOf(true)
@@ -26,7 +26,7 @@ class SettingsState {
 fun SettingsView(settingsState: SettingsState, onClear: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         CheckboxWithLabel(
             modifier = Modifier.requiredWidth(IntrinsicSize.Max),

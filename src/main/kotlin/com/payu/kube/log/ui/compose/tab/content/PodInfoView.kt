@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.model.PodState
 import com.payu.kube.log.ui.compose.ReadyIndicator
-import com.payu.kube.log.ui.compose.component.ThemeProvider
+import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 import com.payu.kube.log.util.DateUtils.fullFormat
 import java.time.Instant
 
@@ -21,14 +21,14 @@ import java.time.Instant
 fun PodInfoView(podInfo: PodInfo, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
     ) {
         ReadyIndicator(podInfo.isReady)
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 "${podInfo.namespace} - ${podInfo.containerImage}",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 maxLines = 2
             )
             Text(

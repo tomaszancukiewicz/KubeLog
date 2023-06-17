@@ -7,9 +7,9 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.DisableSelection
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -127,8 +127,7 @@ fun ShowBeforeLine(
     DisableSelection {
         Text(
             "Show more before...",
-            style = MaterialTheme.typography.bodyMedium,
-            lineHeight = LINE_HEIGHT,
+            style = MaterialTheme.typography.labelMedium,
             textAlign = TextAlign.Center,
             modifier = modifier.clickable { onPrevClick() }
         )
@@ -143,8 +142,7 @@ fun ShowAfterLine(
     DisableSelection {
         Text(
             "Show more after...",
-            style = MaterialTheme.typography.bodyMedium,
-            lineHeight = LINE_HEIGHT,
+            style = MaterialTheme.typography.labelMedium,
             textAlign = TextAlign.Center,
             modifier = modifier.clickable { onAfterClick() }
         )

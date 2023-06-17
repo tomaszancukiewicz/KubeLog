@@ -85,20 +85,28 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
                             currentNamespaceChannel.tryEmit(currentNamespace)
                         }
                     )
-
-                    is LoadableResult.Value -> PodInfoList(status.value, podFilterText) {
-                        logTabsState.open(
-                            it,
-                            podListStateFlow
-                        )
-                    }
+                    is LoadableResult.Value -> PodInfoList(
+                        status.value,
+                        podFilterText,
+                        {
+                            logTabsState.open(
+                                it,
+                                podListStateFlow
+                            )
+                        }
+                    )
                 }
             }
         } else null
 
     val secondColumnCompose: (@Composable () -> Unit)? =
         if (logTabsState.tabs.isNotEmpty()) {
-            { TabsView(logTabsState) { logTabsState.open(it, podListStateFlow) } }
+            {
+                TabsView(
+                    logTabsState,
+                    { logTabsState.open(it, podListStateFlow) }
+                )
+            }
         } else null
 
     MyHorizontalSplitPane(

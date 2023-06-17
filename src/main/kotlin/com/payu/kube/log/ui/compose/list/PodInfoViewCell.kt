@@ -1,8 +1,9 @@
 package com.payu.kube.log.ui.compose.list
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,33 +12,37 @@ import androidx.compose.ui.unit.dp
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.model.PodState
 import com.payu.kube.log.ui.compose.ReadyIndicator
-import com.payu.kube.log.ui.compose.component.ThemeProvider
+import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 import com.payu.kube.log.util.DateUtils.fullFormat
 import java.time.Instant
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PodInfoViewCell(
     item: PodInfo,
     onPodClick: (PodInfo) -> Unit
 ) {
-    Row(modifier = Modifier
-        .clickable { onPodClick(item) }
-        .padding(horizontal = 6.dp, vertical = 2.dp)
-        .fillMaxWidth()
+    Card(
+        onClick = { onPodClick(item) },
+        modifier = Modifier.fillMaxWidth()
     ) {
-        ReadyIndicator(item.isReady, modifier = Modifier
-            .padding(end = 6.dp, top = 6.dp)
-            .size(10.dp)
-        )
-        Column {
-            Text(item.name, style = MaterialTheme.typography.titleSmall)
-            Text(
-                "${item.state.short()} " +
-                        "${item.readyCount}/${item.startedCount}/${item.containerCount} " +
-                        "R:${item.restarts}",
-                style = MaterialTheme.typography.bodySmall
+        Row(Modifier.padding(8.dp)) {
+            ReadyIndicator(
+                item.isReady,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .size(10.dp)
             )
-            Text(item.creationTimestamp.fullFormat(), style = MaterialTheme.typography.bodySmall)
+            Column(Modifier.padding(start = 8.dp)) {
+                Text(item.name, style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    "${item.state.short()} " +
+                            "${item.readyCount}/${item.startedCount}/${item.containerCount} " +
+                            "R:${item.restarts}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(item.creationTimestamp.fullFormat(), style = MaterialTheme.typography.bodyMedium)
+            }
         }
     }
 }

@@ -1,19 +1,27 @@
 package com.payu.kube.log.ui.compose.tab
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.ui.compose.tab.content.TabContent
 
 @Composable
-fun TabsView(logTabsState: LogTabsState, openPod: (PodInfo) -> Unit) {
-    Column {
+fun TabsView(
+    logTabsState: LogTabsState,
+    openPod: (PodInfo) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
         ScrollableTabRow(
             selectedTabIndex = logTabsState.selection,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground
         ) {
             logTabsState.tabs.forEachIndexed { index, logTab ->
                 CustomTab(
@@ -24,6 +32,7 @@ fun TabsView(logTabsState: LogTabsState, openPod: (PodInfo) -> Unit) {
                 )
             }
         }
+        Spacer(Modifier.height(8.dp))
         logTabsState.active?.let {
             TabContent(it, openPod)
         }

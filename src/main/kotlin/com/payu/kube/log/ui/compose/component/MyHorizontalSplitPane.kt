@@ -23,7 +23,7 @@ fun MyHorizontalSplitPane(
     when {
         firstColumnCompose != null && secondColumnCompose != null -> {
             HorizontalSplitPane(splitPaneState = splitPaneState) {
-                first(minSize = 250.dp) {
+                first(minSize = 200.dp) {
                     firstColumnCompose()
                 }
                 second(minSize = 200.dp) {
@@ -33,7 +33,7 @@ fun MyHorizontalSplitPane(
                     visiblePart {
                         Box(
                             Modifier
-                                .width(1.dp)
+                                .width(16.dp)
                                 .fillMaxHeight()
                         )
                     }
@@ -42,7 +42,7 @@ fun MyHorizontalSplitPane(
                             Modifier
                                 .markAsHandle()
                                 .pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
-                                .width(8.dp)
+                                .width(16.dp)
                                 .fillMaxHeight()
                         )
                     }

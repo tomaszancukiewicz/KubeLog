@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 
 @Composable
 fun CheckboxWithLabel(
@@ -27,7 +28,7 @@ fun CheckboxWithLabel(
                 onValueChange = { onCheckedChange?.invoke(!checked) },
                 role = Role.Checkbox
             )
-            .padding(10.dp)
+            .padding(8.dp)
     ) {
         Checkbox(
             checked = checked,
@@ -35,7 +36,7 @@ fun CheckboxWithLabel(
         )
         Text(
             text = label,
-            modifier = Modifier.padding(start = 10.dp)
+            modifier = Modifier.padding(start = 8.dp)
         )
     }
 }

@@ -1,50 +1,38 @@
 package com.payu.kube.log.ui.compose.component
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 
 @Composable
 fun <T> Select(items: List<T>, value: T, onSelect: (T) -> Unit, modifier: Modifier = Modifier) {
     var expanded by remember { mutableStateOf(false) }
-    var textFieldSize by remember { mutableStateOf(Size.Zero) }
 
     Box(modifier = modifier
-        .onSizeChanged { textFieldSize = it.toSize() }
-        .clickable {
-            expanded = true
-        },
     ) {
-        InputLayout {
-            Row {
+        Button(onClick = { expanded = true }) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(value.toString())
                 Icon(
                     if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp, 16.dp),
-                    tint = MaterialTheme.colorScheme.onSurface
+                    modifier = Modifier.size(16.dp, 16.dp)
                 )
             }
         }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .widthIn(min = with(LocalDensity.current) { textFieldSize.width.toDp() })
         ) {
             items.forEach { title ->
                 DropdownMenuItem(

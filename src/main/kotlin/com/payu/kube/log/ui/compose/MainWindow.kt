@@ -1,19 +1,26 @@
 package com.payu.kube.log.ui.compose
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.rememberWindowState
 import com.payu.kube.log.service.NamespaceService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
 import com.payu.kube.log.ui.compose.component.SnackbarState
-import com.payu.kube.log.ui.compose.component.ThemeProvider
+import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.util.LoadableResult
 
@@ -51,34 +58,40 @@ fun MainWindow(exitApplication: () -> Unit) {
         }
     }
 
-    Window(title = windowTitle, onCloseRequest = exitApplication, icon = painterResource("AppIcon.png"), onPreviewKeyEvent = {
-        if (it.type != KeyEventType.KeyDown) {
-            return@Window false
+    Window(
+        onCloseRequest = exitApplication,
+        state = rememberWindowState(size = DpSize(900.dp, 600.dp)),
+        title = windowTitle,
+        icon = painterResource("AppIcon.png"),
+        onPreviewKeyEvent = {
+            if (it.type != KeyEventType.KeyDown) {
+                return@Window false
+            }
+            when {
+                it.isMetaPressed && it.key == Key.T -> {
+                    podsListVisible = !podsListVisible
+                    true
+                }
+                it.isMetaPressed && it.key == Key.F -> {
+                    logTabsState.active?.search?.toggleVisible()
+                    true
+                }
+                it.isMetaPressed && it.isShiftPressed && it.key == Key.W -> {
+                    logTabsState.closeAll()
+                    true
+                }
+                it.isMetaPressed && it.key == Key.W -> {
+                    logTabsState.active?.let { active -> logTabsState.close(active) }
+                    true
+                }
+                it.isMetaPressed && it.isShiftPressed && it.key == Key.C -> {
+                    logTabsState.active?.clear()
+                    true
+                }
+                else -> false
+            }
         }
-        when {
-            it.isMetaPressed && it.key == Key.T -> {
-                podsListVisible = !podsListVisible
-                true
-            }
-            it.isMetaPressed && it.key == Key.F -> {
-                logTabsState.active?.search?.toggleVisible()
-                true
-            }
-            it.isMetaPressed && it.isShiftPressed && it.key == Key.W -> {
-                logTabsState.closeAll()
-                true
-            }
-            it.isMetaPressed && it.key == Key.W -> {
-                logTabsState.active?.let { active -> logTabsState.close(active) }
-                true
-            }
-            it.isMetaPressed && it.isShiftPressed && it.key == Key.C -> {
-                logTabsState.active?.clear()
-                true
-            }
-            else -> false
-        }
-    }) {
+    ) {
         MenuBar {
             NamespacesMenu(namespaces, currentNamespace) {
                 currentNamespace = it
@@ -87,10 +100,8 @@ fun MainWindow(exitApplication: () -> Unit) {
         ThemeProvider {
             Scaffold(snackbarHost = { SnackbarHost(snackbarState) }) {
                 UpdateDialog()
-                Surface(
-                    color = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.fillMaxSize()
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(16.dp)
                 ) {
                     val namespace = currentNamespace
                     when (val isLoaded = isLoadedResult) {

@@ -6,14 +6,13 @@ import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.TooltipPlacement
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -22,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.payu.kube.log.service.search.SearchQueryCompilerService
 import com.payu.kube.log.ui.compose.component.Select
 import com.payu.kube.log.ui.compose.component.TextField
-import com.payu.kube.log.ui.compose.component.ThemeProvider
+import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 
 enum class SearchType {
     FILTER, MARK,
@@ -57,7 +56,8 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
     }
 
     if (search.isVisible) {
-        Row(verticalAlignment = Alignment.CenterVertically,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.height(IntrinsicSize.Min)
         ) {
             TextField(
@@ -81,39 +81,39 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
                             else -> false
                         }
                     },
-                placeholder = "Search in logs e.g. \"Hello\" OR \"world\""
-            )
-            TooltipArea(
-                tooltip = {
-                    Surface(
-                        modifier = Modifier.shadow(4.dp),
-                        color = Color(255, 255, 210),
-                        contentColor = Color.Black,
-                        shape = RoundedCornerShape(4.dp)
+                placeholder = "Search in logs e.g. \"Hello\" OR \"world\"",
+                trailingIcon = {
+                    TooltipArea(
+                        tooltip = {
+                            ElevatedCard {
+                                Text(
+                                    text = queryErrors
+                                        ?.takeIf { it.isNotEmpty() }
+                                        ?.joinToString("\n", "Literal mode.\nNot interpreted because of errors:\n") {
+                                            " - $it"
+                                        } ?: "Interpreted mode",
+                                    modifier = Modifier.padding(10.dp)
+                                )
+                            }
+                        },
+                        delayMillis = 0,
+                        tooltipPlacement = TooltipPlacement.CursorPoint()
                     ) {
-                        Text(
-                            text = queryErrors
-                                ?.takeIf { it.isNotEmpty() }
-                                ?.joinToString("\n", "Literal mode.\nNot interpreted because of errors:\n") {
-                                    " - $it"
-                                } ?: "Interpreted mode",
-                            modifier = Modifier.padding(10.dp)
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .background(
+                                    if (queryErrors.isNullOrEmpty()) Color(0xFF2979FF) else Color(0xFF2bc140),
+                                    CircleShape
+                                )
                         )
                     }
-                },
-                delayMillis = 0,
-                tooltipPlacement = TooltipPlacement.CursorPoint()
-            ) {
-                Box(
-                    modifier = Modifier.width(20.dp)
-                        .fillMaxHeight()
-                        .background(if (queryErrors.isNullOrEmpty()) Color(0xFF2979FF) else Color(0xFF2bc140))
-                )
-            }
+                }
+            )
+            Spacer(Modifier.width(8.dp))
             Select(
                 SearchType.values().toList(),
-                search.searchType, { search.searchType = it },
-                modifier = Modifier.fillMaxHeight()
+                search.searchType, { search.searchType = it }
             )
         }
     }
