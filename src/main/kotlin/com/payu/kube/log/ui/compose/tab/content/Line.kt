@@ -128,6 +128,7 @@ fun ShowBeforeLine(
         Text(
             "Show more before...",
             style = MaterialTheme.typography.labelMedium,
+            lineHeight = LINE_HEIGHT,
             textAlign = TextAlign.Center,
             modifier = modifier.clickable { onPrevClick() }
         )
@@ -143,6 +144,7 @@ fun ShowAfterLine(
         Text(
             "Show more after...",
             style = MaterialTheme.typography.labelMedium,
+            lineHeight = LINE_HEIGHT,
             textAlign = TextAlign.Center,
             modifier = modifier.clickable { onAfterClick() }
         )

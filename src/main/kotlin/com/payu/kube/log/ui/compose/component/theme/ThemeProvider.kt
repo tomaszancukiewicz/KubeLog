@@ -6,6 +6,8 @@ import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 
 val lightColor = lightColorScheme(
     primary = md_theme_light_primary,
@@ -71,7 +73,25 @@ val darkColor = darkColorScheme(
     scrim = md_theme_dark_scrim,
 )
 
-val typography = Typography()
+val typography = Typography().let {
+    it.copy(
+        displayLarge = it.displayLarge.copy(lineHeight = TextUnit.Unspecified, fontSize = 48.sp),
+        displayMedium = it.displayMedium.copy(lineHeight = TextUnit.Unspecified, fontSize = 40.sp),
+        displaySmall = it.displaySmall.copy(lineHeight = TextUnit.Unspecified, fontSize = 32.sp),
+        headlineLarge = it.headlineLarge.copy(lineHeight = TextUnit.Unspecified, fontSize = 30.sp),
+        headlineMedium = it.headlineMedium.copy(lineHeight = TextUnit.Unspecified, fontSize = 24.sp),
+        headlineSmall = it.headlineSmall.copy(lineHeight = TextUnit.Unspecified, fontSize = 20.sp),
+        titleLarge = it.titleLarge.copy(lineHeight = TextUnit.Unspecified, fontSize = 20.sp),
+        titleMedium = it.titleMedium.copy(lineHeight = TextUnit.Unspecified, fontSize = 14.sp),
+        titleSmall = it.titleSmall.copy(lineHeight = TextUnit.Unspecified, fontSize = 12.sp),
+        bodyLarge = it.bodyLarge.copy(lineHeight = TextUnit.Unspecified, fontSize = 14.sp),
+        bodyMedium = it.bodyMedium.copy(lineHeight = TextUnit.Unspecified, fontSize = 12.sp),
+        bodySmall = it.bodySmall.copy(lineHeight = TextUnit.Unspecified, fontSize = 10.sp),
+        labelLarge = it.labelLarge.copy(fontSize = 14.sp),
+        labelMedium = it.labelMedium.copy(fontSize = 11.sp),
+        labelSmall = it.labelSmall.copy(fontSize = 10.sp),
+    )
+}
 
 val typography2 = toM2(typography)
 val lightColors2 = toM2(lightColor, true)
