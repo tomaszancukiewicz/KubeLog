@@ -6,15 +6,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.payu.kube.log.ui.compose.component.theme.LocalCustomColorScheme
 
 @Composable
 fun ReadyIndicator(isReady: Boolean, modifier: Modifier = Modifier) {
+    val customColorScheme = LocalCustomColorScheme.current
+
     Column(modifier = modifier.wrapContentSize(Alignment.Center)) {
         Box(
             modifier = Modifier
-                .background(if (isReady) Color(0xff2bc140) else Color(0xfff55e56), CircleShape)
+                .background(if (isReady) customColorScheme.green else customColorScheme.red, CircleShape)
                 .defaultMinSize(12.dp, 12.dp)
         )
     }

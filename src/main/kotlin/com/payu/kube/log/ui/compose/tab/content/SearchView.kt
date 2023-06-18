@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.payu.kube.log.service.search.SearchQueryCompilerService
 import com.payu.kube.log.ui.compose.component.Select
 import com.payu.kube.log.ui.compose.component.TextField
+import com.payu.kube.log.ui.compose.component.theme.LocalCustomColorScheme
 import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 
 enum class SearchType {
@@ -45,6 +46,7 @@ class SearchState {
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
+    val customColorScheme = LocalCustomColorScheme.current
     val query by search.query
     val queryErrors by remember { derivedStateOf { query?.errors } }
     val textFieldFocusRequester = remember { FocusRequester() }
@@ -103,7 +105,8 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
                             modifier = Modifier
                                 .size(24.dp)
                                 .background(
-                                    if (queryErrors.isNullOrEmpty()) Color(0xFF2979FF) else Color(0xFF2bc140),
+                                    if (queryErrors.isNullOrEmpty()) customColorScheme.blue
+                                    else customColorScheme.green,
                                     CircleShape
                                 )
                         )

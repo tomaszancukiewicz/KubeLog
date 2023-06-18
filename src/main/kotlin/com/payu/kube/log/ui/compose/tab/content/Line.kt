@@ -110,7 +110,7 @@ fun ItemLine(
         lineHeight = LINE_HEIGHT,
         fontFamily = FontFamily.Monospace,
         modifier = clickModifier
-            .let { if (markLine) it.background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)) else it }
+            .let { if (markLine) it.background(MaterialTheme.colorScheme.surface) else it }
     )
     Text(
         "\n",

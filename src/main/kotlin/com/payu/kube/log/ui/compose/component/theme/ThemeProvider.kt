@@ -110,7 +110,10 @@ fun ThemeProvider(
             colors = if (darkTheme) darkColors2 else lightColors2,
             typography = typography2
         ) {
-            content()
+            CustomColorSchemeProvider(
+                darkTheme,
+                content
+            )
         }
     }
 }
