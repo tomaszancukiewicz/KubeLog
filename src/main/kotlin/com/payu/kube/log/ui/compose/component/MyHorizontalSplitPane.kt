@@ -33,7 +33,7 @@ fun MyHorizontalSplitPane(
                     visiblePart {
                         Box(
                             Modifier
-                                .width(16.dp)
+                                .width(12.dp)
                                 .fillMaxHeight()
                         )
                     }
@@ -42,7 +42,7 @@ fun MyHorizontalSplitPane(
                             Modifier
                                 .markAsHandle()
                                 .pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
-                                .width(16.dp)
+                                .width(12.dp)
                                 .fillMaxHeight()
                         )
                     }

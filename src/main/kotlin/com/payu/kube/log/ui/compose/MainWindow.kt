@@ -101,7 +101,7 @@ fun MainWindow(exitApplication: () -> Unit) {
             Scaffold(snackbarHost = { SnackbarHost(snackbarState) }) {
                 UpdateDialog()
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(16.dp)
+                    modifier = Modifier.fillMaxSize().padding(12.dp)
                 ) {
                     val namespace = currentNamespace
                     when (val isLoaded = isLoadedResult) {
