@@ -11,11 +11,9 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import com.payu.kube.log.service.search.SearchQueryCompilerService
@@ -43,7 +41,7 @@ class SearchState {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
     val customColorScheme = LocalCustomColorScheme.current
@@ -115,7 +113,7 @@ fun SearchView(search: SearchState, onSearchRequest: () -> Unit) {
             )
             Spacer(Modifier.width(8.dp))
             Select(
-                SearchType.values().toList(),
+                SearchType.entries,
                 search.searchType, { search.searchType = it }
             )
         }

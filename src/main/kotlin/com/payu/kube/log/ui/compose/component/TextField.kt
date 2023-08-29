@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextField(
     modifier: Modifier = Modifier,

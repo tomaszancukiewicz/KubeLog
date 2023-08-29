@@ -3,8 +3,7 @@ package com.payu.kube.log.ui.compose
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -21,7 +20,6 @@ data class UpdateData(
     val localVersion: List<Int>
 )
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun UpdateDialog() {
     var isDialogVisible by remember { mutableStateOf(true) }

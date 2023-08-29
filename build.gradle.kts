@@ -5,11 +5,11 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("antlr")
-    kotlin("jvm") version "1.9.0"
-    kotlin("kapt") version "1.9.0"
-    kotlin("plugin.serialization") version "1.9.0"
-    id("org.springframework.boot") version "2.7.14"
-    id("org.jetbrains.compose") version "1.4.3"
+    kotlin("jvm") version "1.9.10"
+    kotlin("kapt") version "1.9.10"
+    kotlin("plugin.serialization") version "1.9.10"
+    id("org.springframework.boot") version "2.7.15"
+    id("org.jetbrains.compose") version "1.5.1"
 }
 
 group = "com.payu.kube.log"
@@ -37,7 +37,7 @@ dependencies {
 
     implementation(compose.desktop.currentOs)
     implementation(compose.material3)
-    implementation("org.jetbrains.compose.components:components-splitpane:1.4.3")
+    implementation("org.jetbrains.compose.components:components-splitpane:1.5.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3")

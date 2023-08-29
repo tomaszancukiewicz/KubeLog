@@ -93,10 +93,6 @@ val typography = Typography().let {
     )
 }
 
-val typography2 = toM2(typography)
-val lightColors2 = toM2(lightColor, true)
-val darkColors2 = toM2(darkColor, false)
-
 @Composable
 fun ThemeProvider(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -106,14 +102,9 @@ fun ThemeProvider(
         colorScheme = if (darkTheme) darkColor else lightColor,
         typography = typography
     ) {
-        androidx.compose.material.MaterialTheme(
-            colors = if (darkTheme) darkColors2 else lightColors2,
-            typography = typography2
-        ) {
-            CustomColorSchemeProvider(
-                darkTheme,
-                content
-            )
-        }
+        CustomColorSchemeProvider(
+            darkTheme,
+            content
+        )
     }
 }

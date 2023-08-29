@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
@@ -18,7 +17,6 @@ import com.payu.kube.log.service.search.SearchQueryCompilerService
 import com.payu.kube.log.ui.compose.component.TextField
 import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PodInfoList(
     podList: List<PodInfo>,
