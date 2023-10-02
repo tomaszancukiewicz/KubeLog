@@ -9,7 +9,7 @@ plugins {
     kotlin("kapt") version "1.9.10"
     kotlin("plugin.serialization") version "1.9.10"
     id("org.springframework.boot") version "2.7.15"
-    id("org.jetbrains.compose") version "1.5.1"
+    id("org.jetbrains.compose") version "1.5.3"
 }
 
 group = "com.payu.kube.log"
