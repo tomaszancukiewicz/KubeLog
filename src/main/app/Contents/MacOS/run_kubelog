@@ -25,10 +25,10 @@ JH=`/usr/libexec/java_home -X |
   grep -A 1 "<key>JVMHomePath</key>" |
   grep -e "<string>" | sed "s@.*<string>\(.*\)</string>.*@\1@" |
   grep -v "jdk1." | grep jdk | head -n 1`
-JH11=/Library/Java/JavaVirtualMachines/jdk-11.0.7.jdk/Contents/Home
-if [ -d "$JH11" ]; then
-  stub_logger "Found java11: $JH11"
-  export JAVA_HOME="$JH11"
+JH17=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home
+if [ -d "$JH17" ]; then
+  stub_logger "Found java17: $JH17"
+  export JAVA_HOME="$JH17"
   JAVACMD="$JAVA_HOME/bin/java"
 elif [ -d "$JH" ]; then
   stub_logger "Found java: $JH"

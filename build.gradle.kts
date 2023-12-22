@@ -15,7 +15,7 @@ plugins {
 group = "com.payu.kube.log"
 version = "1.5.0"
 
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
     jcenter()
@@ -80,7 +80,7 @@ tasks.withType<KotlinCompile> {
     dependsOn(tasks.generateGrammarSource)
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
