@@ -18,7 +18,6 @@ version = "1.5.0"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
-    jcenter()
     mavenCentral()
     google()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
@@ -28,7 +27,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    implementation("ch.qos.logback:logback-classic:1.4.11")
+    implementation("ch.qos.logback:logback-classic:1.4.12")
 
     antlr("org.antlr:antlr4:4.13.1")
 
@@ -138,7 +137,7 @@ tasks.register("creatAppBundle") {
         }
 
         // output path
-        val buildAppDir = buildDir.toPath().resolve("app")
+        val buildAppDir = layout.buildDirectory.dir("app").get().asFile
         delete(buildAppDir)
         mkdir(buildAppDir)
 
