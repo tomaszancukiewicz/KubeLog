@@ -77,6 +77,7 @@ tasks.withType<Test> {
 tasks.withType<KotlinCompile> {
     dependsOn(tasks.withType<BuildInfo>())
     dependsOn(tasks.generateGrammarSource)
+    dependsOn(tasks.generateTestGrammarSource)
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = "17"
