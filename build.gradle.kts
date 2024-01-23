@@ -34,7 +34,8 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.9.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
-    implementation(compose.desktop.currentOs)
+    implementation(compose.desktop.macos_x64)
+    implementation(compose.desktop.macos_arm64)
     implementation(compose.material3)
     implementation("org.jetbrains.compose.components:components-splitpane:1.5.1")
 
@@ -54,7 +55,7 @@ compose.desktop {
     application {
         mainClass = "com.payu.kube.log.MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(TargetFormat.Dmg)
             packageName = project.name
             packageVersion = project.version.toString()
         }
