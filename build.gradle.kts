@@ -5,11 +5,11 @@ import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("antlr")
-    kotlin("jvm") version "1.9.21"
-    kotlin("kapt") version "1.9.21"
-    kotlin("plugin.serialization") version "1.9.21"
-    id("org.springframework.boot") version "2.7.15"
-    id("org.jetbrains.compose") version "1.5.11"
+    kotlin("jvm") version "1.9.22"
+    kotlin("kapt") version "1.9.22"
+    kotlin("plugin.serialization") version "1.9.22"
+    id("org.springframework.boot") version "2.7.18"
+    id("org.jetbrains.compose") version "1.5.12"
 }
 
 group = "com.payu.kube.log"
@@ -27,7 +27,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    implementation("ch.qos.logback:logback-classic:1.4.12")
+    implementation("ch.qos.logback:logback-classic:1.4.14")
 
     antlr("org.antlr:antlr4:4.13.1")
 
@@ -45,10 +45,10 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 
-    implementation("io.ktor:ktor-client-core:2.3.7")
-    implementation("io.ktor:ktor-client-cio:2.3.7")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+    implementation("io.ktor:ktor-client-core:2.3.8")
+    implementation("io.ktor:ktor-client-cio:2.3.8")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.8")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.8")
 }
 
 compose.desktop {
