@@ -41,34 +41,16 @@ jobs:
         run: ./gradlew creatAppBundle
       - name: Get app version
         id: app_version
-        run: echo "APP_VERSION=$(./gradlew version --no-daemon --console=plain -q)" >> $GITHUB_OUTPUT
+        run: echo "APP_VERSION=$(./gradlew version --no-daemon --console=plain -q | tail -n 1)" >> $GITHUB_OUTPUT
       - name: Get short SHA
         id: short_sha
         run: echo "SHA8=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_OUTPUT
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Create GH Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.app_version.outputs.APP_VERSION }}-${{ steps.short_sha.outputs.SHA8 }}
-          release_name: Release v${{ steps.app_version.outputs.APP_VERSION }}-${{ steps.short_sha.outputs.SHA8 }}
-          body: |
-            Pkg installs application in /Applications by default. You can change it to HOME/Applications during
-            installation.
-
-            When you see "unidentified developer" error,
-            open installer in "System Preferences" > "Security & Privacy" > "General" > "Open anyway"
-          draft: false
-          prerelease: false
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/app/KubeLog.pkg
-          asset_name: KubeLog-installer-mac.pkg
-          asset_content_type: application/x-xar
-      - name: Print release url
-        run: echo "Relese ${{ steps.create_release.outputs.html_url }}"
+          APP_VERSION: ${{ steps.app_version.outputs.APP_VERSION }}-${{ steps.short_sha.outputs.SHA8 }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "v$APP_VERSION" \
+            -t "Release v$APP_VERSION" \
+            --generate-notes \
+            './build/app/KubeLog.pkg#KubeLog-installer-mac.pkg'
