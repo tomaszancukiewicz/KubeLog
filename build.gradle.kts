@@ -1,15 +1,18 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.springframework.boot.gradle.tasks.buildinfo.BuildInfo
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
     id("antlr")
-    kotlin("jvm") version "1.9.24"
-    kotlin("kapt") version "1.9.24"
-    kotlin("plugin.serialization") version "1.9.24"
+    kotlin("jvm") version "2.0.0"
+    kotlin("kapt") version "2.0.0"
+    kotlin("plugin.serialization") version "2.0.0"
+    kotlin("plugin.compose") version "2.0.0"
+
     id("org.springframework.boot") version "2.7.18"
-    id("org.jetbrains.compose") version "1.6.10"
+    id("org.jetbrains.compose") version "1.6.11"
 }
 
 group = "com.payu.kube.log"
@@ -27,7 +30,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    implementation("ch.qos.logback:logback-classic:1.5.5")
+    implementation("ch.qos.logback:logback-classic:1.5.6")
 
     antlr("org.antlr:antlr4:4.13.1")
 
@@ -43,12 +46,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.1")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
 
-    implementation("io.ktor:ktor-client-core:2.3.11")
-    implementation("io.ktor:ktor-client-cio:2.3.11")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.11")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.11")
+    implementation("io.ktor:ktor-client-core:2.3.12")
+    implementation("io.ktor:ktor-client-cio:2.3.12")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.12")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.12")
 }
 
 compose.desktop {
@@ -79,9 +82,9 @@ tasks.withType<KotlinCompile> {
     dependsOn(tasks.withType<BuildInfo>())
     dependsOn(tasks.generateGrammarSource)
     dependsOn(tasks.generateTestGrammarSource)
-    kotlinOptions {
+    compilerOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "21"
+        jvmTarget = JvmTarget.JVM_21
     }
 }
 
