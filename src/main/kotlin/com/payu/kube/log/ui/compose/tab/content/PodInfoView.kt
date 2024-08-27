@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.model.PodState
-import com.payu.kube.log.ui.compose.ReadyIndicator
+import com.payu.kube.log.ui.compose.component.ReadyIndicator
 import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 import com.payu.kube.log.util.DateUtils.fullFormat
 import java.time.Instant

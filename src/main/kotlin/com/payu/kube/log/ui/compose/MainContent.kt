@@ -17,7 +17,7 @@ import org.jetbrains.compose.splitpane.rememberSplitPaneState
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalSplitPaneApi::class)
 @Composable
-fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState: LogTabsState) {
+fun MainContent(currentNamespace: String, tailLogs: Boolean, podsListVisible: Boolean, logTabsState: LogTabsState) {
     val coroutineScope = rememberCoroutineScope()
     val notificationCenter = NotificationCenter.current
     val snackbarState = SnackbarState.current
@@ -91,6 +91,7 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
                         {
                             logTabsState.open(
                                 it,
+                                tailLogs,
                                 podListStateFlow
                             )
                         }
@@ -104,7 +105,7 @@ fun MainContent(currentNamespace: String, podsListVisible: Boolean, logTabsState
             {
                 TabsView(
                     logTabsState,
-                    { logTabsState.open(it, podListStateFlow) }
+                    { logTabsState.open(it, tailLogs, podListStateFlow) }
                 )
             }
         } else null

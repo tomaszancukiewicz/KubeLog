@@ -1,4 +1,4 @@
-package com.payu.kube.log.ui.compose
+package com.payu.kube.log.ui.compose.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

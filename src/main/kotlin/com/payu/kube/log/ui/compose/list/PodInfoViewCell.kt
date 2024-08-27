@@ -13,7 +13,6 @@ import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 import com.payu.kube.log.util.DateUtils.fullFormat
 import java.time.Instant
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PodInfoViewCell(
     item: PodInfo,

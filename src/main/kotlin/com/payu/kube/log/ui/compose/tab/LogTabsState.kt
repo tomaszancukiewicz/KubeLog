@@ -15,8 +15,8 @@ class LogTabsState(private val coroutineScope: CoroutineScope) {
     val active: LogTab?
         get() = selection.let { tabs.getOrNull(it) }
 
-    fun open(podInfo: PodInfo, allPodsFlow: Flow<List<PodInfo>>) {
-        val tab = LogTab(podInfo, coroutineScope, allPodsFlow)
+    fun open(podInfo: PodInfo, tailLogs: Boolean, allPodsFlow: Flow<List<PodInfo>>) {
+        val tab = LogTab(podInfo, tailLogs, coroutineScope, allPodsFlow)
         tab.init()
         tabs.add(tab)
         selection = tabs.lastIndex

@@ -17,9 +17,10 @@ import kotlinx.coroutines.flow.*
 import kotlin.math.max
 import kotlin.math.min
 
-class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: Flow<List<PodInfo>>) {
+class LogTab(initialPodInfo: PodInfo, private val tailLogs: Boolean, parentScope: CoroutineScope,
+             allListFlow: Flow<List<PodInfo>>) {
     companion object {
-        private const val MORE_ELEMENT = 3
+        private const val MORE_ELEMENT = 5
     }
 
     private val coroutineScope = parentScope + SupervisorJob()
@@ -58,7 +59,8 @@ class LogTab(initialPodInfo: PodInfo, parentScope: CoroutineScope, allListFlow: 
             }
         }.launchIn(coroutineScope)
 
-        PodLogService.watchingLogsSuspending(podInfoState)
+        val tail = if (tailLogs) 1000 else null
+        PodLogService.watchingLogsSuspending(podInfoState, tail)
             .debounceWithCache(50)
             .filter { it.isNotEmpty() }
             .buffer()

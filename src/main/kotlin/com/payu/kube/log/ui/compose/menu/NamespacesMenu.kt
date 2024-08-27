@@ -1,4 +1,4 @@
-package com.payu.kube.log.ui.compose
+package com.payu.kube.log.ui.compose.menu
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.MenuBarScope
@@ -9,10 +9,10 @@ fun MenuBarScope.NamespacesMenu(
 ) {
     Menu("Namespaces", mnemonic = 'N') {
         for (namespace in namespaces) {
-            CheckboxItem(
+            RadioButtonItem(
                 namespace,
-                checked = currentNamespace == namespace,
-                onCheckedChange = { onChangeCurrentNamespace(namespace) }
+                selected = currentNamespace == namespace,
+                onClick = { onChangeCurrentNamespace(namespace) }
             )
         }
     }

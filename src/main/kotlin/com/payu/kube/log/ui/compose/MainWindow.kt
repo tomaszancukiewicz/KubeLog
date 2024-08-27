@@ -19,6 +19,8 @@ import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
 import com.payu.kube.log.ui.compose.component.SnackbarState
 import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
+import com.payu.kube.log.ui.compose.menu.NamespacesMenu
+import com.payu.kube.log.ui.compose.menu.TailLogsMenu
 import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.util.LoadableResult
 
@@ -26,6 +28,7 @@ import com.payu.kube.log.util.LoadableResult
 fun MainWindow(exitApplication: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = SnackbarState.current
+    var tailLogs by remember { mutableStateOf(true) }
     var podsListVisible by remember { mutableStateOf(true) }
     var currentNamespace by remember { mutableStateOf<String?>(null) }
     var namespaces by remember { mutableStateOf(listOf<String>()) }
@@ -93,6 +96,9 @@ fun MainWindow(exitApplication: () -> Unit) {
             NamespacesMenu(namespaces, currentNamespace) {
                 currentNamespace = it
             }
+            TailLogsMenu(tailLogs) {
+                tailLogs = it
+            }
         }
         ThemeProvider {
             Scaffold(snackbarHost = { SnackbarHost(snackbarState) }) {
@@ -106,7 +112,7 @@ fun MainWindow(exitApplication: () -> Unit) {
                         is LoadableResult.Error -> ErrorView(isLoaded.error.message ?: "")
                         is LoadableResult.Value ->
                             if (namespace == null) LoadingView()
-                            else MainContent(namespace, podsListVisible, logTabsState)
+                            else MainContent(namespace, tailLogs, podsListVisible, logTabsState)
                     }
                 }
             }
