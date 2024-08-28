@@ -22,6 +22,7 @@ import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 import com.payu.kube.log.ui.compose.menu.NamespacesMenu
 import com.payu.kube.log.ui.compose.menu.TailLogsMenu
 import com.payu.kube.log.ui.compose.tab.LogTabsState
+import com.payu.kube.log.ui.compose.update.UpdateDialog
 import com.payu.kube.log.util.LoadableResult
 
 @Composable

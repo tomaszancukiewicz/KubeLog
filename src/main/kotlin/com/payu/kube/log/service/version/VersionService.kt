@@ -2,26 +2,37 @@ package com.payu.kube.log.service.version
 
 import com.payu.kube.log.util.RegexUtils.getOrNull
 
-object VersionService {
-    private val versionRegex = "v([0-9]+\\.[0-9]+\\.[0-9]+)(?:-.*)?".toRegex()
+data class VersionHolder(val table: List<Int>): Comparable<VersionHolder> {
+    override fun compareTo(other: VersionHolder): Int {
+        var i = 0
+        while (i < table.size && i < other.table.size) {
+            val c = table[i].compareTo(other.table[i])
+            if (c != 0) {
+                return c
+            }
+            i++
+        }
+        return table.size.compareTo(other.table.size)
+    }
 
-    fun extractVersionTable(versionText: String): List<Int>? {
-        return versionRegex.find(versionText)?.groups
+    override fun toString(): String {
+        return table.joinToString(".")
+    }
+}
+
+object VersionService {
+    private val versionRegex = "v?([0-9]+\\.[0-9]+\\.[0-9]+)(?:-.*)?".toRegex()
+
+    fun extractVersion(versionText: String): VersionHolder? {
+        val table = versionRegex.find(versionText)?.groups
             ?.getOrNull(1)
             ?.value
             ?.split('.')
-            ?.map { it.toInt() }
+            ?.map { it.toInt() } ?: return null
+        return VersionHolder(table)
     }
 
-    fun needsUpdate(onlineVersion: List<Int>, localVersion: List<Int>): Boolean {
-        var i = 0
-        while (i < localVersion.size && i < onlineVersion.size) {
-            if (onlineVersion[i] > localVersion[i])
-                return true
-            if (onlineVersion[i] < localVersion[i])
-                return false
-            i++
-        }
-        return i < onlineVersion.size
+    fun needsUpdate(onlineVersion: VersionHolder, localVersion: VersionHolder): Boolean {
+        return onlineVersion > localVersion
     }
 }
