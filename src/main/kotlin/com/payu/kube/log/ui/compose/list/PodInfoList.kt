@@ -5,26 +5,23 @@ import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
 import com.payu.kube.log.util.LoadableResult
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun PodInfoList(
-    podListDataStateFlow: StateFlow<LoadableResult<List<PodInfo>>>,
-    searchTextState: MutableState<String> = remember { mutableStateOf("") },
+    podListState: PodListState,
     onPodClick: (PodInfo) -> Unit = {},
     onReload: (() -> Unit)? = null,
 ) {
-    val podListData by podListDataStateFlow.collectAsState()
+    val listStatus by podListState.state.collectAsState()
 
-    when (val status = podListData) {
+    when (val status = listStatus) {
         is LoadableResult.Loading -> LoadingView()
         is LoadableResult.Error -> ErrorView(
             status.error.message ?: "",
             onReload = onReload
         )
         is LoadableResult.Value -> PodInfoListContent(
-            status.value,
-            searchTextState,
+            podListState,
             onPodClick
         )
     }

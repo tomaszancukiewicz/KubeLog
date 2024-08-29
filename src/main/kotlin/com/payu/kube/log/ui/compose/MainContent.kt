@@ -1,17 +1,18 @@
 package com.payu.kube.log.ui.compose
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.window.Notification
-import com.payu.kube.log.model.PodInfo
-import com.payu.kube.log.service.PodService
 import com.payu.kube.log.ui.compose.component.MyHorizontalSplitPane
 import com.payu.kube.log.ui.compose.component.NotificationCenter
 import com.payu.kube.log.ui.compose.component.SnackbarState
 import com.payu.kube.log.ui.compose.list.PodInfoList
+import com.payu.kube.log.ui.compose.list.PodListState
 import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.ui.compose.tab.TabsView
 import com.payu.kube.log.util.FlowUtils.zipWithNext
-import com.payu.kube.log.util.LoadableResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
@@ -23,30 +24,14 @@ fun MainContent(currentNamespace: String, tailLogs: Boolean, podsListVisible: Bo
     val coroutineScope = rememberCoroutineScope()
     val notificationCenter = NotificationCenter.current
     val snackbarState = SnackbarState.current
-    val podFilterText = remember { mutableStateOf("") }
-    val currentNamespaceChannel = remember { MutableSharedFlow<String>(1) }
-    val podListDataStateFlow: StateFlow<LoadableResult<List<PodInfo>>> = remember {
-        currentNamespaceChannel
-            .flatMapLatest { currentNamespace ->
-                PodService.monitorPods(currentNamespace)
-                    .map { it.sortedWith(PodInfo.COMPARATOR) }
-                    .map<List<PodInfo>, LoadableResult<List<PodInfo>>> { LoadableResult.Value(it) }
-                    .catch { emit(LoadableResult.Error(it)) }
-                    .onStart { emit(LoadableResult.Loading) }
-            }
-            .stateIn(coroutineScope, SharingStarted.Eagerly, LoadableResult.Loading)
-    }
-    val podListStateFlow: Flow<List<PodInfo>> = remember {
-        podListDataStateFlow
-            .map { (it as? LoadableResult.Value)?.value ?: listOf() }
-    }
+    val podListState = remember { PodListState(coroutineScope) }
 
     LaunchedEffect(currentNamespace) {
-        currentNamespaceChannel.tryEmit(currentNamespace)
+        podListState.showNamespace(currentNamespace)
     }
 
     LaunchedEffect(Unit) {
-        val podOfOpenAppsFlow = podListStateFlow
+        val podOfOpenAppsFlow = podListState.list
             .combine(logTabsState.openAppsFlow) { list, monitoredApps ->
                 list
                     .filter { it.calculatedAppName in monitoredApps }
@@ -77,17 +62,16 @@ fun MainContent(currentNamespace: String, tailLogs: Boolean, podsListVisible: Bo
 
     val firstColumnCompose = @Composable {
         PodInfoList(
-            podListDataStateFlow,
-            podFilterText,
+            podListState,
             onPodClick = {
                 logTabsState.open(
                     it,
                     tailLogs,
-                    podListStateFlow
+                    podListState.list
                 )
             },
             onReload = {
-                currentNamespaceChannel.tryEmit(currentNamespace)
+                podListState.showNamespace(currentNamespace)
             }
         )
     }
@@ -95,7 +79,7 @@ fun MainContent(currentNamespace: String, tailLogs: Boolean, podsListVisible: Bo
     val secondColumnCompose = @Composable {
         TabsView(
             logTabsState,
-            { logTabsState.open(it, tailLogs, podListStateFlow) }
+            { logTabsState.open(it, tailLogs, podListState.list) }
         )
     }
 
