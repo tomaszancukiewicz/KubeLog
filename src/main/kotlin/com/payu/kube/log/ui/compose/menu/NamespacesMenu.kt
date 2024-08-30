@@ -4,23 +4,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.window.MenuBarScope
-import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun MenuBarScope.NamespacesMenu(
-    namespacesFlow: StateFlow<List<String>>,
-    currentNamespaceFlow: StateFlow<String?>,
-    onChangeCurrentNamespace: (String) -> Unit
+    namespacesState: NamespacesState
 ) {
-    val namespaces by namespacesFlow.collectAsState()
-    val currentNamespace by currentNamespaceFlow.collectAsState()
+    val namespaces by namespacesState.namespaces.collectAsState()
+    val currentNamespace by namespacesState.currentNamespace.collectAsState()
 
     Menu("Namespaces", mnemonic = 'N') {
         for (namespace in namespaces) {
             RadioButtonItem(
                 namespace,
                 selected = currentNamespace == namespace,
-                onClick = { onChangeCurrentNamespace(namespace) }
+                onClick = { namespacesState.changeNamespace(namespace) }
             )
         }
     }

@@ -72,9 +72,7 @@ fun MainWindow(exitApplication: () -> Unit) {
     ) {
         MenuBar {
             NamespacesMenu(
-                mainState.namespaces,
-                mainState.currentNamespace,
-                onChangeCurrentNamespace = mainState::changeNamespace
+                mainState.namespacesState
             )
             TailLogsMenu(
                 mainState.tailLogs,

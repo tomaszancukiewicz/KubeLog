@@ -4,29 +4,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.payu.kube.log.model.PodInfo
-import com.payu.kube.log.service.NamespaceService
 import com.payu.kube.log.ui.compose.list.PodListState
+import com.payu.kube.log.ui.compose.menu.NamespacesState
 import com.payu.kube.log.ui.compose.tab.LogTab
 import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.util.FlowUtils.zipWithNext
-import com.payu.kube.log.util.LoadableResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainState(private val coroutineScope: CoroutineScope) {
-    val state: MutableStateFlow<LoadableResult<Unit>> = MutableStateFlow(LoadableResult.Loading)
-    val currentNamespace = MutableStateFlow<String?>(null)
-    val namespaces = MutableStateFlow(listOf<String>())
     var tailLogs by mutableStateOf(true)
         private set
     private var podsListVisible by mutableStateOf(true)
 
+    val namespacesState = NamespacesState()
     val logTabsState = LogTabsState()
     val podListState = PodListState(coroutineScope)
 
-    val windowTitle = currentNamespace.map {
+    val state = namespacesState.state
+    val windowTitle = namespacesState.currentNamespace.map {
         if (!it.isNullOrEmpty()) {
             "KubeLog - $it"
         } else {
@@ -50,16 +50,29 @@ class MainState(private val coroutineScope: CoroutineScope) {
         }
         .flatMapConcat { it.asFlow() }
 
-    suspend fun loadData() {
-        state.value = LoadableResult.Loading
-
-        try {
-            namespaces.value = NamespaceService.readAllNamespaceSuspending()
-            changeNamespace(NamespaceService.readCurrentNamespaceSuspending())
-            state.value = LoadableResult.Value(Unit)
-        } catch (e: Exception) {
-            state.value = LoadableResult.Error(e)
+    suspend fun loadData() = coroutineScope {
+        val watchingJob = async {
+            namespacesState.currentNamespace
+                .filterNotNull()
+                .collect(::monitorNamespace)
         }
+        namespacesState.loadData()
+        watchingJob.await()
+    }
+
+    private fun monitorNamespace(newNamespace: String) {
+        logTabsState.closeAll()
+        podListState.showNamespace(newNamespace)
+    }
+
+    fun reloadNamespace() {
+        namespacesState.currentNamespace.value
+            ?.let { podListState.showNamespace(it) }
+    }
+
+    fun openTab(it: PodInfo) {
+        val tab = LogTab(it, tailLogs, coroutineScope, podListState.list)
+        logTabsState.open(tab)
     }
 
     fun togglePodListVisible() {
@@ -68,21 +81,6 @@ class MainState(private val coroutineScope: CoroutineScope) {
 
     fun changeTailLogs(newTailLogs: Boolean) {
         tailLogs = newTailLogs
-    }
-
-    fun changeNamespace(newNamespace: String) {
-        logTabsState.closeAll()
-        currentNamespace.value = newNamespace
-        podListState.showNamespace(newNamespace)
-    }
-
-    fun reloadNamespace() {
-        currentNamespace.value?.let { podListState.showNamespace(it) }
-    }
-
-    fun openTab(it: PodInfo) {
-        val tab = LogTab(it, tailLogs, coroutineScope, podListState.list)
-        logTabsState.open(tab)
     }
 
     fun isPodListVisible(): Boolean {
