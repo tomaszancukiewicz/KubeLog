@@ -14,7 +14,7 @@ fun PodInfoListContent(
     onPodClick: (PodInfo) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val filteredList by podListState.filteredList.collectAsState(listOf())
+    val filteredList by podListState.filteredList.collectAsState()
     val filterText by podListState.filterText.collectAsState()
 
     Column(modifier = modifier) {

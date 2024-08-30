@@ -23,7 +23,7 @@ class PodListState(private val coroutineScope: CoroutineScope) {
                 ?.let { { pod -> it.check(pod.name) } }
                 ?: { true }
         l.filter(filterPredicate)
-    }
+    }.stateIn(coroutineScope, SharingStarted.Lazily, listOf())
 
     fun showNamespace(namespace: String) {
         monitorJob?.cancel()

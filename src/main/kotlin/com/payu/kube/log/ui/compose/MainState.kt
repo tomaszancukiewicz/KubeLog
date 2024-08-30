@@ -32,7 +32,7 @@ class MainState(private val coroutineScope: CoroutineScope) {
         } else {
             "Kubelog"
         }
-    }.stateIn(coroutineScope, SharingStarted.WhileSubscribed(), "KubeLog")
+    }.stateIn(coroutineScope, SharingStarted.Lazily, "KubeLog")
 
     private val podOfOpenAppsFlow = podListState.list
         .combine(logTabsState.openAppsFlow) { list, monitoredApps ->
