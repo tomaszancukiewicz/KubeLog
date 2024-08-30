@@ -14,14 +14,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.MenuBar
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
-import com.payu.kube.log.service.NamespaceService
 import com.payu.kube.log.ui.compose.component.ErrorView
 import com.payu.kube.log.ui.compose.component.LoadingView
 import com.payu.kube.log.ui.compose.component.SnackbarState
 import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 import com.payu.kube.log.ui.compose.menu.NamespacesMenu
 import com.payu.kube.log.ui.compose.menu.TailLogsMenu
-import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.ui.compose.update.UpdateDialog
 import com.payu.kube.log.util.LoadableResult
 
@@ -29,40 +27,19 @@ import com.payu.kube.log.util.LoadableResult
 fun MainWindow(exitApplication: () -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarState = SnackbarState.current
-    var tailLogs by remember { mutableStateOf(true) }
-    var podsListVisible by remember { mutableStateOf(true) }
-    var currentNamespace by remember { mutableStateOf<String?>(null) }
-    var namespaces by remember { mutableStateOf(listOf<String>()) }
-    val logTabsState = remember { LogTabsState(coroutineScope) }
+    val mainState = remember { MainState(coroutineScope) }
 
-    val windowTitle by remember {
-        derivedStateOf {
-            if (!currentNamespace.isNullOrEmpty()) {
-                "KubeLog - $currentNamespace"
-            } else {
-                "Kubelog"
-            }
-        }
+    LaunchedEffect(Unit) {
+        mainState.loadData()
     }
 
-    LaunchedEffect(currentNamespace) {
-        logTabsState.closeAll()
-    }
-
-    val isLoadedResult by produceState<LoadableResult<Unit>>(LoadableResult.Loading) {
-        try {
-            namespaces = NamespaceService.readAllNamespaceSuspending()
-            currentNamespace = NamespaceService.readCurrentNamespaceSuspending()
-            value = LoadableResult.Value(Unit)
-        } catch (e: Exception) {
-            value = LoadableResult.Error(e)
-        }
-    }
+    val state by mainState.state.collectAsState()
+    val title by mainState.windowTitle.collectAsState()
 
     Window(
         onCloseRequest = exitApplication,
         state = rememberWindowState(size = DpSize(900.dp, 600.dp)),
-        title = windowTitle,
+        title = title,
         icon = painterResource("AppIcon.png"),
         onPreviewKeyEvent = {
             if (it.type != KeyEventType.KeyDown) {
@@ -70,23 +47,23 @@ fun MainWindow(exitApplication: () -> Unit) {
             }
             when {
                 it.isMetaPressed && it.key == Key.T -> {
-                    podsListVisible = !podsListVisible
+                    mainState.togglePodListVisible()
                     true
                 }
                 it.isMetaPressed && it.key == Key.F -> {
-                    logTabsState.active?.search?.toggleVisible()
+                    mainState.logTabsState.active?.search?.toggleVisible()
                     true
                 }
                 it.isMetaPressed && it.isShiftPressed && it.key == Key.W -> {
-                    logTabsState.closeAll()
+                    mainState.logTabsState.closeAll()
                     true
                 }
                 it.isMetaPressed && it.key == Key.W -> {
-                    logTabsState.active?.let { active -> logTabsState.close(active) }
+                    mainState.logTabsState.active?.let { active -> mainState.logTabsState.close(active) }
                     true
                 }
                 it.isMetaPressed && it.isShiftPressed && it.key == Key.C -> {
-                    logTabsState.active?.clear()
+                    mainState.logTabsState.active?.clear()
                     true
                 }
                 else -> false
@@ -94,12 +71,15 @@ fun MainWindow(exitApplication: () -> Unit) {
         }
     ) {
         MenuBar {
-            NamespacesMenu(namespaces, currentNamespace) {
-                currentNamespace = it
-            }
-            TailLogsMenu(tailLogs) {
-                tailLogs = it
-            }
+            NamespacesMenu(
+                mainState.namespaces,
+                mainState.currentNamespace,
+                onChangeCurrentNamespace = mainState::changeNamespace
+            )
+            TailLogsMenu(
+                mainState.tailLogs,
+                onChangeTail = mainState::changeTailLogs
+            )
         }
         ThemeProvider {
             Scaffold(snackbarHost = { SnackbarHost(snackbarState) }) {
@@ -107,13 +87,10 @@ fun MainWindow(exitApplication: () -> Unit) {
                 Box(
                     modifier = Modifier.fillMaxSize().padding(12.dp)
                 ) {
-                    val namespace = currentNamespace
-                    when (val isLoaded = isLoadedResult) {
+                    when (val s = state) {
                         is LoadableResult.Loading -> LoadingView()
-                        is LoadableResult.Error -> ErrorView(isLoaded.error.message ?: "")
-                        is LoadableResult.Value ->
-                            if (namespace == null) LoadingView()
-                            else MainContent(namespace, tailLogs, podsListVisible, logTabsState)
+                        is LoadableResult.Error -> ErrorView(s.error.message ?: "")
+                        is LoadableResult.Value -> MainContent(mainState)
                     }
                 }
             }

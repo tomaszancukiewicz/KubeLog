@@ -13,7 +13,7 @@ import com.payu.kube.log.ui.compose.tab.LogTab
 import com.payu.kube.log.util.Item
 
 @Composable
-fun TabContent(logTab: LogTab, openPod: (PodInfo) -> Unit) {
+fun TabContent(logTab: LogTab, onOpenPod: (PodInfo) -> Unit) {
     val podInfo by logTab.podInfoState.collectAsState()
     val newestAppPod by logTab.newestAppPodState.collectAsState()
     val logs by logTab.logs.collectAsState()
@@ -59,7 +59,7 @@ fun TabContent(logTab: LogTab, openPod: (PodInfo) -> Unit) {
             )
         }
         newestAppPod?.let {
-            NewestPodView(it, openPod)
+            NewestPodView(it, onOpenPod)
         }
     }
 }

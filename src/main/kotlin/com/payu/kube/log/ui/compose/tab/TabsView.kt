@@ -14,7 +14,7 @@ import com.payu.kube.log.ui.compose.tab.content.TabContent
 @Composable
 fun TabsView(
     logTabsState: LogTabsState,
-    openPod: (PodInfo) -> Unit,
+    onOpenPod: (PodInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -27,14 +27,14 @@ fun TabsView(
                 CustomTab(
                     podInfoState = logTab.podInfoState,
                     selected = logTabsState.selection == index,
-                    onClick = { logTabsState.selection = index },
+                    onClick = { logTabsState.selectTab(index) },
                     onClose = { logTabsState.close(logTab) }
                 )
             }
         }
         Spacer(Modifier.height(8.dp))
         logTabsState.active?.let {
-            TabContent(it, openPod)
+            TabContent(it, onOpenPod)
         }
     }
 }

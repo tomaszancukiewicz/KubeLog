@@ -2,53 +2,26 @@ package com.payu.kube.log.ui.compose
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.window.Notification
 import com.payu.kube.log.ui.compose.component.MyHorizontalSplitPane
 import com.payu.kube.log.ui.compose.component.NotificationCenter
 import com.payu.kube.log.ui.compose.component.SnackbarState
 import com.payu.kube.log.ui.compose.list.PodInfoList
-import com.payu.kube.log.ui.compose.list.PodListState
-import com.payu.kube.log.ui.compose.tab.LogTabsState
 import com.payu.kube.log.ui.compose.tab.TabsView
-import com.payu.kube.log.util.FlowUtils.zipWithNext
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.rememberSplitPaneState
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalSplitPaneApi::class)
+@OptIn(ExperimentalSplitPaneApi::class)
 @Composable
-fun MainContent(currentNamespace: String, tailLogs: Boolean, podsListVisible: Boolean, logTabsState: LogTabsState) {
+fun MainContent(mainState: MainState) {
     val coroutineScope = rememberCoroutineScope()
     val notificationCenter = NotificationCenter.current
     val snackbarState = SnackbarState.current
-    val podListState = remember { PodListState(coroutineScope) }
-
-    LaunchedEffect(currentNamespace) {
-        podListState.showNamespace(currentNamespace)
-    }
 
     LaunchedEffect(Unit) {
-        val podOfOpenAppsFlow = podListState.list
-            .combine(logTabsState.openAppsFlow) { list, monitoredApps ->
-                list
-                    .filter { it.calculatedAppName in monitoredApps }
-                    .sortedBy { it.creationTimestamp }
-                    .associateBy { it.calculatedAppName }
-            }
-
-        val newReadyAppsFlow = podOfOpenAppsFlow
-            .zipWithNext { old, new ->
-                new.filter { (k, v) ->
-                    val oldVal = old?.get(k) ?: return@filter false
-                    oldVal.isReady != v.isReady && v.isReady
-                }.values
-            }
-            .flatMapConcat { it.asFlow() }
-
-        newReadyAppsFlow
+        mainState.newReadyAppsFlow
             .onEach {
                 val notification = Notification(
                     "KubeLog - ${it.calculatedAppName}",
@@ -62,32 +35,24 @@ fun MainContent(currentNamespace: String, tailLogs: Boolean, podsListVisible: Bo
 
     val firstColumnCompose = @Composable {
         PodInfoList(
-            podListState,
-            onPodClick = {
-                logTabsState.open(
-                    it,
-                    tailLogs,
-                    podListState.list
-                )
-            },
-            onReload = {
-                podListState.showNamespace(currentNamespace)
-            }
+            mainState.podListState,
+            onPodClick = mainState::openTab,
+            onReload = mainState::reloadNamespace
         )
     }
 
     val secondColumnCompose = @Composable {
         TabsView(
-            logTabsState,
-            { logTabsState.open(it, tailLogs, podListState.list) }
+            mainState.logTabsState,
+            onOpenPod = mainState::openTab
         )
     }
 
     MyHorizontalSplitPane(
         splitPaneState = rememberSplitPaneState(0.2f),
         firstColumnCompose = firstColumnCompose
-            .takeIf { podsListVisible || logTabsState.tabs.isEmpty() },
+            .takeIf { mainState.isPodListVisible() },
         secondColumnCompose = secondColumnCompose
-            .takeIf { logTabsState.tabs.isNotEmpty() }
+            .takeIf { mainState.isTabListVisible() }
     )
 }

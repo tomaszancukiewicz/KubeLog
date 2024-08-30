@@ -1,12 +1,10 @@
 package com.payu.kube.log.ui.compose.tab
 
 import androidx.compose.runtime.*
-import com.payu.kube.log.model.PodInfo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 
-class LogTabsState(private val coroutineScope: CoroutineScope) {
+class LogTabsState {
     var selection by mutableStateOf(0)
+        private set
     var tabs = mutableStateListOf<LogTab>()
         private set
 
@@ -15,8 +13,11 @@ class LogTabsState(private val coroutineScope: CoroutineScope) {
     val active: LogTab?
         get() = selection.let { tabs.getOrNull(it) }
 
-    fun open(podInfo: PodInfo, tailLogs: Boolean, allPodsFlow: Flow<List<PodInfo>>) {
-        val tab = LogTab(podInfo, tailLogs, coroutineScope, allPodsFlow)
+    fun selectTab(index: Int) {
+        selection = index
+    }
+
+    fun open(tab: LogTab) {
         tab.init()
         tabs.add(tab)
         selection = tabs.lastIndex

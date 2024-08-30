@@ -16,7 +16,10 @@ import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 import java.time.Instant
 
 @Composable
-fun NewestPodView(newestPodInfo: PodInfo, openPod: (PodInfo) -> Unit) {
+fun NewestPodView(
+    newestPodInfo: PodInfo,
+    onOpenPod: (PodInfo) -> Unit = {}
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -26,7 +29,7 @@ fun NewestPodView(newestPodInfo: PodInfo, openPod: (PodInfo) -> Unit) {
             "There is newer pod(${newestPodInfo.name}) with this app(${newestPodInfo.calculatedAppName})",
             modifier = Modifier.weight(1.0f, false)
         )
-        Button(onClick = { openPod(newestPodInfo) }) {
+        Button(onClick = { onOpenPod(newestPodInfo) }) {
             Text("Open")
         }
     }
@@ -42,6 +45,6 @@ private fun NewestPodViewPreview() {
                 "", "", 0, 0, 0, 0,
                 PodState.Running, "", Instant.now(), null
             )
-        ) {}
+        )
     }
 }
