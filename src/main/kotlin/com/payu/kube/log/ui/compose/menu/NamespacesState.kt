@@ -5,7 +5,7 @@ import com.payu.kube.log.util.LoadableResult
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class NamespacesState {
-    val state: MutableStateFlow<LoadableResult<Unit>> = MutableStateFlow(LoadableResult.Loading)
+    val state = MutableStateFlow<LoadableResult<Unit>>(LoadableResult.Loading)
     val namespaces = MutableStateFlow(listOf<String>())
     val currentNamespace = MutableStateFlow<String?>(null)
 

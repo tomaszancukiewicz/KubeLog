@@ -94,8 +94,7 @@ class LogTab(initialPodInfo: PodInfo, private val tailLogs: Boolean, parentScope
 
     private fun addNewItems(showedLogList: List<VirtualItem<String>>,
                             items: List<Item<String>>,
-                            predicate: (String) -> Boolean):
-            List<VirtualItem<String>> {
+                            predicate: (String) -> Boolean): List<VirtualItem<String>> {
         val newShowedList = showedLogList.toMutableList()
         for (item in items) {
             val lastElement = newShowedList.lastOrNull()

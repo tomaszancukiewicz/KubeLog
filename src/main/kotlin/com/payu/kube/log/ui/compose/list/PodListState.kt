@@ -11,8 +11,8 @@ import kotlinx.coroutines.launch
 
 class PodListState(private val coroutineScope: CoroutineScope) {
     private var monitorJob: Job? = null
-    val state: MutableStateFlow<LoadableResult<Unit>> = MutableStateFlow(LoadableResult.Loading)
-    val list: MutableStateFlow<List<PodInfo>> = MutableStateFlow(listOf())
+    val state = MutableStateFlow<LoadableResult<Unit>>(LoadableResult.Loading)
+    val list = MutableStateFlow<List<PodInfo>>(listOf())
 
     val filterText = MutableStateFlow("")
     val filteredList = list.combine(filterText) { l, t ->
