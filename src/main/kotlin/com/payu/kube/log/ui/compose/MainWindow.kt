@@ -35,6 +35,7 @@ fun MainWindow(exitApplication: () -> Unit) {
 
     val state by mainState.state.collectAsState()
     val title by mainState.windowTitle.collectAsState()
+    val tailLogs by mainState.tailLogs.collectAsState()
 
     Window(
         onCloseRequest = exitApplication,
@@ -75,7 +76,7 @@ fun MainWindow(exitApplication: () -> Unit) {
                 mainState.namespacesState
             )
             TailLogsMenu(
-                mainState.tailLogs,
+                tailLogs,
                 onChangeTail = mainState::changeTailLogs
             )
         }

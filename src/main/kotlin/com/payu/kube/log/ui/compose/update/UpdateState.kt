@@ -1,5 +1,6 @@
 package com.payu.kube.log.ui.compose.update
 
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -18,9 +19,9 @@ data class UpdateData(
 class UpdateState {
     private var isDialogVisible by mutableStateOf(true)
     private var updateData by mutableStateOf<UpdateData?>(null)
-
-    val visibleUpdate: UpdateData?
-        get() = updateData?.takeIf { isDialogVisible }
+    val visibleUpdate by derivedStateOf {
+        updateData?.takeIf { isDialogVisible }
+    }
 
     suspend fun loadData() {
         val latestRelease: Release = runCatching { GithubClientService.getLatestReleaseUrl() }.getOrNull() ?: return

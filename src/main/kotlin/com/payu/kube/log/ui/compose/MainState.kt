@@ -1,8 +1,5 @@
 package com.payu.kube.log.ui.compose
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.ui.compose.list.PodListState
 import com.payu.kube.log.ui.compose.menu.NamespacesState
@@ -17,10 +14,8 @@ import kotlinx.coroutines.flow.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainState(private val coroutineScope: CoroutineScope) {
-    var tailLogs by mutableStateOf(true)
-        private set
-    private var podsListVisible by mutableStateOf(true)
-
+    val tailLogs = MutableStateFlow(true)
+    val podListVisible = MutableStateFlow(true)
     val namespacesState = NamespacesState()
     val logTabsState = LogTabsState()
     val podListState = PodListState(coroutineScope)
@@ -41,7 +36,7 @@ class MainState(private val coroutineScope: CoroutineScope) {
                 .sortedBy { it.creationTimestamp }
                 .associateBy { it.calculatedAppName }
         }
-    val newReadyAppsFlow = podOfOpenAppsFlow
+    val newReadyApps = podOfOpenAppsFlow
         .zipWithNext { old, new ->
             new.filter { (k, v) ->
                 val oldVal = old?.get(k) ?: return@filter false
@@ -71,23 +66,15 @@ class MainState(private val coroutineScope: CoroutineScope) {
     }
 
     fun openTab(it: PodInfo) {
-        val tab = LogTab(it, tailLogs, coroutineScope, podListState.list)
+        val tab = LogTab(it, tailLogs.value, coroutineScope, podListState.list)
         logTabsState.open(tab)
     }
 
     fun togglePodListVisible() {
-        podsListVisible = !podsListVisible
+        podListVisible.update { !it }
     }
 
     fun changeTailLogs(newTailLogs: Boolean) {
-        tailLogs = newTailLogs
-    }
-
-    fun isPodListVisible(): Boolean {
-        return podsListVisible || logTabsState.tabs.isEmpty()
-    }
-
-    fun isTabListVisible(): Boolean {
-        return logTabsState.tabs.isNotEmpty()
+        tailLogs.value = newTailLogs
     }
 }

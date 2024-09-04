@@ -1,8 +1,6 @@
 package com.payu.kube.log.ui.compose
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.window.Notification
 import com.payu.kube.log.ui.compose.component.MyHorizontalSplitPane
 import com.payu.kube.log.ui.compose.component.NotificationCenter
@@ -19,9 +17,12 @@ fun MainContent(mainState: MainState) {
     val coroutineScope = rememberCoroutineScope()
     val notificationCenter = NotificationCenter.current
     val snackbarState = SnackbarState.current
+    val listVisible by mainState.podListVisible.collectAsState()
+    val tabListVisible = mainState.logTabsState.tabs.isNotEmpty()
+    val podListVisible = listVisible || mainState.logTabsState.tabs.isEmpty()
 
     LaunchedEffect(Unit) {
-        mainState.newReadyAppsFlow
+        mainState.newReadyApps
             .onEach {
                 val notification = Notification(
                     "KubeLog - ${it.calculatedAppName}",
@@ -51,8 +52,8 @@ fun MainContent(mainState: MainState) {
     MyHorizontalSplitPane(
         splitPaneState = rememberSplitPaneState(0.2f),
         firstColumnCompose = firstColumnCompose
-            .takeIf { mainState.isPodListVisible() },
+            .takeIf { podListVisible },
         secondColumnCompose = secondColumnCompose
-            .takeIf { mainState.isTabListVisible() }
+            .takeIf { tabListVisible }
     )
 }
