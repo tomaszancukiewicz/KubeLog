@@ -39,6 +39,13 @@ val lightColor = lightColorScheme(
     surfaceTint = md_theme_light_surfaceTint,
     outlineVariant = md_theme_light_outlineVariant,
     scrim = md_theme_light_scrim,
+    surfaceBright = md_theme_light_surfaceBright,
+    surfaceContainer = md_theme_light_surfaceContainer,
+    surfaceContainerHigh = md_theme_light_surfaceContainerHigh,
+    surfaceContainerHighest = md_theme_light_surfaceContainerHighest,
+    surfaceContainerLow = md_theme_light_surfaceContainerLow,
+    surfaceContainerLowest = md_theme_light_surfaceContainerLowest,
+    surfaceDim = md_theme_light_surfaceDim,
 )
 
 val darkColor = darkColorScheme(
@@ -71,6 +78,13 @@ val darkColor = darkColorScheme(
     surfaceTint = md_theme_dark_surfaceTint,
     outlineVariant = md_theme_dark_outlineVariant,
     scrim = md_theme_dark_scrim,
+    surfaceBright = md_theme_dark_surfaceBright,
+    surfaceContainer = md_theme_dark_surfaceContainer,
+    surfaceContainerHigh = md_theme_dark_surfaceContainerHigh,
+    surfaceContainerHighest = md_theme_dark_surfaceContainerHighest,
+    surfaceContainerLow = md_theme_dark_surfaceContainerLow,
+    surfaceContainerLowest = md_theme_dark_surfaceContainerLowest,
+    surfaceDim = md_theme_dark_surfaceDim,
 )
 
 val typography = Typography().let {

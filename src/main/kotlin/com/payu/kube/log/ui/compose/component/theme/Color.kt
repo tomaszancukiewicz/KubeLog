@@ -31,6 +31,13 @@ val md_theme_light_shadow = Color(0xFF000000)
 val md_theme_light_surfaceTint = Color(0xFF205FA6)
 val md_theme_light_outlineVariant = Color(0xFFC4C6CF)
 val md_theme_light_scrim = Color(0xFF000000)
+val md_theme_light_surfaceContainerHighest = md_theme_light_surfaceVariant
+val md_theme_light_surfaceContainerHigh = Color(0xFFf6f5fa)
+val md_theme_light_surfaceContainer = Color(0xFFefeff6)
+val md_theme_light_surfaceContainerLow = Color(0xFFe7e8f1)
+val md_theme_light_surfaceContainerLowest = md_theme_light_surface
+val md_theme_light_surfaceBright = md_theme_light_surfaceContainerHighest
+val md_theme_light_surfaceDim = md_theme_light_surfaceContainerLowest
 
 val md_theme_dark_primary = Color(0xFFA6C8FF)
 val md_theme_dark_onPrimary = Color(0xFF00315F)
@@ -62,6 +69,13 @@ val md_theme_dark_shadow = Color(0xFF000000)
 val md_theme_dark_surfaceTint = Color(0xFFA6C8FF)
 val md_theme_dark_outlineVariant = Color(0xFF43474E)
 val md_theme_dark_scrim = Color(0xFF000000)
+val md_theme_dark_surfaceContainerHighest = md_theme_dark_surfaceVariant
+val md_theme_dark_surfaceContainerHigh = Color(0xFF24272a)
+val md_theme_dark_surfaceContainer = Color(0xFF2e3136)
+val md_theme_dark_surfaceContainerLow = Color(0xFF383c42)
+val md_theme_dark_surfaceContainerLowest = md_theme_dark_surface
+val md_theme_dark_surfaceBright = md_theme_dark_surfaceContainerLowest
+val md_theme_dark_surfaceDim = md_theme_dark_surfaceContainerHighest
 
 
 val seed = Color(0xFF255FA3)

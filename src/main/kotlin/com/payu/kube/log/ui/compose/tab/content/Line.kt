@@ -7,7 +7,7 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.DisableSelection
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.ripple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -102,7 +102,7 @@ fun ItemLine(
     val interactionSource = remember { MutableInteractionSource() }
     val clickModifier = modifier
         .hoverable(interactionSource)
-        .indication(interactionSource, rememberRipple())
+        .indication(interactionSource, ripple())
 
     Text(
         text,
