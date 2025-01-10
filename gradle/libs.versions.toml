@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.1.0"
 compose-plugin = "1.7.3"
-sprintBoot = "2.7.18"
+sprintBoot = "3.4.1"
 antlr = "4.13.2"
 logback = "1.5.15"
 splitpane = "1.7.3"
