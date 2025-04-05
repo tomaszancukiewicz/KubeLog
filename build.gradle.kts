@@ -88,20 +88,24 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.register("version") {
-    println(version)
+    doLast {
+        println(version)
+    }
 }
 
 tasks.register("creatAppBundle") {
     group = "build"
-    dependsOn(tasks.withType<BootJar>())
+    val projectName = project.name
+    val bootJarTask = tasks.withType<BootJar>()
+    dependsOn(bootJarTask)
     doLast {
-        val srcAppDir = project.projectDir.resolve("src/main/app")
+        val srcAppDir = layout.projectDirectory.dir("src/main/app").asFile
         delete(temporaryDir)
         val tempDstDir = temporaryDir.toPath().resolve("dst")
         mkdir(tempDstDir)
 
         // create app
-        val tempAppDir = tempDstDir.resolve("${project.name}.app")
+        val tempAppDir = tempDstDir.resolve("$projectName.app")
         val contentsDir = tempAppDir.resolve("Contents")
 
         copy {
@@ -110,7 +114,6 @@ tasks.register("creatAppBundle") {
         }
 
         val macOsDir = contentsDir.resolve("MacOS")
-        val bootJarTask = project.tasks.withType<BootJar>()
         val jarFile = bootJarTask.map { it.outputs.files.singleFile }.first()
         copy {
             from(jarFile)
@@ -120,13 +123,13 @@ tasks.register("creatAppBundle") {
         providers.exec {
             workingDir(macOsDir)
             commandLine("chmod", "+x", "./run_kubelog")
-        }
+        }.result.get()
         providers.exec {
             workingDir(tempDstDir)
             commandLine("codesign", "-f", "--deep",
                 "--entitlements", srcAppDir.resolve("java.entitlements"),
                 "-s", "Code Signing Certificate", tempAppDir)
-        }
+        }.result.get()
 
         // create temp pkg
         val tempPkgDir = temporaryDir.resolve("temp.pkg")
@@ -138,7 +141,7 @@ tasks.register("creatAppBundle") {
                 "--root", tempDstDir,
                 "--component-plist", srcAppDir.resolve("component.plist"),
                 tempPkgDir)
-        }
+        }.result.get()
 
         // output path
         val buildAppDir = layout.buildDirectory.dir("app").get().asFile
@@ -160,7 +163,7 @@ tasks.register("creatAppBundle") {
                 "--package", tempPkgDir,
                 "--product", srcAppDir.resolve("requirements.plist"),
                 "--cert", "Code Signing Certificate",
-                buildAppDir.resolve("${project.name}.pkg"))
-        }
+                buildAppDir.resolve("$projectName.pkg"))
+        }.result.get()
     }
 }
