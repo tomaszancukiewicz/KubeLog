@@ -18,10 +18,11 @@ open installer in `System Settings` > `Privacy & Security` > `Security` > `Open 
 
 ## Log query language
 
-- Logical keywords: `AND`, `OR`, `NOT`
-- Functions, applied to log line, before check query inside: `upperCase()`, `lowerCase()`
-- Function to make case-insensitive queries `ignoreCase()`
-- String literals marked with `"` or `'`, e.g. `"Hello \"World\""` or `'Hello "World"'`
+- Logical keywords: `AND`/`and`, `OR`/`or`, `NOT`/`not`
+  - if there is no operator added between literals, then `AND` is assumed
+- String literals
+  - marked with `"` or `'`, e.g. `"Hello \"World\""` or `'Hello "World"'` - it's an exact match
+  - without `"` or `'` - it's an ignore case match
 - Regex patterns, e.g. `r"[0-9]+"` or `r'[0-9]+'`
 
 For more, check [grammar file](src/main/antlr/com/payu/kube/log/search/query/SearchQuery.g4)
@@ -29,17 +30,17 @@ For more, check [grammar file](src/main/antlr/com/payu/kube/log/search/query/Sea
 ### Example
 
 Search
-`r"[0-9]+" AND upperCase("HELLO" OR '"WORLD"')`
+`r"[0-9]+" Hello World (ab OR '"c d"')`
 matches all lines, that: 
-- have any digit 
-- after applying upperCase to log line, 
-  it has to have `Hello` or `"World"` word
+- have any number
+- have the words `Hello`, `World` (ignore case)
+- have word `ab`(ignore case) or `"C D"`(exact)
   
-| Log line           | Is matched? |
-| -----------------  | ----------- |
-| 1 hello            | yes         |
-| hello              | no          |
-| "World" 2          | yes         |
-| World 2            | no          |
-| 123 alfa           | no          |
-| "HELLO" "WORLD" 3  | yes         |
+| Log line               | Is it matched?                       |
+|------------------------|--------------------------------------|
+| 1 hello world ab       | yes                                  |
+| 40 HELLO WORLD AB      | yes                                  |
+| 1043 HELLO WORLD "c d" | yes                                  |
+| hello world            | no - missing number, `ab` or `"C D"` |
+| 1234 ab                | no - missing `hello`, `world`        |
+

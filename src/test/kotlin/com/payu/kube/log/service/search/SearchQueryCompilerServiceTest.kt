@@ -22,57 +22,121 @@ internal class SearchQueryCompilerServiceTest {
         fun provideQuery(): List<Arguments> {
             return listOf(
                 Arguments.of(
-                    "\"abc\"",
-                    TextQuery("abc")
+                    "abc",
+                    TextQuery("abc", true)
                 ),
                 Arguments.of(
-                    "abc",
-                    TextQuery("abc")
+                    "\"abc\"",
+                    TextQuery("abc", false)
+                ),
+                Arguments.of(
+                    "'abc'",
+                    TextQuery("abc", false)
+                ),
+                Arguments.of(
+                    "ri\"abc\"",
+                    RegexQuery("abc".toRegex(RegexOption.IGNORE_CASE))
+                ),
+                Arguments.of(
+                    "not '123'",
+                    NotQuery(TextQuery("123", false))
+                ),
+                Arguments.of(
+                    "NOT '123'",
+                    NotQuery(TextQuery("123", false))
+                ),
+                Arguments.of(
+                    "'123' '234'",
+                    AndQuery(
+                        TextQuery("123", false),
+                        TextQuery("234", false),
+                    )
+                ),
+                Arguments.of(
+                    "'123' and '234'",
+                    AndQuery(
+                        TextQuery("123", false),
+                        TextQuery("234", false),
+                    )
+                ),
+                Arguments.of(
+                    "'123' AND '234'",
+                    AndQuery(
+                        TextQuery("123", false),
+                        TextQuery("234", false),
+                    )
+                ),
+                Arguments.of(
+                    "'123' or '234'",
+                    OrQuery(
+                        TextQuery("123", false),
+                        TextQuery("234", false),
+                    )
+                ),
+                Arguments.of(
+                    "'123' OR '234'",
+                    OrQuery(
+                        TextQuery("123", false),
+                        TextQuery("234", false),
+                    )
                 ),
                 Arguments.of(
                     "\"abc\" OR NOT('123')",
                     OrQuery(
-                        TextQuery("abc"),
-                        NotQuery(TextQuery("123"))
+                        TextQuery("abc", false),
+                        NotQuery(TextQuery("123", false))
                     )
                 ),
                 Arguments.of(
-                    "abc OR NOT 123",
+                    "abc or not 123",
                     OrQuery(
-                        TextQuery("abc"),
-                        NotQuery(TextQuery("123"))
+                        TextQuery("abc", true),
+                        NotQuery(TextQuery("123", true))
                     )
                 ),
                 Arguments.of(
-                    "\"1\" or not '2' and '3'",
+                    "1 or not 2 and '3'",
+                    OrQuery(
+                        TextQuery("1", true),
+                        AndQuery(
+                            NotQuery(TextQuery("2", true)),
+                            TextQuery("3", false)
+                        ),
+                    )
+                ),
+                Arguments.of(
+                    "1 or ((not 2) and '3')",
+                    OrQuery(
+                        TextQuery("1", true),
+                        AndQuery(
+                            NotQuery(TextQuery("2", true)),
+                            TextQuery("3", false)
+                        ),
+                    )
+                ),
+                Arguments.of(
+                    "(1 or not 2) and 3",
                     AndQuery(
                         OrQuery(
-                            TextQuery("1"),
-                            NotQuery(TextQuery("2")),
+                            TextQuery("1", true),
+                            NotQuery(TextQuery("2", true)),
                         ),
-                        TextQuery("3")
+                        TextQuery("3", true)
                     )
                 ),
                 Arguments.of(
-                    "\"1\" OR ((NOT '2') AND '3')",
+                    "a b or c d",
                     OrQuery(
-                        TextQuery("1"),
                         AndQuery(
-                            NotQuery(TextQuery("2")),
-                            TextQuery("3")
+                            TextQuery("a", true),
+                            TextQuery("b", true),
+                        ),
+                        AndQuery(
+                            TextQuery("c", true),
+                            TextQuery("d", true),
                         ),
                     )
                 ),
-                Arguments.of(
-                    "1 or ((not 2) and 3)",
-                    OrQuery(
-                        TextQuery("1"),
-                        AndQuery(
-                            NotQuery(TextQuery("2")),
-                            TextQuery("3")
-                        ),
-                    )
-                )
             )
         }
     }

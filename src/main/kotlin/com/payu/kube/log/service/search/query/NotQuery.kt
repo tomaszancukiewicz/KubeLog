@@ -5,11 +5,7 @@ class NotQuery(q: Query) : UnaryOperationQuery(q) {
         return "NotQuery($q)"
     }
 
-    override fun check(text: String, ignoreCase: Boolean): Boolean {
-        return !super.check(text, ignoreCase)
-    }
-
-    override fun toQueryString(): String {
-        return "NOT ${wrapInBracketsWhenNeeded(q)}"
+    override fun check(text: String): Boolean {
+        return !super.check(text)
     }
 }

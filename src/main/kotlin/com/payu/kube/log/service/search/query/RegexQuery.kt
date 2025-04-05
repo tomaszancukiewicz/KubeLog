@@ -2,7 +2,7 @@ package com.payu.kube.log.service.search.query
 
 class RegexQuery(val regex: Regex) : Query() {
     override fun toString(): String {
-        return "RegexQuery($regex)"
+        return "RegexQuery(${regex.pattern}, ${regex.options})"
     }
 
     override fun hashCode(): Int {
@@ -10,32 +10,17 @@ class RegexQuery(val regex: Regex) : Query() {
     }
 
     override fun equals(other: Any?): Boolean {
-        if (!super.equals(other))
-            return false
-        if (other !is RegexQuery)
-            return false
-        return regex == other.regex
+        if (!super.equals(other)) return false
+        if (other !is RegexQuery) return false
+        return regex.pattern == other.regex.pattern && regex.options == other.regex.options
     }
 
-    private fun createRegexWith(ignoreCase: Boolean): Regex {
-        return if (ignoreCase) {
-            Regex(regex.pattern, RegexOption.IGNORE_CASE)
-        } else {
-            regex
-        }
-    }
-
-    override fun check(text: String, ignoreCase: Boolean): Boolean {
+    override fun check(text: String): Boolean {
         if (regex.pattern.isEmpty()) return false
-        return createRegexWith(ignoreCase).containsMatchIn(text)
+        return regex.containsMatchIn(text)
     }
 
-    override fun phrasesToMark(text: String, ignoreCase: Boolean): List<IntRange> {
-        return createRegexWith(ignoreCase).findAll(text).map { it.range }.toList()
-    }
-
-    override fun toQueryString(): String {
-        val escapedPattern = regex.pattern.replace("\"", "\\\"")
-        return "r\"$escapedPattern\""
+    override fun phrasesToMark(text: String): List<IntRange> {
+        return regex.findAll(text).map { it.range }.toList()
     }
 }

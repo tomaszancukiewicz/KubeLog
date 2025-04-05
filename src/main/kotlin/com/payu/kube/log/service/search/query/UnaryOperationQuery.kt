@@ -10,22 +10,16 @@ abstract class UnaryOperationQuery(val q: Query) : Query() {
     }
 
     override fun equals(other: Any?): Boolean {
-        if (!super.equals(other))
-            return false
-        if (other !is UnaryOperationQuery)
-            return false
+        if (!super.equals(other)) return false
+        if (other !is UnaryOperationQuery) return false
         return q == other.q
     }
 
-    override fun check(text: String, ignoreCase: Boolean): Boolean {
-        return q.check(text, ignoreCase)
+    override fun check(text: String): Boolean {
+        return q.check(text)
     }
 
-    override fun phrasesToMark(text: String, ignoreCase: Boolean): List<IntRange> {
-        return q.phrasesToMark(text, ignoreCase)
-    }
-
-    override fun toQueryString(): String {
-        return q.toQueryString()
+    override fun phrasesToMark(text: String): List<IntRange> {
+        return q.phrasesToMark(text)
     }
 }

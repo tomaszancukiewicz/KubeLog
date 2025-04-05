@@ -7,17 +7,12 @@ fullQuery
 query
    : LC query RC                        # bracket
    | LS query RS                        # bracket
-   | NOT query                          # unaryOperation
-   | query BinaryOperator query         # binaryOperation
-   | IdentifierLiteral LC query RC     # function
-   | RegexLiteral                       # regex
+   | NOT query                          # notOperation
+   | query AND? query                   # andOperation
+   | query OR query                     # orOperation
+   | RegexIndicator StringLiteral       # regex
    | StringLiteral                      # string
    | IdentifierLiteral                  # identifier
-   ;
-
-BinaryOperator
-   : AND
-   | OR
    ;
 
 // lexer
@@ -30,8 +25,8 @@ RC : ')' ;
 LS : '[' ;
 RS : ']' ;
 
-RegexLiteral
-    : 'r' StringLiteral
+RegexIndicator
+    : 'r' ('i')? ('c')?
     ;
 
 StringLiteral
@@ -44,5 +39,5 @@ IdentifierLiteral
     ;
 
 WS
-    :  [ \t\r\n\u000C]+ -> skip
+    :  [ \t\r\n\u000C]+ -> channel(HIDDEN)
     ;

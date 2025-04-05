@@ -1,36 +1,35 @@
 package com.payu.kube.log.service.search.query
 
-class TextQuery(val searchedText: String) : Query() {
+class TextQuery(val searchedText: String, private val ignoreCase: Boolean = true) : Query() {
     override fun toString(): String {
-        return "TextQuery($searchedText)"
+        val options = buildSet {
+            if (ignoreCase) add(RegexOption.IGNORE_CASE)
+        }
+        return "TextQuery($searchedText, $options)"
     }
 
     override fun hashCode(): Int {
-        return 31 * super.hashCode() + searchedText.hashCode()
+        return 31 * (31 * super.hashCode() + searchedText.hashCode()) + ignoreCase.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
-        if (!super.equals(other))
-            return false
-        if (other !is TextQuery)
-            return false
-        return searchedText == other.searchedText
+        if (!super.equals(other)) return false
+        if (other !is TextQuery) return false
+        return searchedText == other.searchedText && ignoreCase == other.ignoreCase
     }
 
-    override fun check(text: String, ignoreCase: Boolean): Boolean {
+    override fun check(text: String): Boolean {
         if (searchedText.isEmpty()) return false
         return text.contains(searchedText, ignoreCase)
     }
 
-    override fun phrasesToMark(text: String, ignoreCase: Boolean): List<IntRange> {
+    override fun phrasesToMark(text: String): List<IntRange> {
         return findAllIndexes(text, ignoreCase)
             .map { IntRange(it, it + searchedText.length - 1) }
     }
 
     private fun findAllIndexes(textString: String, ignoreCase: Boolean): List<Int> {
-        if (searchedText.isEmpty()) {
-            return listOf()
-        }
+        if (searchedText.isEmpty()) return listOf()
         val indexes = mutableListOf<Int>()
         var wordLength = 0
         var index = 0
@@ -42,10 +41,5 @@ class TextQuery(val searchedText: String) : Query() {
             wordLength = searchedText.length
         }
         return indexes
-    }
-
-    override fun toQueryString(): String {
-        val escapedText = searchedText.replace("\"", "\\\"")
-        return "\"$escapedText\""
     }
 }

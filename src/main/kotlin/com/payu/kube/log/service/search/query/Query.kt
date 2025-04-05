@@ -15,33 +15,6 @@ abstract class Query {
         return javaClass.hashCode()
     }
 
-    open fun check(text: String): Boolean {
-        return check(text, false)
-    }
-
-    open fun phrasesToMark(text: String): List<IntRange> {
-        return phrasesToMark(text, false)
-    }
-
-    open fun check(text: String, ignoreCase: Boolean): Boolean {
-        return false
-    }
-
-    open fun phrasesToMark(text: String, ignoreCase: Boolean): List<IntRange> {
-        return listOf()
-    }
-
-    open fun toQueryString(): String {
-        return ""
-    }
-
-    companion object {
-        @JvmStatic
-        protected fun wrapInBracketsWhenNeeded(query: Query): String {
-            if (query is TextQuery || query is RegexQuery) {
-                return query.toQueryString()
-            }
-            return "(${query.toQueryString()})"
-        }
-    }
+    abstract fun check(text: String): Boolean
+    abstract fun phrasesToMark(text: String): List<IntRange>
 }

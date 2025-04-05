@@ -14,29 +14,25 @@ class SearchQueryVisitor: SearchQueryBaseVisitor<Query?>() {
         return ctx?.query()?.let { visit(it) }
     }
 
-    override fun visitBinaryOperation(ctx: SearchQueryParser.BinaryOperationContext?): Query? {
+    override fun visitOrOperation(ctx: SearchQueryParser.OrOperationContext?): Query? {
         val r1 = ctx?.query(0)?.let { visit(it) } ?: return null
         val r2 = ctx.query(1)?.let { visit(it) } ?: return null
-        return when(ctx.BinaryOperator().text) {
-            "AND", "and" -> AndQuery(r1, r2)
-            "OR", "or" -> OrQuery(r1, r2)
-            else -> null
-        }
+        return OrQuery(r1, r2)
     }
 
-    override fun visitUnaryOperation(ctx: SearchQueryParser.UnaryOperationContext?): Query? {
-        ctx?.NOT() ?: return null
-        return ctx.query()?.let { visit(it) }?.let { NotQuery(it) }
+    override fun visitAndOperation(ctx: SearchQueryParser.AndOperationContext?): Query? {
+        val r1 = ctx?.query(0)?.let { visit(it) } ?: return null
+        val r2 = ctx.query(1)?.let { visit(it) } ?: return null
+        return AndQuery(r1, r2)
     }
 
-    override fun visitFunction(ctx: SearchQueryParser.FunctionContext?): Query? {
-        val functionName = ctx?.IdentifierLiteral()?.text ?: return null
-        return ctx.query()?.let { visit(it) }?.let { FunctionQuery(functionName, it) }
+    override fun visitNotOperation(ctx: SearchQueryParser.NotOperationContext?): Query? {
+        return ctx?.query()?.let { visit(it) }?.let { NotQuery(it) }
     }
 
     override fun visitIdentifier(ctx: SearchQueryParser.IdentifierContext?): Query? {
         val text = ctx?.IdentifierLiteral()?.text ?: return null
-        return TextQuery(text)
+        return TextQuery(text, true)
     }
 
     override fun visitString(ctx: SearchQueryParser.StringContext?): Query? {
@@ -47,18 +43,24 @@ class SearchQueryVisitor: SearchQueryBaseVisitor<Query?>() {
             else
                 it.replace("\\'", "'")
         }
-        return TextQuery(text)
+        return TextQuery(text, false)
     }
 
     override fun visitRegex(ctx: SearchQueryParser.RegexContext?): Query? {
-        val node = ctx?.RegexLiteral()?.text ?: return null
-        val text = node.substring(2, node.lastIndex).let {
+        val flags = ctx?.RegexIndicator()?.text ?: ""
+        val node = ctx?.StringLiteral()?.text ?: return null
+        val text = node.substring(1, node.lastIndex).let {
             if (node[1] == '\"')
                 it.replace("\\\"", "\"")
             else
                 it.replace("\\'", "'")
         }
-        val regex = runCatching { text.toRegex() }.getOrNull() ?: return null
+
+        val options = buildSet {
+            if ('i' in flags) add(RegexOption.IGNORE_CASE)
+            if ('c' in flags) add(RegexOption.IGNORE_CASE)
+        }
+        val regex = runCatching { text.toRegex(options) }.getOrNull() ?: return null
         return RegexQuery(regex)
     }
 }
