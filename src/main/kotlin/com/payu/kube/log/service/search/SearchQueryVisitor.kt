@@ -10,20 +10,16 @@ class SearchQueryVisitor: SearchQueryBaseVisitor<Query?>() {
         return ctx?.query()?.let { visit(it) }
     }
 
-    override fun visitSquareBracket(ctx: SearchQueryParser.SquareBracketContext?): Query? {
-        return ctx?.query()?.let { visit(it) }
-    }
-
-    override fun visitCurlyBracket(ctx: SearchQueryParser.CurlyBracketContext?): Query? {
+    override fun visitBracket(ctx: SearchQueryParser.BracketContext?): Query? {
         return ctx?.query()?.let { visit(it) }
     }
 
     override fun visitBinaryOperation(ctx: SearchQueryParser.BinaryOperationContext?): Query? {
         val r1 = ctx?.query(0)?.let { visit(it) } ?: return null
         val r2 = ctx.query(1)?.let { visit(it) } ?: return null
-        return when(ctx.BinaryOperator()?.text) {
-            "AND" -> AndQuery(r1, r2)
-            "OR" -> OrQuery(r1, r2)
+        return when(ctx.BinaryOperator().text) {
+            "AND", "and" -> AndQuery(r1, r2)
+            "OR", "or" -> OrQuery(r1, r2)
             else -> null
         }
     }
@@ -34,8 +30,13 @@ class SearchQueryVisitor: SearchQueryBaseVisitor<Query?>() {
     }
 
     override fun visitFunction(ctx: SearchQueryParser.FunctionContext?): Query? {
-        val functionName = ctx?.FunctionName()?.text ?: return null
+        val functionName = ctx?.IdentifierLiteral()?.text ?: return null
         return ctx.query()?.let { visit(it) }?.let { FunctionQuery(functionName, it) }
+    }
+
+    override fun visitIdentifier(ctx: SearchQueryParser.IdentifierContext?): Query? {
+        val text = ctx?.IdentifierLiteral()?.text ?: return null
+        return TextQuery(text)
     }
 
     override fun visitString(ctx: SearchQueryParser.StringContext?): Query? {

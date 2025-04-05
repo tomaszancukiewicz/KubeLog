@@ -5,13 +5,14 @@ fullQuery
     ;
 
 query
-   : query BinaryOperator query         # binaryOperation
+   : LC query RC                        # bracket
+   | LS query RS                        # bracket
    | NOT query                          # unaryOperation
-   | LC query RC                        # curlyBracket
-   | LS query RS                        # squareBracket
-   | FunctionName LC query RC           # function
+   | query BinaryOperator query         # binaryOperation
+   | IdentifierLiteral LC query RC     # function
    | RegexLiteral                       # regex
    | StringLiteral                      # string
+   | IdentifierLiteral                  # identifier
    ;
 
 BinaryOperator
@@ -19,38 +20,27 @@ BinaryOperator
    | OR
    ;
 
-NOT : 'NOT' ;
-AND : 'AND' ;
-OR : 'OR' ;
+// lexer
+NOT : 'NOT' | 'not' ;
+AND : 'AND' | 'and' ;
+OR : 'OR' | 'or' ;
 
 LC : '(' ;
 RC : ')' ;
 LS : '[' ;
 RS : ']' ;
 
-FunctionName
-    : [a-z] [a-zA-Z0-9]*
-    ;
-
 RegexLiteral
     : 'r' StringLiteral
     ;
 
 StringLiteral
-	:	'"' StringCharacter* '"'
-	|	'\'' StringCharacterApostrophe* '\''
+	:	'"' (~'"' | '\\"')* '"'
+	|	'\'' (~'\'' | '\\\'')* '\''
 	;
 
-fragment
-StringCharacter
-	:	~["]
-	|	'\\' ["]
-	;
-
-fragment
-StringCharacterApostrophe
-    :	~[']
-    |	'\\' [']
+IdentifierLiteral
+    : ~["' ()[\]]+
     ;
 
 WS
