@@ -2,7 +2,7 @@ package com.payu.kube.log.service.search.query
 
 class RegexQuery(val regex: Regex) : Query() {
     override fun toString(): String {
-        return "RegexQuery($regex, errors=$errors)"
+        return "RegexQuery($regex)"
     }
 
     override fun hashCode(): Int {

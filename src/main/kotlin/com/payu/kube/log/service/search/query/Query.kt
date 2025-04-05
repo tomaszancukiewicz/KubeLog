@@ -1,21 +1,18 @@
 package com.payu.kube.log.service.search.query
 
 abstract class Query {
-    val errors = mutableListOf<String>()
-
     override fun toString(): String {
-        return "Query(errors=$errors)"
+        return "Query()"
     }
 
     override fun equals(other: Any?): Boolean {
-        if (other !is Query) {
-            return false
-        }
-        return errors == other.errors
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        return true
     }
 
     override fun hashCode(): Int {
-        return errors.hashCode()
+        return javaClass.hashCode()
     }
 
     open fun check(text: String): Boolean {

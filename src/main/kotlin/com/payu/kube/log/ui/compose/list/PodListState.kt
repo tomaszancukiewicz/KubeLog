@@ -19,7 +19,7 @@ class PodListState(private val coroutineScope: CoroutineScope) {
         val filterPredicate: (PodInfo) -> Boolean =
             t.trim()
                 .takeIf { it.isNotEmpty() }
-                ?.let { SearchQueryCompilerService.compile(it) }
+                ?.let { SearchQueryCompilerService.compile(it).query }
                 ?.let { { pod -> it.check(pod.name) } }
                 ?: { true }
         l.filter(filterPredicate)

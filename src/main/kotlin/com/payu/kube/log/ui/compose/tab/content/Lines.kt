@@ -14,6 +14,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import com.payu.kube.log.ui.compose.tab.content.search.SearchState
 import com.payu.kube.log.util.VirtualItem
 
 @Composable

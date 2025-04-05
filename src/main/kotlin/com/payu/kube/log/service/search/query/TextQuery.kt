@@ -2,7 +2,7 @@ package com.payu.kube.log.service.search.query
 
 class TextQuery(val searchedText: String) : Query() {
     override fun toString(): String {
-        return "TextQuery($searchedText, errors=$errors)"
+        return "TextQuery($searchedText)"
     }
 
     override fun hashCode(): Int {

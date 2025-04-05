@@ -2,7 +2,7 @@ package com.payu.kube.log.service.search.query
 
 abstract class BinaryOperationQuery(val q1: Query, val q2: Query) : Query() {
     override fun toString(): String {
-        return "BinaryOperationQuery($q1, $q2, errors=$errors)"
+        return "BinaryOperationQuery($q1, $q2)"
     }
 
     override fun hashCode(): Int {

@@ -2,7 +2,7 @@ package com.payu.kube.log.service.search.query
 
 abstract class UnaryOperationQuery(val q: Query) : Query() {
     override fun toString(): String {
-        return "UnaryOperationQuery($q, errors=$errors)"
+        return "UnaryOperationQuery($q)"
     }
 
     override fun hashCode(): Int {

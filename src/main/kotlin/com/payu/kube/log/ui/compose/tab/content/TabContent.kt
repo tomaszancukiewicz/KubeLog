@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.ui.compose.tab.LogTab
+import com.payu.kube.log.ui.compose.tab.content.search.SearchType
+import com.payu.kube.log.ui.compose.tab.content.search.SearchView
 import com.payu.kube.log.util.Item
 
 @Composable

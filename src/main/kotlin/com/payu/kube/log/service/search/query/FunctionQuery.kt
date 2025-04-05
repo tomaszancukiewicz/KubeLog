@@ -2,7 +2,7 @@ package com.payu.kube.log.service.search.query
 
 class FunctionQuery(val functionName: String, q: Query) : UnaryOperationQuery(q) {
     override fun toString(): String {
-        return "FunctionQuery($functionName, $q, errors=$errors)"
+        return "FunctionQuery($functionName, $q)"
     }
 
     override fun hashCode(): Int {

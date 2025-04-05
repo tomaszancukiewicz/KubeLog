@@ -4,8 +4,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.snapshotFlow
 import com.payu.kube.log.model.PodInfo
 import com.payu.kube.log.service.PodLogService
-import com.payu.kube.log.ui.compose.tab.content.SearchState
-import com.payu.kube.log.ui.compose.tab.content.SearchType
+import com.payu.kube.log.ui.compose.tab.content.search.SearchState
+import com.payu.kube.log.ui.compose.tab.content.search.SearchType
 import com.payu.kube.log.ui.compose.tab.content.SettingsState
 import com.payu.kube.log.util.FlowUtils.debounceWithCache
 import com.payu.kube.log.util.Item
