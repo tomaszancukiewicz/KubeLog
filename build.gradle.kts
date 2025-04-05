@@ -117,11 +117,11 @@ tasks.register("creatAppBundle") {
             into(macOsDir)
             rename(jarFile.name, "KubeLog.jar")
         }
-        exec {
+        providers.exec {
             workingDir(macOsDir)
             commandLine("chmod", "+x", "./run_kubelog")
         }
-        exec {
+        providers.exec {
             workingDir(tempDstDir)
             commandLine("codesign", "-f", "--deep",
                 "--entitlements", srcAppDir.resolve("java.entitlements"),
@@ -130,7 +130,7 @@ tasks.register("creatAppBundle") {
 
         // create temp pkg
         val tempPkgDir = temporaryDir.resolve("temp.pkg")
-        exec {
+        providers.exec {
             workingDir(temporaryDir)
             commandLine("pkgbuild",
                 "--install-location", "/Applications",
@@ -154,7 +154,7 @@ tasks.register("creatAppBundle") {
         }
 
         // create pkg
-        exec {
+        providers.exec {
             workingDir(buildAppDir)
             commandLine("productbuild",
                 "--package", tempPkgDir,
