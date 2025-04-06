@@ -14,7 +14,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ErrorView(message: String, onReload: (() -> Unit)? = null) {
+fun ErrorView(error: Throwable, onReload: (() -> Unit)? = null) {
+    ErrorView(
+        message = error.message ?: "",
+        onReload = onReload
+    )
+}
+
+@Composable
+fun ErrorView(
+    message: String,
+    onReload: (() -> Unit)? = null
+) {
     val scrollState = rememberScrollState()
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.padding(10.dp).verticalScroll(scrollState)) {

@@ -2,20 +2,22 @@ package com.payu.kube.log.ui.compose.tab.content
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.requiredWidth
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.WrapText
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.VerticalAlignBottom
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.payu.kube.log.ui.compose.component.CheckboxWithLabel
+import com.payu.kube.log.ui.compose.component.IconButton
+import com.payu.kube.log.ui.compose.component.IconToggleButton
 import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
+import com.payu.kube.log.ui.compose.tab.content.search.SearchState
 
 class SettingsState {
     var autoscroll by mutableStateOf(true)
@@ -23,24 +25,35 @@ class SettingsState {
 }
 
 @Composable
-fun SettingsView(settingsState: SettingsState, onClear: () -> Unit) {
+fun SettingsView(
+    settingsState: SettingsState,
+    searchState: SearchState,
+    onClear: () -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        CheckboxWithLabel(
-            modifier = Modifier.requiredWidth(IntrinsicSize.Max),
-            label = "Autoscroll",
+        IconToggleButton(
+            Icons.Default.VerticalAlignBottom,
+            description = "Autoscroll",
             checked = settingsState.autoscroll, onCheckedChange = { settingsState.autoscroll = it },
         )
-        CheckboxWithLabel(
-            modifier = Modifier.requiredWidth(IntrinsicSize.Max),
-            label = "Wrap",
+        IconToggleButton(
+            Icons.AutoMirrored.Filled.WrapText,
+            description = "Wrap",
             checked = settingsState.isWrap, onCheckedChange = { settingsState.isWrap = it },
         )
-        Button(onClick = onClear, modifier = Modifier.requiredWidth(IntrinsicSize.Max)) {
-            Text("Clear")
-        }
+        IconToggleButton(
+            Icons.Default.Search,
+            description = "Search",
+            checked = searchState.isVisible, onCheckedChange = { searchState.toggleVisible() },
+        )
+        IconButton(
+            Icons.Default.Delete,
+            description = "Clear",
+            onClick = onClear
+        )
     }
 }
 
@@ -48,6 +61,10 @@ fun SettingsView(settingsState: SettingsState, onClear: () -> Unit) {
 @Composable
 private fun SettingsViewPreview() {
     ThemeProvider {
-        SettingsView(SettingsState()) {}
+        SettingsView(
+            SettingsState(),
+            SearchState(),
+            onClear = {}
+        )
     }
 }

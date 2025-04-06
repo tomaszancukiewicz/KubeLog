@@ -17,7 +17,7 @@ fun PodInfoList(
     when (val status = listStatus) {
         is LoadableResult.Loading -> LoadingView()
         is LoadableResult.Error -> ErrorView(
-            status.error.message ?: "",
+            status.error,
             onReload = onReload
         )
         is LoadableResult.Value -> PodInfoListContent(

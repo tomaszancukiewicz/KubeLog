@@ -1,12 +1,8 @@
 package com.payu.kube.log.ui.compose
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpSize
@@ -83,14 +79,10 @@ fun MainWindow(exitApplication: () -> Unit) {
         ThemeProvider {
             Scaffold(snackbarHost = { SnackbarHost(snackbarState) }) {
                 UpdateDialog()
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(12.dp)
-                ) {
-                    when (val s = state) {
-                        is LoadableResult.Loading -> LoadingView()
-                        is LoadableResult.Error -> ErrorView(s.error.message ?: "")
-                        is LoadableResult.Value -> MainContent(mainState)
-                    }
+                when (val s = state) {
+                    is LoadableResult.Loading -> LoadingView()
+                    is LoadableResult.Error -> ErrorView(s.error)
+                    is LoadableResult.Value -> MainContent(mainState)
                 }
             }
         }

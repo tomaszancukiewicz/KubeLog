@@ -51,9 +51,13 @@ fun TabContent(logTab: LogTab, onOpenPod: (PodInfo) -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             PodInfoView(podInfo, modifier = Modifier.weight(1.0f))
-            SettingsView(logTab.settings) { logTab.clear() }
+            SettingsView(
+                logTab.settings,
+                logTab.search,
+                onClear = logTab::clear
+            )
         }
-        SearchView(logTab.search) { }
+        SearchView(logTab.search)
         Box(modifier = Modifier.weight(1.0f)) {
             Lines(
                 logs, logTab.settings, logTab.search, scrollState,

@@ -1,6 +1,11 @@
 package com.payu.kube.log.ui.compose
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Notification
 import com.payu.kube.log.ui.compose.component.MyHorizontalSplitPane
 import com.payu.kube.log.ui.compose.component.NotificationCenter
@@ -49,11 +54,13 @@ fun MainContent(mainState: MainState) {
         )
     }
 
-    MyHorizontalSplitPane(
-        splitPaneState = rememberSplitPaneState(0.2f),
-        firstColumnCompose = firstColumnCompose
-            .takeIf { podListVisible },
-        secondColumnCompose = secondColumnCompose
-            .takeIf { tabListVisible }
-    )
+    Box(modifier = Modifier.fillMaxSize().padding(12.dp)) {
+        MyHorizontalSplitPane(
+            splitPaneState = rememberSplitPaneState(0.2f),
+            firstColumnCompose = firstColumnCompose
+                .takeIf { podListVisible },
+            secondColumnCompose = secondColumnCompose
+                .takeIf { tabListVisible }
+        )
+    }
 }

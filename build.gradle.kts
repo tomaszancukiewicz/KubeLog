@@ -40,6 +40,7 @@ dependencies {
     implementation(compose.desktop.macos_x64)
     implementation(compose.desktop.macos_arm64)
     implementation(compose.material3)
+    implementation(compose.materialIconsExtended)
     implementation(libs.compose.components.splitpane)
 
     implementation(libs.kotlinx.coroutines.core)

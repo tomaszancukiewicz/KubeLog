@@ -18,11 +18,15 @@ import java.awt.Cursor
 fun MyHorizontalSplitPane(
     splitPaneState: SplitPaneState,
     firstColumnCompose: (@Composable () -> Unit)? = null,
-    secondColumnCompose: (@Composable () -> Unit)? = null
+    secondColumnCompose: (@Composable () -> Unit)? = null,
+    modifier: Modifier = Modifier,
 ) {
     when {
         firstColumnCompose != null && secondColumnCompose != null -> {
-            HorizontalSplitPane(splitPaneState = splitPaneState) {
+            HorizontalSplitPane(
+                modifier = modifier,
+                splitPaneState = splitPaneState
+            ) {
                 first(minSize = 200.dp) {
                     firstColumnCompose()
                 }
