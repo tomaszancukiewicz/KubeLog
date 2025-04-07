@@ -16,6 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import com.payu.kube.log.ui.compose.component.IconButton
 import com.payu.kube.log.ui.compose.component.IconToggleButton
+import com.payu.kube.log.ui.compose.component.shortcut.CLEAR_LOGS_SHORTCUT
+import com.payu.kube.log.ui.compose.component.shortcut.TOGGLE_SEARCH_SHORTCUT
 import com.payu.kube.log.ui.compose.component.theme.ThemeProvider
 import com.payu.kube.log.ui.compose.tab.content.search.SearchState
 
@@ -47,11 +49,13 @@ fun SettingsView(
         IconToggleButton(
             Icons.Default.Search,
             description = "Search",
+            shortcut = TOGGLE_SEARCH_SHORTCUT,
             checked = searchState.isVisible, onCheckedChange = { searchState.toggleVisible() },
         )
         IconButton(
             Icons.Default.Delete,
             description = "Clear",
+            shortcut = CLEAR_LOGS_SHORTCUT,
             onClick = onClear
         )
     }

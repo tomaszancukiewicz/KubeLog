@@ -7,11 +7,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.payu.kube.log.ui.compose.component.shortcut.Shortcut
 
 @Composable
 fun IconToggleButton(
     image: ImageVector,
     description: String,
+    shortcut : Shortcut? = null,
     modifier: Modifier = Modifier,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
@@ -29,6 +31,9 @@ fun IconToggleButton(
     Tooltip(
         tooltip = {
             Text(desc)
+            if (shortcut != null) {
+                Text("($shortcut)")
+            }
         },
     ) {
         FilledIconToggleButton(

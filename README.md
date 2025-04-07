@@ -12,7 +12,7 @@ open installer in `System Settings` > `Privacy & Security` > `Security` > `Open 
 
 * `CMD + T` - close/open pod list
 * `CMD + F` - open/close log search
-* `CMD + SHIFT + C` - clear logs in active tab
+* `CMD + K` - clear logs in active tab
 * `CMD + W` - close active tab
 * `CMD + SHIFT + W` - close all tabs
 

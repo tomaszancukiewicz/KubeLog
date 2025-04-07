@@ -7,17 +7,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import com.payu.kube.log.ui.compose.component.shortcut.Shortcut
 
 @Composable
 fun IconButton(
     image: ImageVector,
     description: String,
+    shortcut : Shortcut? = null,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     IconButton(
         tooltip = {
             Text(description)
+            if (shortcut != null) {
+                Text("($shortcut)")
+            }
         },
         modifier = modifier,
         onClick = onClick
