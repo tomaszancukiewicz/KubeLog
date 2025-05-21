@@ -57,13 +57,4 @@ object Rules {
     val EXTRACT_VALUES_RULE = ColoringRegexRule(
         "(?<=[,\\s(\\[{])[\\w]+=([\\w+:./?#@-]+)(?=[,\\s)\\]}]|$)".toRegex()
     )
-    val IP_RULE = ColoringRegexRule(
-        "(?:25[0-5]|2[0-4]\\d|[0-1]?\\d{1,2})(?:\\.(?:25[0-5]|2[0-4]\\d|[0-1]?\\d{1,2})){3}".toRegex()
-    )
-    val EMAIL_RULE = ColoringRegexRule(
-        "(?:[\\w]+(?:[.+-][\\w]+)*)@(?:(?:[\\w-]+\\.)*\\w[\\w-]{0,66})\\.(?:[a-z]{2,6}(?:\\.[a-z]{2})?)".toRegex()
-    )
-    val QQ_ID_RULE = ColoringRegexRule(
-        "QQ[0-9A-Z]{16}QQ|TT[0-9]{10}TT".toRegex()
-    )
 }
