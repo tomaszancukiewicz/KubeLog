@@ -1,10 +1,10 @@
 [versions]
-kotlin = "2.1.20"
-compose-plugin = "1.8.0"
+kotlin = "2.1.21"
+compose-plugin = "1.8.1"
 sprintBoot = "3.4.5"
 antlr = "4.13.2"
 logback = "1.5.18"
-splitpane = "1.8.0"
+splitpane = "1.8.1"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.8.1"
 ktor = "3.1.3"
