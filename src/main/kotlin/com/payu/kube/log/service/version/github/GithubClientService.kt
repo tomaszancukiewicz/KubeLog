@@ -9,7 +9,7 @@ import kotlinx.coroutines.withContext
 object GithubClientService {
     suspend fun getLatestReleaseUrl(): Release = withContext(Dispatchers.IO) {
         HttpClientConfiguration.client
-            .get("https://api.github.com/repos/tomaszancukiewicz/KubeLog/releases/latest")
+            .get("https://api.github.com/repos/tomekancu/KubeLog/releases/latest")
             .body()
     }
 }
