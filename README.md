@@ -25,7 +25,7 @@ open installer in `System Settings` > `Privacy & Security` > `Security` > `Open 
   - without `"` or `'` - it's an ignore case match
 - Regex patterns, e.g. `r"[0-9]+"` or `r'[0-9]+'`
 
-For more, check [grammar file](src/main/antlr/com/payu/kube/log/search/query/SearchQuery.g4)
+For more, check [grammar file](src/main/antlr/com/kube/log/search/query/SearchQuery.g4)
 
 ### Example
 

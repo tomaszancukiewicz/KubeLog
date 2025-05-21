@@ -1,4 +1,4 @@
-package com.payu.kube.log.model
+package com.kube.log.model
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.params.ParameterizedTest

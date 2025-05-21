@@ -1,4 +1,4 @@
-package com.payu.kube.log.service.search.query
+package com.kube.log.service.search.query
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.params.ParameterizedTest

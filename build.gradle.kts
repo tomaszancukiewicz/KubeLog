@@ -14,7 +14,7 @@ plugins {
     alias(libs.plugins.jetbrainsCompose)
 }
 
-group = "com.payu.kube.log"
+group = "com.kube.log"
 version = "1.6.1"
 
 java.sourceCompatibility = JavaVersion.VERSION_21
@@ -57,7 +57,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "com.payu.kube.log.MainKt"
+        mainClass = "com.kube.log.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg)
             packageName = project.name
@@ -67,12 +67,12 @@ compose.desktop {
 }
 
 springBoot {
-    mainClass.set("com.payu.kube.log.MainKt")
+    mainClass.set("com.kube.log.MainKt")
     buildInfo()
 }
 
 tasks.generateGrammarSource {
-    arguments = arguments + listOf("-visitor", "-long-messages", "-package", "com.payu.kube.log.search.query")
+    arguments = arguments + listOf("-visitor", "-long-messages", "-package", "com.kube.log.search.query")
 }
 
 tasks.withType<Test> {
@@ -139,7 +139,7 @@ tasks.register("creatAppBundle") {
             workingDir(temporaryDir)
             commandLine("pkgbuild",
                 "--install-location", "/Applications",
-                "--identifier", "com.payu.KubeLog",
+                "--identifier", "com.KubeLog",
                 "--root", tempDstDir,
                 "--component-plist", srcAppDir.resolve("component.plist"),
                 tempPkgDir)
